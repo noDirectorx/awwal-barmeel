@@ -9,7 +9,7 @@ L=[('edde3552','sapling',26),('3a224814','acacia',84),('0a40afe6','well',54),('5
 ('ecda1b83','house',92),('6bcc634d','office',88),('12d1d2d4','tank1',46),('43042339','farm',118),('7980471d','tank2',60),
 ('28f6d7e3','yard',96),('2930ce29','transport',124),('00228770','tank3',78),('f7e1c3fc','radar',74),('701dffc0','security',62),
 ('ca666189','dock',88),('d0c67228','fire',94),('d69ff51e','tank4',112),('efb48b24','forklift',42),('94ac3cdd','defense',82),
-('e9efe724','p_nasser',128),('69229b29','p_abu',128),('d4a79724','p_abdullah',128),('389cbfe3','p_khawaja',128),('cdaab2f5','jeep',58),('7ad0b347','camel',54),('15c1d0ce','sheep',20),('707ed8dc','kitchen',100),('09984c0a','billboard',66),('e882889e','wall1',192),('efdfe95e','cow',32),('bd0523d4','wall2',192),('71ad573c','pump',62),('7c172806','nursery',72),('0f1790ff','gate',60),('75fe4be9','derrick2',90),('38baadac','dock2',98),('b32a2af6','office2',94),('f67f553f','hut2',78),('fece9628','shop2',84)]
+('e9efe724','p_nasser',128),('69229b29','p_abu',128),('d4a79724','p_abdullah',128),('389cbfe3','p_khawaja',128),('00f4b37e','p_munira',128),('218f48ee','p_hamdan',128),('cdaab2f5','jeep',58),('7ad0b347','camel',54),('15c1d0ce','sheep',20),('707ed8dc','kitchen',100),('09984c0a','billboard',66),('e882889e','wall1',192),('efdfe95e','cow',32),('bd0523d4','wall2',192),('71ad573c','pump',62),('7c172806','nursery',72),('0f1790ff','gate',60),('75fe4be9','derrick2',90),('38baadac','dock2',98),('b32a2af6','office2',94),('f67f553f','hut2',78),('fece9628','shop2',84)]
 def load(i): return np.array(Image.open(A+i+'-image.png').convert('RGBA')).astype(np.int32)
 def process(i,name,tw):
     a=load(i); r,g,b,al=a[...,0],a[...,1],a[...,2],a[...,3]

@@ -1,7 +1,7 @@
 const {chromium}=require('playwright');const fs=require('fs');
 const wrap='<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0}[hidden]{display:none!important}</style></head><body>'+fs.readFileSync('audit.html','utf8')+'</body></html>';
 (async()=>{const b=await chromium.launch();const p=await (await b.newContext({viewport:{width:390,height:800}})).newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));await p.route('http://g.test/',r=>r.fulfill({contentType:'text/html',body:wrap}));
-await p.goto('http://g.test/');await p.getByRole('button',{name:'ابدأ القصة'}).click();await p.getByRole('button',{name:'تخطّي'}).click();await p.waitForTimeout(300);
+await p.goto('http://g.test/');await p.getByRole('button',{name:'ابدأ القصة'}).click();await p.getByRole('button',{name:'عبدالله'}).click();await p.getByRole('button',{name:'تخطّي'}).click();await p.waitForTimeout(300);
 const out=await p.evaluate(()=>{const g=window.__g,S=g.S(),log=[];let simT=0,lastM=-1,stall=0;
  const step=n=>{for(let i=0;i<n;i++){g.sim(.1);g.move(.1);simT+=.1}g.hud()};
  const goto_=t=>{S.px=t.x;S.py=t.y+ (t.hp!==undefined&&t.st?10:0)};
