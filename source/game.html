@@ -4,7 +4,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#000000">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Lalezar&family=Aref+Ruqaa:wght@700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Lalezar&family=Aref+Ruqaa:wght@700&display=block">
 <style>
 :root{--ink:#f7e7c8;--gold:#f2b84b;--rust:#a4481c;--night:rgba(24,12,6,.92);--sub:#c9b28c}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
@@ -12,9 +12,28 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;overscroll-behavi
 canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
 #ui{position:fixed;inset:0;pointer-events:none;font-size:clamp(14px,2.5vmin + .4vw,24px)}
 #ui>*{pointer-events:auto}
-#title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5vh;padding-bottom:9vh;gap:.3em;background:rgba(30,10,0,.12);text-align:center}#title .go{margin-top:auto}
-#title h1{font:400 clamp(58px,17vmin,150px)/1 Lalezar,serif;margin:0;color:#fff4d8;text-shadow:0 .05em 0 #6e2c0c,0 .1em .3em rgba(0,0,0,.55)}
+#title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:max(3vh,env(safe-area-inset-top)) max(5vw,env(safe-area-inset-right)) max(3vh,env(safe-area-inset-bottom)) max(5vw,env(safe-area-inset-left));background-size:cover;background-position:center 62%;text-align:center;transition:opacity .7s;overflow:hidden}
+#title:before{content:"";position:absolute;inset:0;background:linear-gradient(to left,rgba(25,8,0,.62),rgba(25,8,0,.12) 42%,rgba(25,8,0,0) 60%);pointer-events:none}
+#title>*{position:relative}#title .go{margin-top:1em}
+#title h1{font:400 clamp(58px,16vmin,150px)/1.25 Lalezar,serif;margin:0;color:#fff4d8;text-shadow:0 .05em 0 #6e2c0c,0 .1em .3em rgba(0,0,0,.55)}
 #title p{margin:0;font-weight:700;text-shadow:0 1px 3px #000,0 0 8px #000}
+.menu{position:absolute!important;right:max(6vw,env(safe-area-inset-right));top:50%;transform:translateY(-44%);display:flex;flex-direction:column;align-items:flex-start;gap:.1em}
+.mi{background:none;border:0;padding:.14em .3em;min-height:44px;font:700 clamp(25px,6.1vmin,50px)/1.3 "Aref Ruqaa",Almarai,serif;color:#fff4d8;text-shadow:0 2px 0 #4b1f07,0 3px 10px rgba(0,0,0,.75);cursor:pointer;transition:color .15s,transform .15s}
+.mi:hover,.mi:active{color:var(--gold);transform:translateX(-.3em)}
+.mi.first{color:var(--gold)}
+#panel{position:absolute;inset:0;background:rgba(14,6,2,.86);display:flex;align-items:center;justify-content:center;padding:1em;overflow:auto;touch-action:auto}
+#panel>div{width:min(36em,96%);max-height:96%;overflow:auto;touch-action:pan-y}
+#panel h2{font:400 1.9em Lalezar,serif;color:var(--gold);margin:0 0 .4em}
+#panel .row{display:flex;align-items:center;justify-content:space-between;gap:1em;background:rgba(255,235,190,.08);border-radius:.5em;padding:.6em .9em;margin-bottom:.5em}
+#panel .row b{display:block}#panel .row small{opacity:.75}
+#panel .row.off{opacity:.5}
+#panel input[type=range]{width:45%;accent-color:var(--gold);touch-action:auto;min-height:36px}
+#panel .seg{display:flex;gap:.3em}#panel .seg button{min-height:40px;padding:.3em .8em;border:0;border-radius:.4em;background:rgba(255,235,190,.15);color:var(--ink);font:700 .9em Almarai,sans-serif}#panel .seg button.on{background:var(--gold);color:#2b1205}
+#panel .note{opacity:.7;font-size:.82em;margin:.2em 0 .8em;line-height:1.6}
+#panel a{color:var(--gold);font-weight:800;direction:ltr;display:inline-block;user-select:text;-webkit-user-select:text}
+#leave{position:absolute;top:max(1.4vmin,env(safe-area-inset-top));left:max(2vw,env(safe-area-inset-left));font-size:.85em;min-height:44px;padding:.4em 1em}
+#trophy{position:absolute;left:50%;top:12%;transform:translateX(-50%);background:linear-gradient(#4b2a0c,#22110a);border:2px solid var(--gold);border-radius:.7em;padding:.7em 1.5em;text-align:center;pointer-events:none;transition:opacity .4s;white-space:nowrap}
+#trophy b{font:400 1.45em Lalezar,serif;color:var(--gold);display:block}
 .btn{font:800 1.05em Almarai,sans-serif;color:#2b1205;background:var(--gold);border:0;border-bottom:.22em solid #94591a;border-radius:.5em;padding:.65em 1.5em;min-height:48px;cursor:pointer}
 .btn:active{transform:translateY(.12em);border-bottom-width:.1em}
 .btn.ghost{background:rgba(24,12,6,.75);color:var(--ink);border-color:#000}
@@ -23,7 +42,7 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:bl
 #dlg .t{flex:1;min-width:0}
 #dlg b{font:400 1.25em/1.1 Lalezar,serif;color:var(--gold);display:block;margin-bottom:.15em}
 #dlg span{font-weight:700;line-height:1.6;display:block}
-#dlg i{position:absolute;left:.8em;bottom:.45em;font-style:normal;color:var(--gold);animation:nd 1s infinite}
+#dlg i{position:absolute;left:.9em;bottom:.7em;width:0;height:0;border-style:solid;border-width:.42em .62em .42em 0;border-color:transparent var(--gold) transparent transparent;animation:nd 1s infinite}
 @keyframes nd{50%{transform:translateY(-3px)}}
 #choices{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7em;background:rgba(0,0,0,.45);padding:1em}
 #choices h3{font:400 1.45em Lalezar,serif;color:#fff4d8;margin:0 0 .2em;text-align:center;text-shadow:0 2px 4px #000}
@@ -57,9 +76,9 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:bl
 <div id="card" hidden></div>
 <button id="skip" class="btn ghost" hidden>تخطّي</button>
 <div id="letter" hidden><div></div></div>
-<div id="dlg" hidden><img alt=""><div class="t"><b></b><span></span></div><i>◀</i></div>
+<div id="dlg" hidden><img alt=""><div class="t"><b></b><span></span></div><i></i></div>
 <div id="choices" hidden></div>
-<div id="title" hidden></div>
+<button id="leave" class="btn ghost" hidden>اطلع</button><div id="trophy" style="opacity:0"></div><div id="title" hidden></div><div id="panel" hidden><div></div></div>
 </div>
 <div id="rot">لفّ جهازك بالعرض</div>
 <script>
@@ -70,9 +89,14 @@ const img={};
 function loadAll(){return Promise.all(Object.keys(ASSETS).map(k=>new Promise(r=>{const i=new Image();i.onload=()=>{img[k]=i;r()};i.onerror=r;i.src=ASSETS[k]})))}
 function setView(full){const want=full?Math.round(clamp(W*innerHeight/innerWidth,720,1260)):941;if(want!==H||cv.height!==want){H=want;cv.height=want}fit()}
 function fit(){const s=Math.min(innerWidth/W,innerHeight/H);cv.style.width=W*s+'px';cv.style.height=H*s+'px'}
-addEventListener('resize',()=>setView(S.mode==='map'));fit();
+const refit=()=>setView(S.mode==='map');addEventListener('resize',refit);
+const lateRefit=()=>{refit();for(const t of [80,250,500,900])setTimeout(refit,t)};addEventListener('orientationchange',lateRefit);if(window.visualViewport)visualViewport.addEventListener('resize',refit);document.addEventListener('visibilitychange',()=>{if(!document.hidden)lateRefit()});fit();
 let save={ch:0,flags:{}};
 const store={load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&typeof s.ch==='number')save=s}catch(e){}},put(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}},clear(){try{localStorage.removeItem(KEY)}catch(e){}}};
+const META_KEY='awwal-barmeel-meta';let meta={secrets:{},ach:{},music:70,sfx:80,quality:'high'};
+try{meta=Object.assign(meta,JSON.parse(localStorage.getItem(META_KEY))||{})}catch(e){}
+const putMeta=()=>{try{localStorage.setItem(META_KEY,JSON.stringify(meta))}catch(e){}};
+const DEV_EMAIL='csscre4m@gmail.com';
 const TEST=/[?&]test/.test(location.search);
 const ease=t=>t*t*(3-2*t);
 let time=0,skipping=false,skipOK=false;
@@ -105,7 +129,7 @@ function drawCine(){X.save();
  if(S.bars>0){X.fillStyle='#000';const b=62*S.bars;X.fillRect(0,0,W,b);X.fillRect(0,H-b,W,b)}}
 const oil=[];
 function drawDrops(front){for(const d of oil){if((d.z>0)!==front)continue;X.fillStyle=d.c;X.fillRect(d.x|0,d.y|0,d.s,d.s*1.5)}}
-function updDrops(dt){if(S.drops>0){for(let n=0;n<S.drops*dt;n++){oil.push({x:Math.random()*W,y:-20,v:360+Math.random()*420,s:3+Math.random()*7|0,z:Math.random()-.4,c:Math.random()<.2?'#6d3a14':'#1d0d05'})}}
+function updDrops(dt){if(S.drops>0){for(let n=0;n<S.drops*dt*(meta.quality==='low'?.45:1);n++){oil.push({x:Math.random()*W,y:-20,v:360+Math.random()*420,s:3+Math.random()*7|0,z:Math.random()-.4,c:Math.random()<.2?'#6d3a14':'#1d0d05'})}}
  for(let i=oil.length-1;i>=0;i--){const d=oil[i];d.y+=d.v*dt;if(d.y>H)oil.splice(i,1)}}
 function puff(x,y,n=8,c='rgba(235,190,120,.7)',up=80){for(let i=0;i<n;i++)S.dust.push({x:x+(Math.random()-.5)*30,y:y+(Math.random()-.5)*12,vx:(Math.random()-.5)*160,vy:-Math.random()*up,l:.5+Math.random()*.5,t:0,s:6+Math.random()*12|0,c})}
 function drawDust(){for(const p of S.dust){X.globalAlpha=clamp(1-p.t/p.l,0,1);X.fillStyle=p.c;X.fillRect(p.x|0,p.y|0,p.s,p.s)}X.globalAlpha=1}
@@ -157,7 +181,7 @@ async function ch0(){S.mode='cine';startScene();setBg('desert');S.fade=1;S.bars=
  await say('salem','firm','وأول برميل يبقى لي. ما ينباع.');
  await say('young','laugh','Deal!\u200e');
  await fadeTo(1,1000);S.drops=0;$('#skip').hidden=true;
- await card('أول برميل<small>الحلقة الأولى: بريال</small>',2000);
+ await card('أول برميل',1800);
 }
 async function ch1(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;await card('بعد ثلاثين سنة',1400);
  const h=actor('hero',1290,1000,290),m=actor('hamdan',1320,640,235);m.dir='f';m.on=false;
@@ -193,14 +217,13 @@ function place(n,x,y){const im=img['o_'+n],s=OBJ_SCALE[n];const o={n,x,y,im,w:im
 function buildMap(){M.objs=[];M.pick=[];M.npc={};
  const t=document.createElement('canvas');t.width=MW/2;t.height=MH/2;const c=t.getContext('2d');c.scale(.5,.5);
  const R={};
- const rows=[];for(let x=0;x<20;x++)rows.push([x,8,90]);for(let y=9;y<13;y++)rows.push([10,y,0]);
+ const rows=[];for(let x=0;x<20;x++)rows.push([x,8,90]);for(let y=9;y<13;y++)rows.push([10,y,0]);rows.push([10,8.5,0]);
  let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
  c.imageSmoothingEnabled=true;
  for(let y=0;y<13;y++)for(let x=0;x<20;x++){const k=R[x+','+y],px=x*TS,py=y*TS;
   c.drawImage(img.t_sand,px,py,TS+1,TS+1);const q=rnd();if(y!==8&&x!==10&&q<.1)c.drawImage(img.t_stones,px,py,TS+1,TS+1);
   }
- for(const [x,y,rot] of rows){c.save();c.translate(x*TS+TS/2,y*TS+TS/2);c.rotate(rot*Math.PI/180);c.drawImage(img.t_band,-TS/2,-TS/2,TS+1,TS+1);c.restore()}
- c.drawImage(img.t_band,0,127,254,127,10*TS,8*TS+TS/2,TS+1,TS/2);
+ for(const [x,y,rot] of rows.sort((a,b)=>a[2]-b[2])){c.save();c.translate(x*TS+TS/2,y*TS+TS/2);c.rotate(rot*Math.PI/180);c.drawImage(img.t_band,-TS/2,-TS/2,TS+1,TS+1);c.restore()}
  M.tiles=t;
  const fw=img.o_fence.width*OBJ_SCALE.fence-4;
  for(let x=150;x<MW-100;x+=fw)place('fence',x,300);
@@ -222,10 +245,10 @@ function buildMap(){M.objs=[];M.pick=[];M.npc={};
 function blocked(x,y){const r=26,hh=11;if(x<70||x>MW-70||y<340||y>MH-150)return true;
  for(const o of M.objs){const c=o.col;if(c&&x+r>c.x&&x-r<c.x+c.w&&y+hh>c.y&&y-hh<c.y+c.h)return true}
  if(x+r>M.truck.x-190&&x-r<M.truck.x+190&&y+hh>M.truck.y-40&&y-hh<M.truck.y+10)return true;
- for(const n of M.colNpc())if(Math.hypot(n.x-x,(n.y-y)*1.6)<46)return true;return false}
-const keys={};addEventListener('keydown',e=>{keys[e.code]=true;if((e.code==='KeyE'||e.code==='Space'||e.code==='Enter')&&!e.repeat){if(advance)advance();else if(S.mode==='map'&&M.act)doAct()}});addEventListener('keyup',e=>keys[e.code]=false);
+ for(const n of M.colNpc())if(Math.hypot(n.x-x,(n.y-y)*2)<70)return true;return false}
+const keys={};addEventListener('keydown',e=>{keys[e.code]=true;if((e.code==='KeyE'||e.code==='Space'||e.code==='Enter')&&!e.repeat){if(advance)advance();else if((S.mode==='map'||S.mode==='room')&&M.act)doAct()}});addEventListener('keyup',e=>keys[e.code]=false);
 function worldFromEvent(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
-window.addEventListener('pointerdown',e=>{if(e.target!==cv&&e.target.id!=='ui'&&e.target.id!=='float')return;if(S.mode==='map'&&!M.lock){M.stick={id:e.pointerId,x0:e.clientX,y0:e.clientY,dx:0,dy:0}}else if(S.mode==='board')boardDown(e);else if(advance)advance()});
+window.addEventListener('pointerdown',e=>{if(e.target!==cv&&e.target.id!=='ui'&&e.target.id!=='float')return;if(S.mode==='pipes')tapPipes(e);else if(S.mode==='jack')tapJack();else if((S.mode==='map'||S.mode==='room')&&!M.lock){M.stick={id:e.pointerId,x0:e.clientX,y0:e.clientY,dx:0,dy:0}}else if(S.mode==='board')boardDown(e);else if(advance)advance()});
 window.addEventListener('pointermove',e=>{if(M.stick&&M.stick.id===e.pointerId){let dx=e.clientX-M.stick.x0,dy=e.clientY-M.stick.y0;const d=Math.hypot(dx,dy),max=52;if(d>max){M.stick.x0+=dx/d*(d-max);M.stick.y0+=dy/d*(d-max);dx=dx/d*max;dy=dy/d*max}M.stick.dx=dx/max;M.stick.dy=dy/max}else if(S.mode==='board')boardMove(e)});
 const endP=e=>{if(M.stick&&M.stick.id===e.pointerId)M.stick=null;if(S.mode==='board')boardUp(e)};window.addEventListener('pointerup',endP);window.addEventListener('pointercancel',endP);
 function inputVec(){let x=0,y=0;if(keys.KeyA||keys.ArrowLeft)x-=1;if(keys.KeyD||keys.ArrowRight)x+=1;if(keys.KeyW||keys.ArrowUp)y-=1;if(keys.KeyS||keys.ArrowDown)y+=1;if(x||y){const d=Math.hypot(x,y);return{x:x/d,y:y/d}}
@@ -237,6 +260,9 @@ function updMap(dt){if(M.lock){M.vx=M.vy=0;M.p.moving=false}else{const v=inputVe
  let best=null,bd=1e9;const look=(x,y,r,fn,label)=>{const d=Math.hypot(p.x-x,p.y-y);if(d<r&&d<bd){bd=d;best={fn,label}}};
  for(const i of M.pick)look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);
  const g=stage();
+ look(2900,1530,120,enterOffice,'ادخل المكتب');
+ if(!save.flags.sec_stone)look(1830,1400,105,()=>findSecret('stone'),'فتّش عند الحجر');if(!save.flags.sec_pile)look(470,1490,125,()=>findSecret('pile'),'فتّش تحت الخردة');
+ if(save.flags.q1on&&!save.flags.q1)look(3380,1100,170,()=>openJob('pipes'),'عدّل مسار الأنبوب');if(save.flags.q2on&&!save.flags.q2)look(M.truck.x-60,M.truck.y+40,230,()=>openJob('jack'),'ساعد ناصر في الكفر');
  look(M.npc.hamdan.x,M.npc.hamdan.y,135,talkHamdan,'كلّم حمدان');look(M.npc.mubarak.x,M.npc.mubarak.y,135,talkMubarak,'كلّم مبارك');look(M.npc.nasser.x,M.npc.nasser.y,145,talkNasser,'كلّم ناصر');
  if(p.moving&&Math.hypot(p.x-2660,p.y-1620)<1e-9){}
  M.act=M.lock?null:best;const b=$('#act');if(M.act){if(b.textContent!==M.act.label)b.textContent=M.act.label;b.hidden=false}else b.hidden=true;
@@ -251,29 +277,73 @@ function drawMap(){const c=M.cam,cx=c.x|0,cy=c.y|0;X.fillStyle='#e8b673';X.fillR
  list.push({y:M.truck.y,d(){const im=img.truck_side,w=im.width*1.2,h=im.height*1.2;X.drawImage(im,M.truck.x-w/2-cx,M.truck.y-h+24-cy,w,h)}});
  list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});
  list.sort((a,b)=>a.y-b.y);for(const l of list)l.d();
- const t=nextPoint();if(t)edgeArrow(t.x-cx,t.y-cy);}
+ const fl=save.flags;if(fl.q1on&&!fl.q1)marker(3380-cx,760-cy);if(fl.q2on&&!fl.q2)marker(M.truck.x-cx,M.truck.y-190-cy);const t=nextPoint();if(t)edgeArrow(t.x-cx,t.y-cy);}
 function marker(x,y){const b=Math.sin(time*5)*5;X.fillStyle='#f2b84b';X.strokeStyle='#4b1f07';X.lineWidth=3;X.beginPath();X.moveTo(x-13,y-15+b);X.lineTo(x+13,y-15+b);X.lineTo(x,y+3+b);X.closePath();X.fill();X.stroke()}
-function edgeArrow(x,y){if(x>40&&x<W-40&&y>40&&y<H-40)return;const a=Math.atan2(y-H/2,x-W/2),r=Math.min((W/2-70)/Math.abs(Math.cos(a)||1e-3),(H/2-70)/Math.abs(Math.sin(a)||1e-3)),ax=W/2+Math.cos(a)*r,ay=H/2+Math.sin(a)*r;X.save();X.translate(ax,ay);X.rotate(a);X.fillStyle='#f2b84b';X.strokeStyle='#4b1f07';X.lineWidth=4;X.beginPath();X.moveTo(26,0);X.lineTo(-16,-20);X.lineTo(-7,0);X.lineTo(-16,20);X.closePath();X.fill();X.stroke();X.restore()}
+function edgeArrow(x,y){if(x>40&&x<W-40&&y>40&&y<H-40)return;const a=Math.atan2(y-H/2,x-W/2),r=Math.min((W/2-70)/Math.abs(Math.cos(a)||1e-3),(H/2-70)/Math.abs(Math.sin(a)||1e-3)),ax=W/2+Math.cos(a)*r,ay=H/2+Math.sin(a)*r;X.save();X.translate(ax,ay);X.rotate(a);X.fillStyle='#c8401f';X.strokeStyle='#fff4d8';X.lineWidth=4;X.beginPath();X.moveTo(26,0);X.lineTo(-16,-20);X.lineTo(-7,0);X.lineTo(-16,20);X.closePath();X.fill();X.stroke();X.restore()}
 function nextTarget(){const g=stage();if(!g.met)return M.npc.mubarak;if(g.sc>=6&&!g.sold)return M.npc.nasser;if(g.sold&&g.mp>=3)return M.npc.mubarak;return null}
 function nextPoint(){const n=nextTarget();if(n)return n;let best=null,bd=1e9;for(const i of M.pick){const d=Math.hypot(i.x-M.p.x,i.y-M.p.y);if(d<bd){bd=d;best=i}}return best}
 function renderTasks(){const g=stage(),T=$('#tasks');const line=(t,d)=>`<div class="${d?'done':''}">${t}</div>`;
- let h='<b>شغّل المضخة</b>';if(!g.met)h+=line('كلّم مبارك عند المضخة');else{h+=line(`لقّط القطع من الموقع ${g.mp}/3`,g.mp>=3);h+=line(`اجمع الخردة ${g.sc}/6`,g.sc>=6);h+=line('بدّل الخردة عند ناصر',g.sold);if(g.mp>=3&&g.sold)h+=line('ارجع لمبارك وركّب')}T.innerHTML=h;
+ let h='<b>شغّل المضخة</b>';if(!g.met)h+=line('كلّم مبارك عند المضخة');else{h+=line(`لقّط القطع من الموقع ${g.mp}/3`,g.mp>=3);h+=line(`اجمع الخردة ${g.sc}/6`,g.sc>=6);h+=line('بدّل الخردة عند ناصر',g.sold);if(g.mp>=3&&g.sold)h+=line('ارجع لمبارك وركّب')}
+ const f=save.flags;if(f.q1on||f.q2on){h+='<b>جانبية</b>';if(f.q1on)h+=line('عدّل مسار أنبوب الخزان',f.q1);if(f.q2on)h+=line('ساعد ناصر في الكفر',f.q2)}h+=`<div style="opacity:.8">أسرار ${SECRETS.filter(s=>f['sec_'+s.id]).length}/${SECRETS.length}</div>`;T.innerHTML=h;
  $('#stat').textContent='باقي على العقد: 6 أشهر'}
-async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;await fn();M.lock=false;renderTasks();store.put()}
+async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;await fn();M.lock=!!M.leaving;renderTasks();store.put()}
 function takeItem(i){M.pick=M.pick.filter(x=>x!==i);save.flags['got_'+i.id]=1;puff(i.x-M.cam.x,i.y-M.cam.y,6);toast('حصلت: '+i.name);renderTasks();store.put()}
-function talkHamdan(){talk(async()=>{const g=stage();if(!g.met)await say('hamdan','neutral','مبارك عند المضخة. هو أدرى منا كلنا فيها.');else if(!g.sold)await say('hamdan','warm','ناصر عنده الخير كله، بس ما يعطي شي ببلاش. وأنت ما عندك إلا الخردة.');else await say('hamdan','warm','وريهم إنك ولد سالم.')})}
+function talkHamdan(){talk(async()=>{const g=stage();if(!g.met)await say('hamdan','neutral','مبارك عند المضخة. هو أدرى منا كلنا فيها.');else if(!save.flags.q1on){await say('hamdan','worried','الخزان يهرّب من الوصلة. مسار الأنبوب خربان من سنين. إذا فضيت، روح عدله.');await say('hamdan','neutral','وأبوك كان يقعد كل ليلة عند الحجر قدام المضخة. ما قال لأحد ليش.');save.flags.q1on=1}else if(!g.sold)await say('hamdan','warm','ناصر عنده الخير كله، بس ما يعطي شي ببلاش. وأنت ما عندك إلا الخردة.');else await say('hamdan','warm','وريهم إنك ولد سالم.')})}
 function talkMubarak(){talk(async()=>{const g=stage();
  if(!g.met){await say('mubarak','neutral','الولد رجع. قل لي، تعرف تفرق بين مفتاح وملعقة؟');await say('hero','firm','علمني.');
   await say('mubarak','neutral','ناقصها خمس قطع. الرأس والعمود والثقل تلقاها مرمية في الموقع.');await say('mubarak','neutral','السير والصمام عند ناصر. ما معنا فلوس، بس هو يشتري الخردة. لقّطها وودها له.');save.flags.metMubarak=1;return}
- if(g.mp>=3&&g.sold){await say('mubarak','happy','كل القطع معك؟ يلا. أبيك تركبها بيدك.');await say('mubarak','neutral','أبوك ما خلى أحد يركب أول مضخة عنه.');save.ch=3;store.put();M.leave&&M.leave();return}
+ if(g.mp>=3&&g.sold){await say('mubarak','happy','كل القطع معك؟ يلا. أبيك تركبها بيدك.');await say('mubarak','neutral','أبوك ما خلى أحد يركب أول مضخة عنه.');save.ch=3;store.put();M.leaving=true;M.leave&&M.leave();return}
  await say('mubarak','neutral',`باقي عليك: ${3-g.mp>0?(3-g.mp)+' قطع من الموقع':''}${(3-g.mp>0&&!g.sold)?'، و':''}${!g.sold?'سير وصمام من عند ناصر':''}.`)})}
 function talkNasser(){talk(async()=>{const g=stage();
  if(g.sold){await say('nasser','happy','يوم تطلع أول دفعة، شاحنتي جاهزة. بس الكاش قبل الديزل!');return}
- if(g.sc<6){await say('nasser','happy','ولد سالم! الله يرحم أبوك، كان يدفع متأخر بس يدفع.');await say('nasser','neutral',`أبغى ست قطع خردة ومعك ${g.sc}. وأعطيك سير وصمام.`);return}
+ if(g.sc<6){await say('nasser','happy','ولد سالم! الله يرحم أبوك، كان يدفع متأخر بس يدفع.');await say('nasser','neutral',`أبغى ست قطع خردة ومعك ${g.sc}. وأعطيك سير وصمام.`);if(!save.flags.q2on){await say('nasser','happy','وإذا فضيت، الكفر نايم والجك يبي واحد يعرف له. ساعدني وأعوضك.');save.flags.q2on=1}return}
  await say('nasser','happy','هذي خردة تسوى ذهب! خذ السير والصمام.');await say('nasser','neutral','وإذا شغلتها، أول حمولة علي.');save.flags.sold=1;toast('حصلت: السير والصمام');})}
-async function ch2(){S.mode='map';setView(true);startScene();$('#skip').hidden=true;S.bars=0;buildMap();const p=M.p;M.cam.x=clamp(p.x-W/2,0,MW-W);M.cam.y=clamp(p.y-H/2,0,MH-H);M.lock=false;$('#hud').hidden=false;renderTasks();
+async function ch2(){S.mode='map';setView(true);startScene();$('#skip').hidden=true;S.bars=0;M.leaving=false;buildMap();const p=M.p;M.cam.x=clamp(p.x-W/2,0,MW-W);M.cam.y=clamp(p.y-H/2,0,MH-H);M.lock=false;$('#hud').hidden=false;renderTasks();
  if(!save.flags.mapHint){save.flags.mapHint=1;toast(matchMedia('(pointer:coarse)').matches?'اسحب إصبعك في أي مكان عشان تمشي':'امش بالأسهم أو WASD، وتفاعل بـE')}
  await fadeTo(0,500);await new Promise(r=>M.leave=r);M.leave=null;await fadeTo(1,500);$('#hud').hidden=true;$('#act').hidden=true;S.mode='none';setView(false)}
+/* ---------- secrets ---------- */
+const SECRETS=[
+ {id:'cab',title:'رسالة في آخر الدرج',lines:['مستر سالم. للمرة الأخيرة:','أرفع سعر البرميل إلى ثلاثة ريال،','مقابل شيء واحد. تعطيني أول برميل.'],sign:'وتحتها بخط أبوك: لا.'},
+ {id:'stone',title:'علبة مدفونة عند الحجر',lines:['صورة قديمة: سالم وحمدان عند البير،','وبينهم رجل ثالث وجهه مخدوش.','«سامحني يا راشد. البير ما كان لي لحالي.»'],sign:''},
+ {id:'pile',title:'ورقة تحت الخردة',lines:['برميل رقم ١. مختوم بيدي.','لا يتفتح وأنا حي.','اللي فيه يقلب كل شي.'],sign:'سالم'}];
+function note(lines,sign){return new Promise(res=>{const l=$('#letter'),d=l.firstElementChild;d.style.backgroundImage=`url(${ASSETS.s_letter})`;d.style.flexDirection='column';d.innerHTML='';for(const t of lines.concat(sign?[sign]:[])){const p=document.createElement('div');p.style.cssText='position:static;width:auto;aspect-ratio:auto;padding:0;display:block';p.textContent=t;d.appendChild(p)}l.hidden=false;
+ if(TEST||window.__fast)return setTimeout(()=>{l.hidden=true;res()},20);const f=()=>{l.removeEventListener('pointerup',f);l.hidden=true;res()};setTimeout(()=>l.addEventListener('pointerup',f),250)})}
+function trophy(t,s){const e=$('#trophy');e.innerHTML=`<b>${t}</b>${s}`;e.style.opacity=1;setTimeout(()=>e.style.opacity=0,3600)}
+function findSecret(id){const s=SECRETS.find(x=>x.id===id);talk(async()=>{await note(s.lines,s.sign);save.flags['sec_'+id]=1;meta.secrets[id]=1;putMeta();toast(`سر ${SECRETS.filter(x=>save.flags['sec_'+x.id]).length}/${SECRETS.length}: ${s.title}`);
+ if(secretCount()===SECRETS.length&&!meta.ach.ep1){meta.ach.ep1=1;putMeta();trophy('إنجاز: اللي يدور يلقى','لقيت كل أسرار الحلقة الأولى');await wait(1200);await say('hero','worried','يبه… وش كنت مخبي عن الكل؟')}})}
+/* ---------- office you can walk in ---------- */
+const ROOM={spots:[{x:230,y:745,label:'فتّش الأدراج',fn(){if(!save.flags.sec_cab)findSecret('cab');else talk(()=>say('hero','neutral','الباقي فواتير قديمة.'))}},
+ {x:790,y:745,label:'اقرأ الدفتر',fn(){talk(async()=>{await say('hero','worried','تكلفة البرميل ريال ونص. البيع بريال. ثلاثين سنة وأبوي يغطي الفرق من وين؟');save.flags.readLedger=1})}},
+ {x:1090,y:745,label:'شوف الخريطة',fn(){talk(()=>say('hero','neutral','خريطة الحقل… وفيه دايرة بالقلم عند البير الأولى، وكلمة مشطوبة: «راشد».'))}},
+ {x:1370,y:760,label:'أول برميل',fn(){talk(()=>say('hero','neutral','ما تجرأ أحد يحركه من مكانه. ثقيل، ومختوم.'))}}]};
+function enterOffice(){talk(async()=>{await fadeTo(1,300);S.mode='room';setView(false);ROOM.p={name:'hero',x:830,y:850,h:320,dir:'b',step:0,dist:0,moving:false};M.vx=M.vy=0;$('#hud').hidden=true;$('#leave').hidden=false;$('#leave').textContent='اطلع';$('#leave').onclick=exitOffice;await fadeTo(0,300)})}
+function exitOffice(e){e&&e.stopPropagation();talk(async()=>{$('#leave').hidden=true;await fadeTo(1,300);S.mode='map';setView(true);M.p.x=2900;M.p.y=1565;M.p.dir='f';M.cam.x=clamp(M.p.x-W/2,0,MW-W);M.cam.y=clamp(M.p.y-H/2,0,MH-H);$('#hud').hidden=false;await fadeTo(0,300)})}
+function updRoom(dt){const p=ROOM.p;if(M.lock){p.moving=false;M.act=null;$('#act').hidden=true;return}const v=inputVec(),a=1-Math.exp(-dt*16);M.vx+=(v.x*560-M.vx)*a;M.vy+=(v.y*360-M.vy)*a;p.x=clamp(p.x+M.vx*dt,90,1580);p.y=clamp(p.y+M.vy*dt,735,890);p.h=290+(p.y-735)*.33;const sp=Math.hypot(M.vx,M.vy);p.moving=sp>30;if(p.moving){p.dist+=sp*dt;p.step=Math.floor(p.dist/60);if(Math.abs(M.vx)>Math.abs(M.vy)*1.15)p.dir=M.vx>0?'r':'l';else if(Math.abs(M.vy)>Math.abs(M.vx)*1.15)p.dir=M.vy>0?'f':'b'}
+ let best=null,bd=170;for(const s of ROOM.spots){const d=Math.abs(p.x-s.x);if(d<bd){bd=d;best=s}}M.act=best?{fn:best.fn,label:best.label}:null;const b=$('#act');if(best){b.textContent=best.label;b.hidden=false}else b.hidden=true}
+function drawRoom(){X.drawImage(img.bg_office,0,0,W,H);drawWalker(X,ROOM.p)}
+/* ---------- side job: pipe puzzle ---------- */
+const PZ={cols:5,rows:3,size:190,ox:361,oy:200,g:[],done:false};
+const SOL={'0,1':['s',1],'1,1':['e',3],'1,0':['e',1],'2,0':['s',1],'3,0':['e',2],'3,1':['s',0],'3,2':['e',0],'4,2':['s',1]};
+const opens=c=>c.t==='s'?(c.r%2?[1,3]:[0,2]):[c.r%4,(c.r+1)%4];
+function setupPipes(){PZ.g=[];let n=3;for(let y=0;y<3;y++)for(let x=0;x<5;x++){const k=SOL[x+','+y];const t=k?k[0]:((x*3+y)%2?'e':'s');PZ.g.push({x,y,t,r:(k?k[1]:0)+1+(n++%3)})}PZ.done=false;PZ.pop=0}
+function pipePath(){let x=0,y=1,from=3;const seen=[];for(let i=0;i<20;i++){const c=PZ.g.find(q=>q.x===x&&q.y===y);if(!c)return{seen,win:false};const o=opens(c);if(!o.includes(from))return{seen,win:false};seen.push(c);const to=o.find(d=>d!==from);if(x===4&&y===2&&to===1)return{seen,win:true};x+=[0,1,0,-1][to];y+=[-1,0,1,0][to];from=(to+2)%4}return{seen,win:false}}
+function drawPipes(){X.drawImage(img.bg_site,0,0,W,H);X.fillStyle='rgba(20,8,2,.62)';X.fillRect(0,0,W,H);const{size:s,ox,oy}=PZ,{seen,win}=pipePath();
+ X.fillStyle='#fff4d8';X.textAlign='center';X.direction='rtl';X.font='400 46px Lalezar,serif';X.fillText('وصّل الخزان بالشاحنة',W/2,110);X.font='700 26px Almarai,sans-serif';X.fillText('اضغط على القطعة عشان تلفها',W/2,155);
+ const line=(c,cx,cy,col,w)=>{X.strokeStyle=col;X.lineWidth=w;X.lineCap='butt';const o=opens(c);const pt=d=>[cx+[0,1,0,-1][d]*s/2,cy+[-1,0,1,0][d]*s/2];const [a,b]=[pt(o[0]),pt(o[1])];X.beginPath();X.moveTo(a[0],a[1]);if(c.t==='s')X.lineTo(b[0],b[1]);else X.quadraticCurveTo(cx,cy,b[0],b[1]);X.stroke()};
+ for(const c of PZ.g){const cx=ox+c.x*s+s/2,cy=oy+c.y*s+s/2;X.fillStyle='rgba(220,160,95,.9)';X.fillRect(cx-s/2+3,cy-s/2+3,s-6,s-6);line(c,cx,cy,'#3a1605',62);line(c,cx,cy,'#b65a22',46);if(seen.includes(c))line(c,cx,cy,'#1d0d05',20)}
+ const tank=img.o_tanks,tr=img.truck_side;X.drawImage(tank,70,oy+s-80,tank.width*1.15,tank.height*1.15);X.strokeStyle='#3a1605';X.lineWidth=62;X.beginPath();X.moveTo(300,oy+s*1.5);X.lineTo(ox,oy+s*1.5);X.stroke();X.strokeStyle='#b65a22';X.lineWidth=46;X.stroke();
+ X.strokeStyle='#3a1605';X.lineWidth=62;X.beginPath();X.moveTo(ox+s*5,oy+s*2.5);X.lineTo(W,oy+s*2.5);X.stroke();X.strokeStyle='#b65a22';X.lineWidth=46;X.stroke();X.drawImage(tr,ox+s*5+10,oy+s*2.5-190,tr.width*.8,tr.height*.8)}
+function tapPipes(e){if(PZ.done||M.lock)return;const p=worldFromEvent(e),x=Math.floor((p.x-PZ.ox)/PZ.size),y=Math.floor((p.y-PZ.oy)/PZ.size),c=PZ.g.find(q=>q.x===x&&q.y===y);if(!c)return;c.r=(c.r+1)%4;checkPipes()}
+function checkPipes(){if(pipePath().win&&!PZ.done){PZ.done=true;save.flags.q1=1;store.put();backToMap(async()=>{await say('hamdan','warm','الهدر نزل للنص. مين علمك؟ أبوك ولا مبارك؟');toast('مهمة جانبية: الأنبوب تعدّل')})}}
+/* ---------- side job: jack timing ---------- */
+const JK={n:0,t:0,v:1,hits:0,zone:.16,lift:0};
+function drawJack(){X.fillStyle='#e8b673';X.fillRect(0,0,W,H);X.drawImage(img.bg_site,0,0,W,H);X.fillStyle='rgba(30,10,0,.35)';X.fillRect(0,0,W,H);const tr=img.truck_side,k=2.6,w=tr.width*k,h=tr.height*k;X.save();X.translate(W/2,700-JK.lift);X.rotate(-JK.lift*.0016);X.drawImage(tr,-w/2,-h,w,h);X.restore();
+ X.fillStyle='#fff4d8';X.textAlign='center';X.direction='rtl';X.font='400 44px Lalezar,serif';X.fillText('ارفع الجك: اضغط لما يوصل المؤشر للمنطقة الخضراء',W/2,90);
+ const bx=W/2-420,by=800,bw=840;X.fillStyle='#23110a';X.fillRect(bx,by,bw,44);const zw=bw*JK.zone;X.fillStyle='#57a23a';X.fillRect(bx+bw/2-zw/2,by,zw,44);X.fillStyle='#fff';X.fillRect(bx+JK.n*bw-5,by-10,10,64);X.font='700 30px Almarai,sans-serif';X.fillStyle='#fff4d8';X.fillText(`${JK.hits}/3`,W/2,890)}
+function updJack(dt){if(M.lock)return;const sp=.9+JK.hits*.3;JK.t+=dt*sp*2.2;JK.n=.5+.5*Math.sin(JK.t)}
+function tapJack(){if(M.lock)return;if(Math.abs(JK.n-.5)<JK.zone/2){JK.hits++;JK.lift+=26;JK.zone=Math.max(.1,JK.zone-.02);S.shake=6;if(JK.hits>=3){save.flags.q2=1;store.put();backToMap(async()=>{await say('nasser','happy','يا ولد! أبوك ما كان يقرب للكفرات. هذي ما تروح عليك: الديزل عليك بخصم ألفين.');toast('مهمة جانبية: ناصر مدين لك بألفين')})}}else{JK.hits=Math.max(0,JK.hits-1);JK.lift=Math.max(0,JK.lift-26);toast('طاح الجك، جرب مرة ثانية')}}
+function openJob(mode){talk(async()=>{await fadeTo(1,300);S.mode=mode;setView(false);if(mode==='pipes')setupPipes();else{JK.hits=0;JK.lift=0;JK.zone=.16;JK.t=0}$('#hud').hidden=true;$('#act').hidden=true;const b=$('#leave');b.hidden=false;b.textContent='رجوع';b.onclick=e=>{e.stopPropagation();backToMap(async()=>{})};await fadeTo(0,300)})}
+function backToMap(after){talk(async()=>{$('#leave').hidden=true;await fadeTo(1,300);S.mode='map';setView(true);M.cam.x=clamp(M.p.x-W/2,0,MW-W);M.cam.y=clamp(M.p.y-H/2,0,MH-H);$('#hud').hidden=false;await fadeTo(0,300);await after()})}
 /* ---------- assembly board ---------- */
 const PARTS={head:{k:'q_head',s:.72,tx:352,ty:172,hx:1130,hy:135,name:'رأس المضخة'},rod:{k:'q_rod',s:.63,tx:1085,ty:417,hx:1430,hy:125,name:'عمود التوصيل'},weight:{k:'q_weight',s:.6,tx:1090,ty:696,hx:150,hy:400,name:'الثقل'},belt:{k:'q_belt',s:.72,tx:1250,ty:657,hx:1520,hy:370,name:'السير'},valve:{k:'q_valve',s:.62,tx:555,ty:653,hx:95,hy:120,name:'الصمام'}};
 const B={list:[],drag:null,run:0,spin:0,a:0,done:false};
@@ -315,15 +385,15 @@ async function ch3(){startScene();setupBoard();S.mode='board';S.bars=0;await fad
  await fadeTo(1,800);S.mode='none'}
 async function ch4(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;await card('بعد أسبوع',1100);
  const h=actor('hero',760,780,290),m=actor('hamdan',500,790,270),b=actor('mubarak',1070,780,285),n=actor('nasser',1400,850,285);h.dir='r';m.dir='r';b.dir='l';n.dir='l';await fadeTo(0,700);
- await say('nasser','happy','أول حمولة سلمناها للخواجة! هذا حسابك بعد الديزل: ثمانية عشر ألف ريال.');
+ await say('nasser','happy','أول حمولة سلمناها للخواجة! هذا حسابك بعد الديزل: ثمانية عشر ألف ريال.');if(save.flags.q2)await say('nasser','happy','وهذي ألفين فوقها، وعد الكفر.');
  await walk(n,1800,880,240);n.on=false;
- await say('hamdan','worried','الخزان الكبير يهرّب. من كل عشرة براميل نخسر واحد، وإصلاحه ثمانية عشر ألف.');
+ await say('hamdan','worried',save.flags.q1?'عدلت مسار الأنبوب وخففت الهدر، بس الخزان نفسه لازم يتصلح. من كل عشرين برميل نخسر واحد، وإصلاحه ثمانية عشر ألف.':'الخزان الكبير يهرّب. من كل عشرة براميل نخسر واحد، وإصلاحه ثمانية عشر ألف.');
  await say('mubarak','angry','وأنا والشباب ما قبضنا من ثلاثة شهور. وعدتونا. وثمانية عشر ألف تكفي رواتب الشهر.');
  await say('hamdan','neutral','الفلوس ما تكفي الاثنين. أنت صاحب الشركة، قرر.');
  const r=await choose('ثمانية عشر ألف ريال، وين تروح؟',[{t:'رواتب الموظفين',s:'مبارك يبقى، والخزان يكمل يهرّب'},{t:'إصلاح الخزان',s:'الإنتاج يكفي الكمية، بس الموظفين بدون راتب'}]);
  save.flags.decision=r;store.put();
- if(r===0){await say('mubarak','happy','هذا كلام ولد سالم. والله ما أنساها لك.');await say('hamdan','worried','بس كل برميل يطيح في الرمل بينقص من تسليم الشهر.');await card('مبارك بقي معك<small>الخزان يخسر برميل من كل عشرة، وتسليم الشهر صار أصعب</small>',2600)}
- else{await say('mubarak','angry','الحديد عندك أغلى منا؟ طيب.');await walk(b,1800,860,230);b.on=false;await say('hamdan','sad','مبارك يوم يطلع، ما يرجع. والمضخة ما يعرف أسرارها غيره.');await card('مبارك طلع من الشركة<small>الخزان تصلّح، بس المضخة بدون أخبر واحد فيها</small>',2600)}
+ if(r===0){await say('mubarak','happy','هذا كلام ولد سالم. والله ما أنساها لك.');await say('hamdan','worried','بس كل برميل يطيح في الرمل بينقص من تسليم الشهر.');await card(`مبارك بقي معك<small>الخزان يخسر برميل من كل ${save.flags.q1?'عشرين':'عشرة'}، وتسليم الشهر صار أصعب</small>`,2600)}
+ else if(save.flags.q2){save.flags.mubarakAdvance=1;await say('hero','firm','مبارك، هذي ألفين سلفة من حسابي. والباقي أول الشهر، وعد.');await say('mubarak','neutral','ألفين… طيب. أصبر شهر واحد، عشان أبوك بس.');await card('مبارك صابر، بس ما نسى<small>الخزان تصلّح، والألفين اللي من ناصر مسكت مبارك شهر</small>',2800)}else{await say('mubarak','angry','الحديد عندك أغلى منا؟ طيب.');await walk(b,1800,860,230);b.on=false;await say('hamdan','sad','مبارك يوم يطلع، ما يرجع. والمضخة ما يعرف أسرارها غيره.');await card('مبارك طلع من الشركة<small>الخزان تصلّح، بس المضخة بدون أخبر واحد فيها</small>',2600)}
  await fadeTo(1,800)}
 async function ch5(){S.mode='cine';startScene();setBg('office');S.bars=1;S.fade=1;S.tint='rgba(15,20,60,.62)';S.lamp=1;await card('الليلة نفسها',1100);
  const h=actor('hero',520,860,340);h.dir='r';await fadeTo(0,900);await wait(500);
@@ -335,20 +405,37 @@ async function ch5(){S.mode='cine';startScene();setBg('office');S.bars=1;S.fade=
  for(const t of lines){const p=document.createElement('div');p.style.cssText='position:static;width:auto;aspect-ratio:auto;padding:0;display:block';d.style.flexDirection='column';p.style.opacity=0;p.textContent=t;d.appendChild(p);await tween(TEST?5:900,q=>p.style.opacity=q);await wait(650)}
  await new Promise(r=>{if(TEST)return setTimeout(r,10);const f=()=>{l.removeEventListener('pointerup',f);r()};l.addEventListener('pointerup',f)});l.hidden=true;
  await say('hero','firm','ستة أشهر.');await fadeTo(1,1200)}
-async function ch6(){S.mode='none';$('#skip').hidden=true;const dec=save.flags.decision;const c=$('#title');c.innerHTML=`<h1 style="font-size:clamp(40px,10vmin,90px)">نهاية الحلقة الأولى</h1><p>${dec===0?'اخترت الناس، وخسرت من الخزان.':'اخترت الخزان، وخسرت مبارك.'}</p><p style="opacity:.8">الحلقة الجاية: الخواجة يعرف إنك ما بتبيع.</p><button class="btn go" id="again">العب مرة ثانية</button>`;c.hidden=false;S.fade=1;$('#again').onclick=()=>{store.clear();save={ch:0,flags:{}};location.reload()}}
+async function ch6(){S.mode='none';$('#skip').hidden=true;const dec=save.flags.decision;const c=$('#title');c.innerHTML=`<h1 style="font-size:clamp(40px,10vmin,90px)">نهاية الحلقة الأولى</h1><p>${dec===0?'اخترت الناس، وخسرت من الخزان.':''+(save.flags.mubarakAdvance?'اخترت الخزان، ومبارك صابر على مضض.':'اخترت الخزان، وخسرت مبارك.')+''}</p><p style="opacity:.8">الحلقة الجاية: الخواجة يعرف إنك ما بتبيع.</p><p>الأسرار: ${secretCount()}/${SECRETS.length}${meta.ach.ep1?' · إنجاز «اللي يدور يلقى»':' · فيه أسرار ما لقيتها بعد'}</p><button class="btn go" id="again">القائمة الرئيسية</button>`;c.style.backgroundImage='none';c.style.background='#000';c.style.justifyContent='center';c.hidden=false;S.fade=1;$('#again').onclick=()=>{store.clear();save={ch:0,flags:{}};location.reload()}}
 const CH=[ch0,ch1,ch2,ch3,ch4,ch5,ch6];
-async function run(from){for(let i=from;i<CH.length;i++){save.ch=i;store.put();skipOK=(i===0||i===1||i===4)&&!TEST;$('#skip').hidden=true;await CH[i]();if(i===2&&save.ch===3){}save.ch=i+1;store.put()}}
-function titleScreen(){S.mode='cine';setBg('desert');S.fade=0;S.bars=0;S.actors=[];const c=$('#title');const hasSave=save.ch>0;
- c.innerHTML=`<h1>أول برميل</h1><p>تطوير شادي الصاعدي</p><div class="go" style="display:flex;gap:.7em;flex-wrap:wrap;justify-content:center">${hasSave?'<button class="btn" id="go2">كمّل</button><button class="btn ghost" id="go">من البداية</button>':'<button class="btn" id="go">ابدأ</button>'}</div>`;c.hidden=false;
- const start=async(n)=>{c.hidden=true;await fadeTo(1,350);run(n)};
- $('#go').onclick=()=>{save={ch:0,flags:{}};store.clear();start(0)};if(hasSave)$('#go2').onclick=()=>start(save.ch)}
+async function intro(){S.mode='none';S.fade=1;await wait(350);await card('إنتاج<small style="font:400 1.6em Lalezar,serif;margin:.1em 0 0">شادي الصاعدي</small>',1500);await wait(250);await card('الحلقة الأولى<small style="font:400 1.9em Lalezar,serif;color:#f2b84b;margin:.1em 0 0">بريال</small>',1700);await wait(300)}
+async function run(from){if(from===0)await intro();for(let i=from;i<CH.length;i++){save.ch=i;store.put();skipOK=(i===0||i===1||i===4)&&!TEST;$('#skip').hidden=true;await CH[i]();if(i===2&&save.ch===3){}save.ch=i+1;store.put()}}
+function secretCount(){return SECRETS.filter(s=>meta.secrets[s.id]).length}
+function panel(html){const p=$('#panel');p.firstElementChild.innerHTML=html+'<button class="btn ghost" id="pback" style="margin-top:.5em">رجوع</button>';p.hidden=false;$('#pback').onclick=()=>p.hidden=true}
+function panelEpisodes(){panel(`<h2>الحلقات</h2>
+ <div class="row"><div><b>الحلقة الأولى: بريال</b><small>متاحة · الأسرار ${secretCount()}/${SECRETS.length}${meta.ach.ep1?' · الإنجاز محقق':''}</small></div><button class="btn" id="ep1">العب</button></div>
+ <div class="row off"><div><b>الحلقة الثانية</b><small>قريبًا</small></div></div>
+ <div class="row off"><div><b>الحلقة الثالثة</b><small>قريبًا</small></div></div>`);$('#ep1').onclick=()=>{$('#panel').hidden=true;askNew()}}
+function panelSettings(){panel(`<h2>الإعدادات</h2>
+ <div class="row"><b>الموسيقى</b><input type="range" id="sm" min="0" max="100" value="${meta.music}"></div>
+ <div class="row"><b>المؤثرات الصوتية</b><input type="range" id="se" min="0" max="100" value="${meta.sfx}"></div>
+ <div class="note">الصوت يوصل في تحديث قريب، واختيارك هنا ينحفظ له.</div>
+ <div class="row"><b>الجودة</b><div class="seg"><button id="qh" class="${meta.quality==='high'?'on':''}">عالية</button><button id="ql" class="${meta.quality==='low'?'on':''}">موفرة</button></div></div>`);
+ $('#sm').oninput=e=>{meta.music=+e.target.value;putMeta()};$('#se').oninput=e=>{meta.sfx=+e.target.value;putMeta()};
+ const q=v=>{meta.quality=v;putMeta();$('#qh').className=v==='high'?'on':'';$('#ql').className=v==='low'?'on':''};$('#qh').onclick=()=>q('high');$('#ql').onclick=()=>q('low')}
+function panelContact(){panel(`<h2>تواصل معنا</h2><div class="note" style="opacity:1;font-size:1em">عندك فكرة أو لقيت مشكلة؟ راسلنا على:</div><p><a href="mailto:${DEV_EMAIL}?subject=${encodeURIComponent('أول برميل')}">${DEV_EMAIL}</a></p>`)}
+function askNew(){if(save.ch>0){panel(`<h2>تبدأ من جديد؟</h2><div class="note" style="opacity:1;font-size:1em">تقدمك الحالي بينمسح. الأسرار والإنجازات تبقى لك.</div><button class="btn" id="yes">إيه، من البداية</button> `);$('#yes').onclick=()=>{$('#panel').hidden=true;startNew()}}else startNew()}
+function startNew(){save={ch:0,flags:{}};store.clear();beginAt(0)}
+function beginAt(n){const c=$('#title');c.style.opacity=0;setTimeout(()=>{c.hidden=true;c.style.opacity=1;run(n)},TEST?10:720)}
+function titleScreen(){S.mode='none';S.fade=1;const c=$('#title');const has=save.ch>0;c.style.backgroundImage=`url(${ASSETS.bg_desert})`;
+ c.innerHTML=`<h1>أول برميل</h1><nav class="menu">${has?'<button class="mi first" id="go2">استمرار</button>':''}<button class="mi ${has?'':'first'}" id="go">${has?'لعبة جديدة':'ابدأ'}</button><button class="mi" id="eps">الحلقات</button><button class="mi" id="set">الإعدادات</button><button class="mi" id="con">تواصل معنا</button></nav>`;c.hidden=false;
+ $('#go').onclick=askNew;if(has)$('#go2').onclick=()=>beginAt(save.ch);$('#eps').onclick=panelEpisodes;$('#set').onclick=panelSettings;$('#con').onclick=panelContact}
 /* ---------- loop ---------- */
 let last=0;function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;time+=dt;jobs=jobs.filter(j=>!j.u(dt));updDrops(dt);updDust(dt);
- if(S.mode==='map'){updMap(dt);drawMap()}else if(S.mode==='board'){updBoard(dt);drawBoard()}else if(S.mode==='cine')drawCine();else{X.fillStyle='#000';X.fillRect(0,0,W,H)}
+ if(S.mode==='map'){updMap(dt);drawMap()}else if(S.mode==='room'){updRoom(dt);drawRoom()}else if(S.mode==='pipes'){if(S.shake)S.shake=0;drawPipes()}else if(S.mode==='jack'){updJack(dt);S.shake=Math.max(0,S.shake-dt*30);drawJack()}else if(S.mode==='board'){updBoard(dt);drawBoard()}else if(S.mode==='cine')drawCine();else{X.fillStyle='#000';X.fillRect(0,0,W,H)}
  if(S.fade>0){X.fillStyle=`rgba(0,0,0,${S.fade})`;X.fillRect(0,0,W,H)}
  requestAnimationFrame(frame)}
 /*TESTHOOK*/
 document.addEventListener('gesturestart',e=>e.preventDefault());document.addEventListener('contextmenu',e=>e.preventDefault());
-Promise.all([loadAll(),document.fonts?document.fonts.ready:0]).then(()=>{store.load();requestAnimationFrame(frame);titleScreen();window.__ready=true});
+Promise.all([loadAll(),Promise.race([document.fonts?Promise.all(['400 40px Lalezar','700 30px "Aref Ruqaa"','400 20px Almarai','700 20px Almarai','800 20px Almarai'].map(f=>document.fonts.load(f,'ابجد'))):0,new Promise(r=>setTimeout(r,3000))])]).then(()=>{store.load();requestAnimationFrame(frame);titleScreen();window.__ready=true});
 if('serviceWorker'in navigator&&location.protocol==='https:'&&!location.hostname.includes('claude'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>

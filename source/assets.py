@@ -69,7 +69,11 @@ def strip(name,frames,hero=False):
         arr=np.array(f)[...,3]>0;top=arr[:f.height//4];hx=np.where(top)[1].mean()
         x=round(W/2-hx);x=max(0,min(W-f.width,x));S.paste(f,(k*W+x,H-f.height),f)
     if hero:S=charcoal(S)
-    save('w_'+name,S,q=90);meta['w_'+name+'_cell']=(W,H)
+    k=1
+    if not hero:
+        k=2;S=S.resize((S.width*2,S.height*2),Image.LANCZOS);from PIL import ImageFilter
+        al=S.getchannel('A');S=S.filter(ImageFilter.UnsharpMask(radius=2.2,percent=130,threshold=2));S.putalpha(al)
+    save('w_'+name,S,q=90);meta['w_'+name+'_cell']=(W*k,H*k)
 a=L('781de63d');m,lab=key(a,1500);a=despill(a,m);bb=bboxes(m,lab);assert len(bb)==16
 G={}
 for b in bb:G[(int(((b[1]+b[3])/2)//(a.shape[0]/4)),int(((b[0]+b[2])/2)//(a.shape[1]/4)))]=b
@@ -90,9 +94,19 @@ tr=sorted([b for b in bb if b[1]>940 and b[2]-b[0]>120],key=lambda b:b[0])
 print('truck',tr)
 for b,n in zip(tr,['front','back','side']):save('truck_'+n,crop(a,m,b),q=90)
 # map
+def seamless(arr,B=44):
+    a=arr.astype(float);h,w=a.shape[:2]
+    wx=np.linspace(0,1,B)[None,:,None];o=a[:,:w-B].copy();o[:,:B]=a[:,w-B:]*(1-wx)+a[:,:B]*wx
+    wy=np.linspace(0,1,B)[:,None,None];p=o[:h-B].copy();p[:B]=o[h-B:]*(1-wy)+o[:B]*wy
+    return p.astype('uint8')
 a=L('fd7d9cd1');rgb=a[...,:3].astype('uint8')
 for k,(n,x) in enumerate(zip(['sand','stones','dirt','road','curve','tee'],[32,322,613,903,1193,1483])):
-    t=Image.fromarray(rgb[34:288,x+2:x+256]);save('t_'+n,t,q=88)
+    raw=rgb[34:288,x+2:x+256]
+    if n=='sand':t=Image.fromarray(seamless(raw))
+    elif n=='stones':
+        yy,xx=np.mgrid[:254,:254];ed=np.minimum.reduce([yy,xx,253-yy,253-xx]);al=np.clip(ed/26,0,1)*255;t=Image.fromarray(np.dstack([raw,al.astype('uint8')]),'RGBA')
+    else:t=Image.fromarray(raw)
+    save('t_'+n,t,q=88)
 rd=rgb[34:288,905:1159].astype(float)/255
 bw=np.clip(1-np.abs(np.linspace(-1,1,254))/0.62,0,1)*5;bw=np.clip(bw,0,1)
 save('t_band',Image.fromarray(np.dstack([rgb[34:288,905:1159],(np.tile(bw,(254,1))*255).astype('uint8')]),'RGBA'),q=88)
