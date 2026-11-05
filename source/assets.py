@@ -1,0 +1,146 @@
+import numpy as np,cv2,json,base64,io,os
+from PIL import Image
+from scipy import ndimage as ni
+A='/mnt/user-data/attachments/a43984e7-b446-5fa2-9fd4-fd5dfc8a4638/'
+OUT='a/';os.makedirs(OUT,exist_ok=True)
+def L(i): return np.array(Image.open(A+i+'-image.png').convert('RGBA')).astype(int)
+def key(a,minb=300,fr=False):
+    r,g,b,al=[a[...,k] for k in range(4)]
+    green=(g>135)&(g>r*1.35)&(g>b*1.35)
+    fringe=((r>190)&(g<55)&(b<55))|((r>225)&(g>205)&(b<70))
+    m=(al>120)&~green&~(fringe if fr else False)
+    m=ni.binary_opening(m,iterations=1)
+    lab,c=ni.label(m);sz=ni.sum(m,lab,range(1,c+1))
+    return np.isin(lab,[k+1 for k in range(c) if sz[k]>minb]),lab
+def despill(a,m):
+    o=a.copy();e=m&~ni.binary_erosion(m,iterations=2)
+    sp=e&(a[...,1]>a[...,0])&(a[...,1]>a[...,2])
+    o[...,1][sp]=np.minimum(a[...,0],a[...,2])[sp];return o
+def crop(a,m,box):
+    x0,y0,x1,y1=box
+    o=np.dstack([a[y0:y1,x0:x1,:3],(m[y0:y1,x0:x1]*255)]).astype('uint8')
+    return Image.fromarray(o,'RGBA')
+def charcoal(im):
+    a=np.array(im).astype(float);r,g,b=a[...,0],a[...,1],a[...,2]
+    v=a[...,:3].max(2);mn=a[...,:3].min(2);s=(v-mn)/np.maximum(v,1)
+    z=(v<125)&(s<.62);gray=a[...,:3].mean(2)
+    for k in range(3):a[...,k][z]=a[...,k][z]*.3+gray[z]*.7
+    a[...,2][z]=a[...,2][z]*1.04
+    return Image.fromarray(np.clip(a,0,255).astype('uint8'),'RGBA')
+meta={}
+def save(n,im,q=86,lossless=False):
+    im.save(OUT+n+'.webp',quality=q,lossless=lossless,method=6);meta[n]=im.size
+def bboxes(m,lab):
+    o=ni.find_objects(lab);res=[]
+    for k,s in enumerate(o):
+        if s is None:continue
+        if (lab[s]==k+1).sum()==0:continue
+        if m[s][lab[s]==k+1].any():res.append((s[1].start,s[0].start,s[1].stop,s[0].stop))
+    return res
+# backgrounds
+for n,i in dict(desert='0c23956f',gusher='0261b8ea',site='5ce9f162',office='6df3d61d').items():
+    save('bg_'+n,Image.fromarray(L(i)[...,:3].astype('uint8')),q=86)
+# portraits
+PH=300
+def portraits(name,i,names,rows=None,hero=False):
+    a=L(i);m,lab=key(a,3000,fr=(name in('salem','young')));a=despill(a,m);bb=bboxes(m,lab)
+    bb=[b for b in bb if rows(b)];bb.sort(key=lambda b:(round(b[1]/200),b[0]))
+    assert len(bb)==len(names),(name,len(bb),bb)
+    for b,n in zip(bb,names):
+        im=crop(a,m,b)
+        if hero:im=charcoal(im)
+        s=PH/im.height;save(f'p_{name}_{n}',im.resize((round(im.width*s),PH),Image.BOX),q=88)
+portraits('salem','ac2ab0e4',['tired','pain','shock','hope','firm','joy'],lambda b:True)
+portraits('young','f88da36b',['neutral','smile','doubt','sly','laugh','serious'],lambda b:True)
+low=lambda b:b[1]>600
+portraits('old','265d2f50',['neutral','polite','cunning','surprised','angry'],low)
+portraits('hamdan','604f61d1',['neutral','warm','worried','sad','angry'],low)
+portraits('hero','d8024ecf',['neutral','firm','worried','angry','smile'],low,hero=True)
+a=L('4ac9bde6');m,lab=key(a,3000);a=despill(a,m);bb=bboxes(m,lab)
+for nm,y0,y1 in(('nasser',400,700),('mubarak',1200,1536)):
+    r=sorted([b for b in bb if y0<=b[1]<y1],key=lambda b:b[0]);assert len(r)==3,(nm,r)
+    for b,n in zip(r,['neutral','happy','angry']):
+        im=crop(a,m,b);s=PH/im.height;save(f'p_{nm}_{n}',im.resize((round(im.width*s),PH),Image.BOX),q=88)
+# walk strips: 9 frames [front a,s,b, back a,s,b, side(right) a,s,b]; feet at cell bottom, head centred
+def strip(name,frames,hero=False):
+    H=max(f.height for f in frames);W=max(f.width for f in frames)+24
+    S=Image.new('RGBA',(W*9,H),(0,0,0,0))
+    for k,f in enumerate(frames):
+        arr=np.array(f)[...,3]>0;top=arr[:f.height//4];hx=np.where(top)[1].mean()
+        x=round(W/2-hx);x=max(0,min(W-f.width,x));S.paste(f,(k*W+x,H-f.height),f)
+    if hero:S=charcoal(S)
+    save('w_'+name,S,q=90);meta['w_'+name+'_cell']=(W,H)
+a=L('781de63d');m,lab=key(a,1500);a=despill(a,m);bb=bboxes(m,lab);assert len(bb)==16
+G={}
+for b in bb:G[(int(((b[1]+b[3])/2)//(a.shape[0]/4)),int(((b[0]+b[2])/2)//(a.shape[1]/4)))]=b
+fr=[crop(a,m,G[(0,c)]) for c in range(3)]+[crop(a,m,G[(1,c)]) for c in range(3)]+[crop(a,m,G[(2,c)]).transpose(Image.FLIP_LEFT_RIGHT) for c in range(3)]
+strip('hero',fr,True)
+a=L('11ef1f94');m,lab=key(a,700);a=despill(a,m);bb=bboxes(m,lab)
+Hh,Ww=a.shape[:2];G={}
+for b in bb:
+    if b[3]-b[1]>400:continue
+    G.setdefault((int(((b[1]+b[3])/2)//(Hh/7)),int(((b[0]+b[2])/2)//(Ww/9))),[]).append(b)
+names=['salem','young','old','hamdan','nasser','mubarak']
+for r,nm in enumerate(names):
+    fs=[]
+    for c in range(9):
+        bs=G[(r,c)];b=(min(x[0] for x in bs),min(x[1] for x in bs),max(x[2] for x in bs),max(x[3] for x in bs));fs.append(crop(a,m,b))
+    strip(nm,fs)
+tr=sorted([b for b in bb if b[1]>940 and b[2]-b[0]>120],key=lambda b:b[0])
+print('truck',tr)
+for b,n in zip(tr,['front','back','side']):save('truck_'+n,crop(a,m,b),q=90)
+# map
+a=L('fd7d9cd1');rgb=a[...,:3].astype('uint8')
+for k,(n,x) in enumerate(zip(['sand','stones','dirt','road','curve','tee'],[32,322,613,903,1193,1483])):
+    t=Image.fromarray(rgb[34:288,x+2:x+256]);save('t_'+n,t,q=88)
+rd=rgb[34:288,905:1159].astype(float)/255
+bw=np.clip(1-np.abs(np.linspace(-1,1,254))/0.62,0,1)*5;bw=np.clip(bw,0,1)
+save('t_band',Image.fromarray(np.dstack([rgb[34:288,905:1159],(np.tile(bw,(254,1))*255).astype('uint8')]),'RGBA'),q=88)
+m,lab=key(a,300);a=despill(a,m)
+O=dict(office=(29,364,297,615),tanks=(337,394,547,607),pump=(576,337,903,615),shed=(919,371,1206,609),fence=(1242,419,1460,552),gate=(1500,417,1735,552),barrel=(60,720,139,846),barrels=(215,678,361,846),crate=(432,719,558,846),pipes=(613,698,788,846),marker=(845,736,986,838),rock=(1040,732,1192,838),pebble=(1245,768,1322,822),shrub=(1376,732,1484,828),scrappile=(1538,710,1722,841))
+for n,b in O.items():save('o_'+n,crop(a,m,b),q=90)
+# parts
+a=L('03945519');m,lab=key(a,300);a=despill(a,m)
+for n,b in dict(head=(135,311,348,653),rod=(481,327,552,628),weight=(684,311,930,653),belt=(1013,421,1283,546),valve=(1362,380,1540,587)).items():save('q_'+n,crop(a,m,b),q=92)
+# scrap + letter
+a=L('62aac8b0');m,lab=key(a,300);a=despill(a,m)
+for n,b in dict(s1=(53,88,273,303),s2=(317,74,548,310),s3=(593,70,836,305),s4=(892,74,1097,303),s5=(1143,99,1371,279),s6=(1416,88,1621,297),letter=(364,398,1308,897)).items():save('s_'+n,crop(a,m,b),q=90)
+# pump board: split the walking beam and polished rod out, inpaint behind them
+a=L('4421752f')[...,:3].astype('uint8');bgr=a[...,::-1].copy()
+beam=np.array([[345,92],[432,108],[1142,236],[1128,325],[1122,385],[1045,385],[1040,325],[425,212],[418,245],[345,240]],np.int32)
+pm=np.zeros(a.shape[:2],'uint8');cv2.fillPoly(pm,[beam],1)
+g=np.where(cv2.dilate(pm,np.ones((3,3),'uint8'))>0,cv2.GC_PR_FGD,cv2.GC_BGD).astype('uint8')
+g[cv2.erode(pm,np.ones((25,25),'uint8'))>0]=cv2.GC_FGD
+bm=np.zeros((1,65));fm=np.zeros((1,65));cv2.grabCut(bgr,g,None,bm,fm,4,cv2.GC_INIT_WITH_MASK)
+bmask=((g==1)|(g==3))
+bmask=ni.binary_fill_holes(ni.binary_closing(bmask,iterations=2))
+# saddle stays on top of the beam
+yy,xx=np.mgrid[:a.shape[0],:a.shape[1]]
+saddle=(((xx-735)**2+(yy-247)**2<43**2)|((xx>693)&(xx<778)&(yy>=247)&(yy<285)))
+prodk=((xx>=374)&(xx<=396)&(yy>=272)&(yy<=570))|((xx>=361)&(xx<=409)&(yy>=236)&(yy<=276))
+hole=(cv2.dilate(pm,np.ones((27,27),'uint8'))>0)|(cv2.dilate(prodk.astype('uint8'),np.ones((13,13),'uint8'))>0)|(cv2.dilate(bmask.astype('uint8'),np.ones((9,9),'uint8'))>0)
+hole&=~((xx>655)&(xx<814)&(yy>=284))
+hole&=~(yy>=563)
+hole&=~saddle
+clean=a.copy()
+for y in range(a.shape[0]):
+    xs=np.where(hole[y])[0]
+    if not len(xs):continue
+    l,r=xs[0]-1,xs[-1]+1
+    L_=a[y,max(l-5,0):max(l,1)].mean(0);R_=a[y,r:r+5].mean(0)
+    for x in xs:
+        t=(x-l)/max(r-l,1);clean[y,x]=L_*(1-t)+R_*t
+save('pump_bg',Image.fromarray(clean),q=88)
+def sprite(n,mask):
+    ys,xs=np.where(mask);x0,y0,x1,y1=xs.min(),ys.min(),xs.max()+1,ys.max()+1
+    o=np.dstack([a[y0:y1,x0:x1],(mask[y0:y1,x0:x1]*255).astype('uint8')]);save(n,Image.fromarray(o,'RGBA'),q=92);meta[n+'_at']=(int(x0),int(y0))
+sprite('pump_beam',bmask);sprite('pump_saddle',saddle&(ni.binary_dilation(pm)|True));sprite('pump_prod',prodk)
+json.dump(meta,open('meta.json','w'))
+print(len(meta),sum(os.path.getsize(OUT+f) for f in os.listdir(OUT))//1024,'KB')
+# review sheets
+c=Image.new('RGB',(1672,941),(120,120,120));c.paste(Image.open(OUT+'pump_bg.webp'),(0,0));c.save('rv_pump_bg.png')
+v=Image.new('RGB',(1672,941),(40,120,200));b=Image.open(OUT+'pump_beam.webp');v.paste(b,tuple(meta['pump_beam_at']),b);s=Image.open(OUT+'pump_saddle.webp');p=Image.open(OUT+'pump_prod.webp');v.paste(p,tuple(meta['pump_prod_at']),p);v.save('rv_beam.png')
+W=Image.new('RGB',(1500,1000),(236,186,118));y=0
+for n in ['hero','salem','young','old','hamdan','nasser','mubarak']:
+    im=Image.open(OUT+'w_'+n+'.webp');s=130/im.height;i=im.resize((round(im.width*s),130),Image.BOX);W.paste(i,(0,y),i);y+=135
+W.save('rv_walk.png')

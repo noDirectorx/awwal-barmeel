@@ -1,0 +1,354 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>أول برميل</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700;800&family=Lalezar&family=Aref+Ruqaa:wght@700&display=swap">
+<style>
+:root{--ink:#f7e7c8;--gold:#f2b84b;--rust:#a4481c;--night:rgba(24,12,6,.92);--sub:#c9b28c}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+html,body{margin:0;height:100%;background:#000;overflow:hidden;overscroll-behavior:none;touch-action:none;font-family:Almarai,Tahoma,sans-serif;color:var(--ink)}
+canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:block;touch-action:none}
+#ui{position:fixed;inset:0;pointer-events:none;font-size:clamp(14px,2.5vmin + .4vw,24px)}
+#ui>*{pointer-events:auto}
+#title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:5vh;padding-bottom:9vh;gap:.3em;background:rgba(30,10,0,.12);text-align:center}#title .go{margin-top:auto}
+#title h1{font:400 clamp(58px,17vmin,150px)/1 Lalezar,serif;margin:0;color:#fff4d8;text-shadow:0 .05em 0 #6e2c0c,0 .1em .3em rgba(0,0,0,.55)}
+#title p{margin:0;font-weight:700;text-shadow:0 1px 3px #000,0 0 8px #000}
+.btn{font:800 1.05em Almarai,sans-serif;color:#2b1205;background:var(--gold);border:0;border-bottom:.22em solid #94591a;border-radius:.5em;padding:.65em 1.5em;min-height:48px;cursor:pointer}
+.btn:active{transform:translateY(.12em);border-bottom-width:.1em}
+.btn.ghost{background:rgba(24,12,6,.75);color:var(--ink);border-color:#000}
+#dlg{position:absolute;right:max(3vw,env(safe-area-inset-right));left:max(3vw,env(safe-area-inset-left));bottom:max(2.2vmin,env(safe-area-inset-bottom));min-height:7.2em;background:var(--night);border:2px solid #8a5a26;border-radius:.6em;padding:.75em 1em .75em 1em;display:flex;gap:1em;align-items:flex-start;cursor:pointer}
+#dlg img{height:6.4em;width:auto;align-self:flex-end;margin:-1.9em 0 -.75em;filter:drop-shadow(0 2px 3px rgba(0,0,0,.7));flex:none}
+#dlg .t{flex:1;min-width:0}
+#dlg b{font:400 1.25em/1.1 Lalezar,serif;color:var(--gold);display:block;margin-bottom:.15em}
+#dlg span{font-weight:700;line-height:1.6;display:block}
+#dlg i{position:absolute;left:.8em;bottom:.45em;font-style:normal;color:var(--gold);animation:nd 1s infinite}
+@keyframes nd{50%{transform:translateY(-3px)}}
+#choices{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7em;background:rgba(0,0,0,.45);padding:1em}
+#choices h3{font:400 1.45em Lalezar,serif;color:#fff4d8;margin:0 0 .2em;text-align:center;text-shadow:0 2px 4px #000}
+#choices .btn{width:min(30em,92%);line-height:1.4}
+#choices small{display:block;font-weight:400;font-size:.8em;opacity:.8}
+#card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none;font:400 clamp(30px,8vmin,72px) Lalezar,serif;color:#fff4d8;text-shadow:0 3px 8px #000;padding:1em}
+#card small{font:700 .38em/1.7 Almarai,sans-serif;display:block;margin-top:.4em;max-width:34em}
+#hud{position:absolute;top:max(1.4vmin,env(safe-area-inset-top));right:max(2vw,env(safe-area-inset-right));left:max(2vw,env(safe-area-inset-left));display:flex;justify-content:space-between;align-items:flex-start;pointer-events:none;gap:1em}
+#tasks{background:rgba(24,12,6,.72);border-radius:.5em;padding:.45em .75em;font-size:.82em;line-height:1.55;max-width:44%}
+#tasks b{color:var(--gold);font-family:Lalezar,serif;font-weight:400;font-size:1.15em}
+#tasks div.done{opacity:.5;text-decoration:line-through}
+#stat{background:rgba(24,12,6,.72);border-radius:.5em;padding:.45em .75em;font-size:.82em;font-weight:700;direction:rtl}
+#act{position:absolute;left:max(4vw,env(safe-area-inset-left));bottom:max(4vmin,env(safe-area-inset-bottom));font-size:1.05em}
+#float{position:absolute;left:50%;top:18%;transform:translateX(-50%);background:rgba(24,12,6,.85);padding:.35em .9em;border-radius:.5em;font-weight:700;white-space:nowrap;pointer-events:none;transition:opacity .3s}
+#skip{position:absolute;top:max(1.4vmin,env(safe-area-inset-top));left:max(2vw,env(safe-area-inset-left));font-size:.75em;min-height:36px;padding:.4em .9em;border-bottom-width:0}
+#hold{position:absolute;left:50%;bottom:max(4vmin,env(safe-area-inset-bottom));transform:translateX(-50%);overflow:hidden;touch-action:none}
+#hold u{position:absolute;right:0;top:0;bottom:0;background:rgba(255,255,255,.55);width:0;text-decoration:none;pointer-events:none}
+#hold em{position:relative;font-style:normal}
+#letter{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);cursor:pointer}
+#letter div{position:relative;width:min(84vw,120vmin);aspect-ratio:944/499;background-size:100% 100%;display:flex;align-items:center;justify-content:center;padding:6% 9%;color:#2c1608;font:700 clamp(19px,4.5vmin,42px)/1.65 "Aref Ruqaa",serif;text-align:center}
+#rot{display:none;position:fixed;inset:0;background:#120803;z-index:9;align-items:center;justify-content:center;text-align:center;font:400 28px Lalezar,serif;color:var(--gold);padding:1em}
+@media (orientation:portrait){#rot{display:flex}}
+[hidden]{display:none!important}
+</style></head><body>
+<canvas id="c" width="1672" height="941"></canvas>
+<div id="ui">
+<div id="hud" hidden><div id="tasks"></div><div id="stat"></div></div>
+<button id="act" class="btn" hidden></button>
+<div id="float" style="opacity:0"></div>
+<button id="hold" class="btn" hidden><u></u><em>اضغط مطوّل لتشغيل المضخة</em></button>
+<div id="card" hidden></div>
+<button id="skip" class="btn ghost" hidden>تخطّي</button>
+<div id="letter" hidden><div></div></div>
+<div id="dlg" hidden><img alt=""><div class="t"><b></b><span></span></div><i>◀</i></div>
+<div id="choices" hidden></div>
+<div id="title" hidden></div>
+</div>
+<div id="rot">لفّ جهازك بالعرض</div>
+<script>
+const ASSETS=/*ASSETS*/null,META=/*META*/null;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const $=s=>document.querySelector(s),cv=$('#c'),X=cv.getContext('2d',{alpha:false});
+const W=1672;let H=941;const KEY='awwal-barmeel-ep1';
+const img={};
+function loadAll(){return Promise.all(Object.keys(ASSETS).map(k=>new Promise(r=>{const i=new Image();i.onload=()=>{img[k]=i;r()};i.onerror=r;i.src=ASSETS[k]})))}
+function setView(full){const want=full?Math.round(clamp(W*innerHeight/innerWidth,720,1260)):941;if(want!==H||cv.height!==want){H=want;cv.height=want}fit()}
+function fit(){const s=Math.min(innerWidth/W,innerHeight/H);cv.style.width=W*s+'px';cv.style.height=H*s+'px'}
+addEventListener('resize',()=>setView(S.mode==='map'));fit();
+let save={ch:0,flags:{}};
+const store={load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&typeof s.ch==='number')save=s}catch(e){}},put(){try{localStorage.setItem(KEY,JSON.stringify(save))}catch(e){}},clear(){try{localStorage.removeItem(KEY)}catch(e){}}};
+const TEST=/[?&]test/.test(location.search);
+const ease=t=>t*t*(3-2*t);
+let time=0,skipping=false,skipOK=false;
+/* ---------- tweens & waits ---------- */
+let jobs=[];
+function tween(ms,fn){return new Promise(res=>{if(skipping||ms<=0){fn(1);res();return}let t=0;jobs.push({u(dt){t+=dt*1000;const p=clamp(t/ms,0,1);fn(p);if(p>=1){res();return true}}})})}
+const wait=ms=>tween(TEST?Math.min(ms,30):ms,()=>{});
+/* ---------- stage ---------- */
+const S={mode:'none',bg:null,bg2:null,bg2a:0,fade:1,bars:0,shake:0,tint:null,actors:[],parts:[],overlay:null,lamp:0,drops:0,oilT:0,dust:[]};
+function actor(name,x,y,h=255,dir='s'){const a={name,x,y,h,dir,f:1,step:0,on:true,bob:0};S.actors.push(a);return a}
+function drawWalker(c,a,ox=0,oy=0){const im=img['w_'+a.name],[cw,ch]=META['w_'+a.name+'_cell'];if(!im)return;
+ const row={f:0,b:3,r:6,l:6}[a.dir]??0;const s=a.h/ch,dw=cw*s,dh=ch*s,x=a.x-ox,y=a.y-oy+(a.bob||0);
+ c.fillStyle='rgba(40,14,0,.28)';c.beginPath();c.ellipse(x,a.y-oy,dw*.27,dh*.05,0,0,7);c.fill();
+ const k=row+[0,1,2,1][a.step%4]*(a.moving?1:0)+(a.moving?0:1);
+ c.save();c.translate(x,y);if(a.dir==='l')c.scale(-1,1);c.drawImage(im,k*cw,0,cw,ch,-dw/2,-dh,dw,dh);c.restore()}
+function walk(a,x,y,speed=230){return new Promise(res=>{if(skipping){a.x=x;a.y=y;a.moving=false;a.dir='f';res();return}
+ const dx=x-a.x,dy=y-a.y,d=Math.hypot(dx,dy);if(d<1){res();return}a.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'r':'l'):(dy>0?'f':'b');a.moving=true;let go=0;const sp=TEST?speed*12:speed;
+ jobs.push({u(dt){const st=sp*dt;go+=st;a.x+=dx/d*st;a.y+=dy/d*st;a.step=Math.floor(go/(a.h*.17));if(go>=d){a.x=x;a.y=y;a.moving=false;res();return true}}})})}
+function cover(c,im){c.drawImage(im,0,0,W,H)}
+function drawCine(){X.save();
+ if(S.shake>0){X.translate((Math.random()-.5)*S.shake,(Math.random()-.5)*S.shake)}
+ if(S.bg)cover(X,S.bg);if(S.bg2&&S.bg2a>0){X.globalAlpha=S.bg2a;cover(X,S.bg2);X.globalAlpha=1}
+ if(S.drops>0)drawDrops(false);
+ for(const a of [...S.actors].filter(a=>a.on).sort((p,q)=>p.y-q.y))drawWalker(X,a);
+ if(S.drops>0)drawDrops(true);
+ drawDust();
+ if(S.tint){X.fillStyle=S.tint;X.fillRect(0,0,W,H)}
+ if(S.lamp>0){const g=X.createRadialGradient(1010,450,10,1010,450,430);g.addColorStop(0,`rgba(255,190,90,${.42*S.lamp})`);g.addColorStop(1,'rgba(255,190,90,0)');X.fillStyle=g;X.fillRect(0,0,W,H)}
+ X.restore();
+ if(S.bars>0){X.fillStyle='#000';const b=62*S.bars;X.fillRect(0,0,W,b);X.fillRect(0,H-b,W,b)}}
+const oil=[];
+function drawDrops(front){for(const d of oil){if((d.z>0)!==front)continue;X.fillStyle=d.c;X.fillRect(d.x|0,d.y|0,d.s,d.s*1.5)}}
+function updDrops(dt){if(S.drops>0){for(let n=0;n<S.drops*dt;n++){oil.push({x:Math.random()*W,y:-20,v:360+Math.random()*420,s:3+Math.random()*7|0,z:Math.random()-.4,c:Math.random()<.2?'#6d3a14':'#1d0d05'})}}
+ for(let i=oil.length-1;i>=0;i--){const d=oil[i];d.y+=d.v*dt;if(d.y>H)oil.splice(i,1)}}
+function puff(x,y,n=8,c='rgba(235,190,120,.7)',up=80){for(let i=0;i<n;i++)S.dust.push({x:x+(Math.random()-.5)*30,y:y+(Math.random()-.5)*12,vx:(Math.random()-.5)*160,vy:-Math.random()*up,l:.5+Math.random()*.5,t:0,s:6+Math.random()*12|0,c})}
+function drawDust(){for(const p of S.dust){X.globalAlpha=clamp(1-p.t/p.l,0,1);X.fillStyle=p.c;X.fillRect(p.x|0,p.y|0,p.s,p.s)}X.globalAlpha=1}
+function updDust(dt){for(let i=S.dust.length-1;i>=0;i--){const p=S.dust[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.t>p.l)S.dust.splice(i,1)}}
+const fadeTo=(a,ms=700)=>{const s=S.fade;return tween(TEST?10:ms,p=>S.fade=s+(a-s)*ease(p))};
+const bars=(a,ms=500)=>{const s=S.bars;return tween(TEST?10:ms,p=>S.bars=s+(a-s)*ease(p))};
+function setBg(n){S.bg=img['bg_'+n];S.bg2=null;S.bg2a=0}
+/* ---------- dialogue ---------- */
+const NAMES={salem:'سالم',young:'الخواجة',old:'الخواجة',hamdan:'حمدان',hero:'عبدالله',nasser:'ناصر',mubarak:'مبارك'};
+let advance=null;
+function say(who,mood,text){return new Promise(res=>{if(skipping){res();return}
+ const d=$('#dlg'),im=d.querySelector('img'),nm=d.querySelector('b'),sp=d.querySelector('span'),ic=d.querySelector('i');
+ if(who){im.src=ASSETS[`p_${who}_${mood}`]||'';im.hidden=false;nm.textContent=NAMES[who];nm.hidden=false}else{im.hidden=true;nm.hidden=true}
+ d.hidden=false;ic.hidden=true;sp.textContent='';let n=0,done=false;const tick=setInterval(()=>{n+=2;sp.textContent=text.slice(0,n);if(n>=text.length){clearInterval(tick);done=true;ic.hidden=false}},TEST?1:32);
+ advance=()=>{if(!done){clearInterval(tick);sp.textContent=text;done=true;ic.hidden=false;return}advance=null;d.hidden=true;res()};
+ if(TEST)setTimeout(()=>{if(advance){advance();advance&&advance()}},5)})}
+$('#dlg').addEventListener('pointerup',e=>{e.stopPropagation();advance&&advance()});
+function choose(title,opts){return new Promise(res=>{skipping=false;$('#skip').hidden=true;const c=$('#choices');c.innerHTML=`<h3>${title}</h3>`;
+ opts.forEach((o,i)=>{const b=document.createElement('button');b.className='btn';b.innerHTML=o.t+(o.s?`<small>${o.s}</small>`:'');b.onclick=()=>{c.hidden=true;res(i)};c.appendChild(b)});c.hidden=false;
+ if(TEST){window.__choice=res;const k=window.__pick||0;setTimeout(()=>{c.hidden=true;res(k)},10)}})}
+async function card(html,ms=2200){const c=$('#card');c.innerHTML=html;c.hidden=false;c.style.opacity=0;await tween(TEST?5:500,p=>c.style.opacity=p);await wait(ms);await tween(TEST?5:500,p=>c.style.opacity=1-p);c.hidden=true}
+function toast(t){const f=$('#float');f.textContent=t;f.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>f.style.opacity=0,1700)}
+function startScene(){S.actors=[];S.tint=null;S.lamp=0;S.drops=0;S.shake=0;oil.length=0;S.dust=[];skipping=false;$('#skip').hidden=!skipOK}
+$('#skip').onclick=e=>{e.stopPropagation();skipping=true;if(advance){const a=advance;advance=null;$('#dlg').hidden=true;const sp=$('#dlg span');sp.textContent='';forceRes(a)}};
+function forceRes(a){a();a()}
+/* ---------- chapters ---------- */
+async function ch0(){S.mode='cine';startScene();setBg('desert');S.fade=1;S.bars=1;
+ const c=$('#card');await card('قبل ثلاثين سنة',1400);
+ const s=actor('salem',-90,720);fadeTo(0,1100);await walk(s,560,720,190);s.dir='r';
+ await say('salem','tired','ثلاثين يوم أحفر… والبير ناشف.');
+ await say('salem','pain','هذي آخر نقطة مويه في القربة.');
+ puff(760,720,10);S.shake=4;await wait(250);S.shake=0;
+ await say('salem','hope','يا رب… ضربة وحدة بعد.');
+ await walk(s,610,720,160);puff(700,715,14);S.shake=6;await wait(220);S.shake=0;await wait(600);
+ await tween(TEST?5:900,p=>S.shake=p*7);
+ await say('salem','shock','وش هذا؟ الأرض تتحرك!');
+ await tween(TEST?5:1000,p=>S.shake=7+p*12);
+ const w=$('#c');S.tint='rgba(255,255,255,.95)';await wait(90);S.bg=img.bg_gusher;S.tint=null;S.drops=170;s.x=330;s.y=745;s.dir='r';S.shake=14;
+ await tween(TEST?5:1800,p=>S.shake=14-p*11);S.shake=2.5;
+ await say('salem','joy','نفط! نفـــــط يا عالم!');
+ await fadeTo(1,800);S.shake=0;await card('بعد أسبوعين',1100);S.drops=80;
+ const y=actor('young',-90,770);await fadeTo(0,600);await walk(y,170,775,190);y.dir='r';s.dir='l';
+ await say('young','smile','مستر سالم. عندك نفط، بس ما عندك مكينة.');
+ await say('young','neutral','أنا أجيب المكينة والعمال. أنت تعطيني كل النفط. ثلاثين سنة، نفس السعر.');
+ await say('salem','firm','بكم البرميل؟');
+ await wait(600);
+ await say('young','sly','بريال.');
+ await wait(900);
+ await say('salem','firm','وأول برميل يبقى لي. ما ينباع.');
+ await say('young','laugh','Deal!\u200e');
+ await fadeTo(1,1000);S.drops=0;$('#skip').hidden=true;
+ await card('أول برميل<small>الحلقة الأولى: بريال</small>',2000);
+}
+async function ch1(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;await card('بعد ثلاثين سنة',1400);
+ const h=actor('hero',1290,1000,290),m=actor('hamdan',1320,640,235);m.dir='f';m.on=false;
+ fadeTo(0,1000);await walk(h,820,770,190);h.dir='r';m.on=true;await walk(m,1040,750,130);m.dir='l';
+ await say('hamdan','neutral','تأخرت يا ولد سالم.');
+ await say('hero','worried','جيت أول ما سمعت.');
+ await say('hamdan','sad','دفنّاه قبل أربعين يوم. وآخر كلمة قالها: لا يبيع.');
+ await say('hero','neutral','وش وضع الشركة؟');
+ await say('hamdan','worried','المضخة واقفة، والموظفين ما قبضوا من ثلاثة شهور، والديون فوق راسنا.');
+ await say('hamdan','angry','والخواجة جالس في مكتب أبوك، ينتظرك من الصبح.');
+ await fadeTo(1,700);
+ S.actors=[];setBg('office');
+ const o=actor('old',420,840,330),e=actor('hero',1300,860,340),hh=actor('hamdan',1130,830,320);o.dir='r';e.dir='l';hh.dir='l';await fadeTo(0,700);
+ await say('old','polite','الله يرحم أبوك. كان رجل عنيد، وأنا أحترم العناد.');
+ await say('old','neutral','بدون لف. أشتري الشركة بنص مليون ريال. توقّع اليوم، وتسدد الديون، وترجع لحياتك.');
+ await say('hamdan','worried','عقد أبوك معه باقي عليه ستة أشهر. كل شهر لازم نسلّمه كمية محددة بريال البرميل.');
+ await say('hamdan','angry','وإذا نقصنا شهر واحد، الشركة كلها تروح له ببلاش.');
+ await say('old','cunning','والبرميل يكلفكم أكثر من ريال. يعني كل ما اشتغلتوا، خسرتوا.');
+ const r=await choose('الخواجة ماد لك القلم',[{t:'«أحتاج وقت أفكر»',s:'تترك الباب مفتوح'},{t:'«الشركة مو للبيع»',s:'تعلنها من أول يوم'}]);
+ save.flags.firstAnswer=r;
+ if(r===0)await say('old','polite','طبعًا. فكّر على راحتك. العرض ينزل كل شهر.');
+ else{await say('old','surprised','ولد سالم له لسان أبوه.');await say('old','cunning','بس أبوك كان عنده مضخة شغالة.')}
+ await walk(o,-120,840,200);
+ await say('hamdan','warm','إذا بتقعد، خلنا نشغل المضخة قبل كل شي. مبارك عندها.');
+ await fadeTo(1,600);
+}
+/* ---------- free play map ---------- */
+const TS=192,MW=20*TS,MH=13*TS;
+const M={objs:[],pick:[],npc:{},p:null,cam:{x:0,y:0},tiles:null,act:null,stick:null,vx:0,vy:0};
+const OBJ_SCALE={office:1.55,tanks:1.5,pump:1.75,shed:1.5,fence:1.42,gate:1.42,barrel:.8,barrels:.85,crate:.85,pipes:.9,marker:.85,rock:1.05,pebble:.9,shrub:.9,scrappile:1.05};
+const FOOT={office:[.92,.3],tanks:[.9,.22],pump:[.9,.25],shed:[.0,.0],fence:[1,.12],gate:[1,.12],barrel:[.8,.25],barrels:[.85,.25],crate:[.85,.3],pipes:[.85,.3],marker:[.8,.3],rock:[.85,.3],pebble:[0,0],shrub:[0,0],scrappile:[.8,.3]};
+function place(n,x,y){const im=img['o_'+n],s=OBJ_SCALE[n];const o={n,x,y,im,w:im.width*s,h:im.height*s};const [fw,fh]=FOOT[n];o.col=fw?{x:x-o.w*fw/2,y:y-o.h*fh,w:o.w*fw,h:o.h*fh}:null;M.objs.push(o);return o}
+function buildMap(){M.objs=[];M.pick=[];M.npc={};
+ const t=document.createElement('canvas');t.width=MW/2;t.height=MH/2;const c=t.getContext('2d');c.scale(.5,.5);
+ const R={};
+ const rows=[];for(let x=0;x<20;x++)rows.push([x,8,90]);for(let y=9;y<13;y++)rows.push([10,y,0]);
+ let seed=7;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;
+ c.imageSmoothingEnabled=true;
+ for(let y=0;y<13;y++)for(let x=0;x<20;x++){const k=R[x+','+y],px=x*TS,py=y*TS;
+  c.drawImage(img.t_sand,px,py,TS+1,TS+1);const q=rnd();if(y!==8&&x!==10&&q<.1)c.drawImage(img.t_stones,px,py,TS+1,TS+1);
+  }
+ for(const [x,y,rot] of rows){c.save();c.translate(x*TS+TS/2,y*TS+TS/2);c.rotate(rot*Math.PI/180);c.drawImage(img.t_band,-TS/2,-TS/2,TS+1,TS+1);c.restore()}
+ c.drawImage(img.t_band,0,127,254,127,10*TS,8*TS+TS/2,TS+1,TS/2);
+ M.tiles=t;
+ const fw=img.o_fence.width*OBJ_SCALE.fence-4;
+ for(let x=150;x<MW-100;x+=fw)place('fence',x,300);
+ for(let x=150;x<MW-100;x+=fw){if(Math.abs(x-(10*TS+96))<fw*.9)continue;place('fence',x,MH-140)}
+ place('gate',10*TS+96,MH-140);
+ place('office',2900,1500);place('tanks',3380,1050);place('pump',1940,1250);place('shed',760,1420);place('scrappile',470,1450);place('scrappile',900,620);place('marker',1830,1370);
+ for(const [n,x,y] of [['barrels',1130,1400],['barrel',1240,1455],['crate',2590,1560],['pipes',3050,860],['crate',3250,1620],['rock',340,800],['rock',3560,2050],['pebble',1500,750],['pebble',2500,2050],['shrub',620,2020],['shrub',1450,2060],['shrub',3100,2120],['shrub',2450,620],['rock',1250,2000],['barrel',3560,1370]])place(n,x,y);
+ place('rock',170,1300);
+ const items=[{id:'head',k:'q_head',x:760,y:1370,s:.33,name:'رأس المضخة'},{id:'rod',k:'q_rod',x:3180,y:900,s:.35,name:'عمود التوصيل'},{id:'weight',k:'q_weight',x:600,y:760,s:.3,name:'الثقل'},
+ {id:'s1',k:'s_s1',x:1050,y:880,s:.3,name:'خردة'},{id:'s2',k:'s_s2',x:1580,y:1720,s:.3,name:'خردة'},{id:'s3',k:'s_s3',x:2380,y:880,s:.3,name:'خردة'},{id:'s4',k:'s_s4',x:2750,y:1950,s:.3,name:'خردة'},{id:'s5',k:'s_s5',x:3480,y:1780,s:.3,name:'خردة'},{id:'s6',k:'s_s6',x:480,y:1800,s:.3,name:'خردة'}];
+ for(const i of items)if(!save.flags['got_'+i.id])M.pick.push(i);
+ M.p={name:'hero',x:save.flags.px||2700,y:save.flags.py||1720,h:112,dir:'b',step:0,moving:false,dist:0};
+ M.npc.hamdan={name:'hamdan',x:2660,y:1620,h:108,dir:'f',step:0};
+ M.npc.mubarak={name:'mubarak',x:1560,y:1290,h:110,dir:'r',step:0};
+ M.npc.nasser={name:'nasser',x:2190,y:2120,h:106,dir:'l',step:0};
+ M.truck={x:2430,y:2190};
+ M.colNpc=()=>Object.values(M.npc);
+}
+function blocked(x,y){const r=26,hh=11;if(x<70||x>MW-70||y<340||y>MH-150)return true;
+ for(const o of M.objs){const c=o.col;if(c&&x+r>c.x&&x-r<c.x+c.w&&y+hh>c.y&&y-hh<c.y+c.h)return true}
+ if(x+r>M.truck.x-190&&x-r<M.truck.x+190&&y+hh>M.truck.y-40&&y-hh<M.truck.y+10)return true;
+ for(const n of M.colNpc())if(Math.hypot(n.x-x,(n.y-y)*1.6)<46)return true;return false}
+const keys={};addEventListener('keydown',e=>{keys[e.code]=true;if((e.code==='KeyE'||e.code==='Space'||e.code==='Enter')&&!e.repeat){if(advance)advance();else if(S.mode==='map'&&M.act)doAct()}});addEventListener('keyup',e=>keys[e.code]=false);
+function worldFromEvent(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+window.addEventListener('pointerdown',e=>{if(e.target!==cv&&e.target.id!=='ui'&&e.target.id!=='float')return;if(S.mode==='map'&&!M.lock){M.stick={id:e.pointerId,x0:e.clientX,y0:e.clientY,dx:0,dy:0}}else if(S.mode==='board')boardDown(e);else if(advance)advance()});
+window.addEventListener('pointermove',e=>{if(M.stick&&M.stick.id===e.pointerId){let dx=e.clientX-M.stick.x0,dy=e.clientY-M.stick.y0;const d=Math.hypot(dx,dy),max=52;if(d>max){M.stick.x0+=dx/d*(d-max);M.stick.y0+=dy/d*(d-max);dx=dx/d*max;dy=dy/d*max}M.stick.dx=dx/max;M.stick.dy=dy/max}else if(S.mode==='board')boardMove(e)});
+const endP=e=>{if(M.stick&&M.stick.id===e.pointerId)M.stick=null;if(S.mode==='board')boardUp(e)};window.addEventListener('pointerup',endP);window.addEventListener('pointercancel',endP);
+function inputVec(){let x=0,y=0;if(keys.KeyA||keys.ArrowLeft)x-=1;if(keys.KeyD||keys.ArrowRight)x+=1;if(keys.KeyW||keys.ArrowUp)y-=1;if(keys.KeyS||keys.ArrowDown)y+=1;if(x||y){const d=Math.hypot(x,y);return{x:x/d,y:y/d}}
+ if(M.stick){const m=Math.hypot(M.stick.dx,M.stick.dy);if(m>.14)return{x:M.stick.dx,y:M.stick.dy}}if(window.__v)return window.__v;return{x:0,y:0}}
+function updMap(dt){if(M.lock){M.vx=M.vy=0;M.p.moving=false}else{const v=inputVec(),SP=450,a=1-Math.exp(-dt*16);M.vx+=(v.x*SP-M.vx)*a;M.vy+=(v.y*SP-M.vy)*a;const p=M.p;
+ const nx=p.x+M.vx*dt,ny=p.y+M.vy*dt;let moved=0;if(!blocked(nx,p.y)){moved+=Math.abs(nx-p.x);p.x=nx}else M.vx=0;if(!blocked(p.x,ny)){moved+=Math.abs(ny-p.y);p.y=ny}else M.vy=0;
+ const sp=Math.hypot(M.vx,M.vy);p.moving=sp>26;if(p.moving){p.dist+=sp*dt;p.step=Math.floor(p.dist/34);if(Math.abs(M.vx)>Math.abs(M.vy)*1.15)p.dir=M.vx>0?'r':'l';else if(Math.abs(M.vy)>Math.abs(M.vx)*1.15)p.dir=M.vy>0?'f':'b'}}
+ const p=M.p,tx=clamp(p.x-W/2,0,MW-W),ty=clamp(p.y-H/2-20,0,MH-H),k=1-Math.exp(-dt*7);M.cam.x+=(tx-M.cam.x)*k;M.cam.y+=(ty-M.cam.y)*k;
+ let best=null,bd=1e9;const look=(x,y,r,fn,label)=>{const d=Math.hypot(p.x-x,p.y-y);if(d<r&&d<bd){bd=d;best={fn,label}}};
+ for(const i of M.pick)look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);
+ const g=stage();
+ look(M.npc.hamdan.x,M.npc.hamdan.y,135,talkHamdan,'كلّم حمدان');look(M.npc.mubarak.x,M.npc.mubarak.y,135,talkMubarak,'كلّم مبارك');look(M.npc.nasser.x,M.npc.nasser.y,145,talkNasser,'كلّم ناصر');
+ if(p.moving&&Math.hypot(p.x-2660,p.y-1620)<1e-9){}
+ M.act=M.lock?null:best;const b=$('#act');if(M.act){if(b.textContent!==M.act.label)b.textContent=M.act.label;b.hidden=false}else b.hidden=true;
+ if(window.__autosave===undefined||time-window.__autosave>4){window.__autosave=time;save.flags.px=p.x|0;save.flags.py=p.y|0;store.put()}}
+function doAct(){if(M.act){const f=M.act.fn;M.act=null;f()}}
+$('#act').addEventListener('pointerdown',e=>{e.stopPropagation()});$('#act').onclick=e=>{e.stopPropagation();doAct()};
+function stage(){const f=save.flags,sc=[1,2,3,4,5,6].filter(i=>f['got_s'+i]).length,mp=['head','rod','weight'].filter(i=>f['got_'+i]).length;return{sc,mp,sold:f.sold,met:f.metMubarak}}
+function drawMap(){const c=M.cam,cx=c.x|0,cy=c.y|0;X.fillStyle='#e8b673';X.fillRect(0,0,W,H);X.drawImage(M.tiles,0,0,MW/2,MH/2,-cx,-cy,MW,MH);
+ const list=[];for(const o of M.objs)list.push({y:o.y,d(){X.drawImage(o.im,o.x-o.w/2-cx,o.y-o.h-cy,o.w,o.h)}});
+ for(const i of M.pick){const im=img[i.k];list.push({y:i.y,d(){const b=Math.sin(time*3.2+i.x)*5,w=im.width*i.s,h=im.height*i.s;X.fillStyle='rgba(40,14,0,.25)';X.beginPath();X.ellipse(i.x-cx,i.y-cy,w*.4,8,0,0,7);X.fill();X.drawImage(im,i.x-w/2-cx,i.y-h-10+b-cy,w,h);const g=.45+.35*Math.sin(time*4+i.y);X.fillStyle=`rgba(255,240,180,${g})`;X.fillRect(i.x-cx+w*.2,i.y-h-12+b-cy,5,5)}})}
+ for(const n of Object.values(M.npc))list.push({y:n.y,d(){drawWalker(X,n,cx,cy);if(n===nextTarget())marker(n.x-cx,n.y-n.h-26-cy)}});
+ list.push({y:M.truck.y,d(){const im=img.truck_side,w=im.width*1.2,h=im.height*1.2;X.drawImage(im,M.truck.x-w/2-cx,M.truck.y-h+24-cy,w,h)}});
+ list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});
+ list.sort((a,b)=>a.y-b.y);for(const l of list)l.d();
+ const t=nextPoint();if(t)edgeArrow(t.x-cx,t.y-cy);}
+function marker(x,y){const b=Math.sin(time*5)*5;X.fillStyle='#f2b84b';X.strokeStyle='#4b1f07';X.lineWidth=3;X.beginPath();X.moveTo(x-13,y-15+b);X.lineTo(x+13,y-15+b);X.lineTo(x,y+3+b);X.closePath();X.fill();X.stroke()}
+function edgeArrow(x,y){if(x>40&&x<W-40&&y>40&&y<H-40)return;const a=Math.atan2(y-H/2,x-W/2),r=Math.min((W/2-70)/Math.abs(Math.cos(a)||1e-3),(H/2-70)/Math.abs(Math.sin(a)||1e-3)),ax=W/2+Math.cos(a)*r,ay=H/2+Math.sin(a)*r;X.save();X.translate(ax,ay);X.rotate(a);X.fillStyle='#f2b84b';X.strokeStyle='#4b1f07';X.lineWidth=4;X.beginPath();X.moveTo(26,0);X.lineTo(-16,-20);X.lineTo(-7,0);X.lineTo(-16,20);X.closePath();X.fill();X.stroke();X.restore()}
+function nextTarget(){const g=stage();if(!g.met)return M.npc.mubarak;if(g.sc>=6&&!g.sold)return M.npc.nasser;if(g.sold&&g.mp>=3)return M.npc.mubarak;return null}
+function nextPoint(){const n=nextTarget();if(n)return n;let best=null,bd=1e9;for(const i of M.pick){const d=Math.hypot(i.x-M.p.x,i.y-M.p.y);if(d<bd){bd=d;best=i}}return best}
+function renderTasks(){const g=stage(),T=$('#tasks');const line=(t,d)=>`<div class="${d?'done':''}">${t}</div>`;
+ let h='<b>شغّل المضخة</b>';if(!g.met)h+=line('كلّم مبارك عند المضخة');else{h+=line(`لقّط القطع من الموقع ${g.mp}/3`,g.mp>=3);h+=line(`اجمع الخردة ${g.sc}/6`,g.sc>=6);h+=line('بدّل الخردة عند ناصر',g.sold);if(g.mp>=3&&g.sold)h+=line('ارجع لمبارك وركّب')}T.innerHTML=h;
+ $('#stat').textContent='باقي على العقد: 6 أشهر'}
+async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;await fn();M.lock=false;renderTasks();store.put()}
+function takeItem(i){M.pick=M.pick.filter(x=>x!==i);save.flags['got_'+i.id]=1;puff(i.x-M.cam.x,i.y-M.cam.y,6);toast('حصلت: '+i.name);renderTasks();store.put()}
+function talkHamdan(){talk(async()=>{const g=stage();if(!g.met)await say('hamdan','neutral','مبارك عند المضخة. هو أدرى منا كلنا فيها.');else if(!g.sold)await say('hamdan','warm','ناصر عنده الخير كله، بس ما يعطي شي ببلاش. وأنت ما عندك إلا الخردة.');else await say('hamdan','warm','وريهم إنك ولد سالم.')})}
+function talkMubarak(){talk(async()=>{const g=stage();
+ if(!g.met){await say('mubarak','neutral','الولد رجع. قل لي، تعرف تفرق بين مفتاح وملعقة؟');await say('hero','firm','علمني.');
+  await say('mubarak','neutral','ناقصها خمس قطع. الرأس والعمود والثقل تلقاها مرمية في الموقع.');await say('mubarak','neutral','السير والصمام عند ناصر. ما معنا فلوس، بس هو يشتري الخردة. لقّطها وودها له.');save.flags.metMubarak=1;return}
+ if(g.mp>=3&&g.sold){await say('mubarak','happy','كل القطع معك؟ يلا. أبيك تركبها بيدك.');await say('mubarak','neutral','أبوك ما خلى أحد يركب أول مضخة عنه.');save.ch=3;store.put();M.leave&&M.leave();return}
+ await say('mubarak','neutral',`باقي عليك: ${3-g.mp>0?(3-g.mp)+' قطع من الموقع':''}${(3-g.mp>0&&!g.sold)?'، و':''}${!g.sold?'سير وصمام من عند ناصر':''}.`)})}
+function talkNasser(){talk(async()=>{const g=stage();
+ if(g.sold){await say('nasser','happy','يوم تطلع أول دفعة، شاحنتي جاهزة. بس الكاش قبل الديزل!');return}
+ if(g.sc<6){await say('nasser','happy','ولد سالم! الله يرحم أبوك، كان يدفع متأخر بس يدفع.');await say('nasser','neutral',`أبغى ست قطع خردة ومعك ${g.sc}. وأعطيك سير وصمام.`);return}
+ await say('nasser','happy','هذي خردة تسوى ذهب! خذ السير والصمام.');await say('nasser','neutral','وإذا شغلتها، أول حمولة علي.');save.flags.sold=1;toast('حصلت: السير والصمام');})}
+async function ch2(){S.mode='map';setView(true);startScene();$('#skip').hidden=true;S.bars=0;buildMap();const p=M.p;M.cam.x=clamp(p.x-W/2,0,MW-W);M.cam.y=clamp(p.y-H/2,0,MH-H);M.lock=false;$('#hud').hidden=false;renderTasks();
+ if(!save.flags.mapHint){save.flags.mapHint=1;toast(matchMedia('(pointer:coarse)').matches?'اسحب إصبعك في أي مكان عشان تمشي':'امش بالأسهم أو WASD، وتفاعل بـE')}
+ await fadeTo(0,500);await new Promise(r=>M.leave=r);M.leave=null;await fadeTo(1,500);$('#hud').hidden=true;$('#act').hidden=true;S.mode='none';setView(false)}
+/* ---------- assembly board ---------- */
+const PARTS={head:{k:'q_head',s:.72,tx:352,ty:172,hx:1130,hy:135,name:'رأس المضخة'},rod:{k:'q_rod',s:.63,tx:1085,ty:417,hx:1430,hy:125,name:'عمود التوصيل'},weight:{k:'q_weight',s:.6,tx:1090,ty:696,hx:150,hy:400,name:'الثقل'},belt:{k:'q_belt',s:.72,tx:1250,ty:657,hx:1520,hy:370,name:'السير'},valve:{k:'q_valve',s:.62,tx:555,ty:653,hx:95,hy:120,name:'الصمام'}};
+const B={list:[],drag:null,run:0,spin:0,a:0,done:false};
+function setupBoard(){B.list=Object.keys(PARTS).map(id=>({id,...PARTS[id],x:PARTS[id].hx,y:PARTS[id].hy,on:false,pop:0}));B.drag=null;B.run=0;B.spin=0;B.phase=0;B.oil=0}
+function boardDown(e){if(B.done)return;const p=worldFromEvent(e);let best=null,bd=170;for(const q of B.list){if(q.on)continue;const d=Math.hypot(p.x-q.x,p.y-q.y);if(d<bd){bd=d;best=q}}if(best){B.drag=best;best.ox=best.x-p.x;best.oy=best.y-p.y;B.pid=e.pointerId}}
+function boardMove(e){if(B.drag&&e.pointerId===B.pid){const p=worldFromEvent(e);B.drag.x=p.x+B.drag.ox;B.drag.y=p.y+B.drag.oy}}
+function boardUp(e){const q=B.drag;if(!q||e.pointerId!==B.pid)return;B.drag=null;tryPlace(q)}
+function tryPlace(q){if(Math.hypot(q.x-q.tx,q.y-q.ty)<125){q.x=q.tx;q.y=q.ty;q.on=true;q.pop=1;S.shake=7;setTimeout(()=>S.shake=0,110);puff(q.tx,q.ty,14,'rgba(255,200,120,.9)',160);toast('ركبت: '+q.name);if(B.list.every(x=>x.on)){B.phase=1;$('#hold').hidden=false;$('#hold em').textContent='اضغط مطوّل لتشغيل المضخة'}}else{const sx=q.x,sy=q.y;tween(220,p=>{q.x=sx+(q.hx-sx)*ease(p);q.y=sy+(q.hy-sy)*ease(p)})}}
+function spr(n,ox=0,oy=0){const a=META[n+'_at'];X.drawImage(img[n],a[0]+ox,a[1]+oy)}
+function drawBoard(){X.save();if(S.shake>0)X.translate((Math.random()-.5)*S.shake,(Math.random()-.5)*S.shake);
+ X.drawImage(img.pump_bg,0,0,W,H);const b=B.list.reduce((m,q)=>(m[q.id]=q,m),{});
+ const ang=Math.sin(B.a)*.055*(B.spin>0?1:0);const ca=Math.cos(ang),sa=Math.sin(ang),PX=735,PY=247;
+ const rot=(x,y)=>({x:PX+(x-PX)*ca-(y-PY)*sa,y:PY+(x-PX)*sa+(y-PY)*ca});
+ /* polished rod clipped into the stuffing box */
+ const hp=rot(385,240),dy=hp.y-240;X.save();X.beginPath();X.rect(300,0,160,568);X.clip();spr('pump_prod',0,dy);X.restore();
+ /* walking beam + head */
+ X.save();X.translate(PX,PY);X.rotate(ang);X.translate(-PX,-PY);spr('pump_beam');if(b.head.on)drawPart(b.head);X.restore();
+ spr('pump_saddle');
+ if(b.valve.on)drawPart(b.valve);
+ if(b.belt.on)drawPart(b.belt,B.spin>0?(Math.random()-.5)*2:0);
+ if(b.weight.on){const q=b.weight,im=img[q.k],w=im.width*q.s,h=im.height*q.s,hol=(q.ty-628);X.save();X.translate(1090,628);X.rotate(B.spin>0?B.a:0);X.drawImage(im,-w/2,hol-h/2,w,h);X.restore()}
+ if(b.rod.on){const pin=rot(1085,345),im=img.q_rod,dx=1083-pin.x,dyy=490-pin.y,L=Math.hypot(dx,dyy),w=im.width*.63;X.save();X.translate((pin.x+1083)/2,(pin.y+490)/2);X.rotate(Math.atan2(dyy,dx)-Math.PI/2);const hh=im.height*.63*(L/145);X.drawImage(im,-w/2,-hh/2,w,hh);X.restore()}
+ for(const q of B.list)if(!q.on){const im=img[q.k],w=im.width*q.s,h=im.height*q.s;
+  X.setLineDash([12,10]);X.lineWidth=4;X.strokeStyle=`rgba(255,240,190,${B.drag===q?.95:.42+.2*Math.sin(time*4)})`;X.strokeRect(q.tx-w/2-8,q.ty-h/2-8,w+16,h+16);X.setLineDash([]);
+  X.save();X.shadowColor='rgba(0,0,0,.5)';X.shadowBlur=14;X.shadowOffsetY=8;const z=B.drag===q?1.08:1;X.drawImage(im,q.x-w*z/2,q.y-h*z/2,w*z,h*z);X.restore()}
+ drawDust();X.restore();
+ if(B.oil>0){X.fillStyle='rgba(24,12,6,.82)';X.fillRect(W/2-180,18,360,60);X.fillStyle='#f7e7c8';X.font='700 30px Almarai,sans-serif';X.textAlign='center';X.direction='rtl';X.fillText('برميل: '+Math.floor(B.oil),W/2,58)}}
+function drawPart(q,o=0){const im=img[q.k],w=im.width*q.s,h=im.height*q.s,z=1+q.pop*.14;X.drawImage(im,q.x-w*z/2+o,q.y-h*z/2,w*z,h*z)}
+function updBoard(dt){for(const q of B.list)q.pop=Math.max(0,q.pop-dt*4);
+ if(B.holding&&B.phase===1){B.run=Math.min(1,B.run+dt/1.3);$('#hold u').style.width=B.run*100+'%';if(Math.random()<dt*8)puff(1380,600,3,'rgba(50,40,35,.7)',140);S.shake=2+B.run*4;if(B.run>=1){B.phase=2;B.holding=false;S.shake=0;$('#hold').hidden=true;B.spin=.01;puff(1380,590,26,'rgba(50,40,35,.8)',260);B.res&&B.res()}}
+ else if(B.phase===1&&!B.holding&&B.run>0){B.run=Math.max(0,B.run-dt*1.6);$('#hold u').style.width=B.run*100+'%';S.shake=0}
+ if(B.phase>=2){B.spin=Math.min(1,B.spin+dt*.45);B.a+=dt*3.1*B.spin;B.oil+=dt*2.2*B.spin;if(Math.random()<dt*4)puff(1450,560,2,'rgba(70,60,55,.45)',170)}}
+{const h=$('#hold');h.addEventListener('pointerdown',e=>{e.stopPropagation();B.holding=true});const u=()=>B.holding=false;h.addEventListener('pointerup',u);h.addEventListener('pointerleave',u);h.addEventListener('pointercancel',u)}
+async function ch3(){startScene();setupBoard();S.mode='board';S.bars=0;await fadeTo(0,500);toast('اسحب كل قطعة لمكانها');
+ await new Promise(r=>B.res=r);await wait(2600);
+ await say('mubarak','happy','اسمع هالصوت! ثلاث شهور وهي ساكتة.');
+ await say('hero','smile','هذي أول مرة أركب شي بيدي.');
+ await say('mubarak','neutral','وما هي الأخيرة. المضخة تأكل أكثر مما تعطي.');
+ await fadeTo(1,800);S.mode='none'}
+async function ch4(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;await card('بعد أسبوع',1100);
+ const h=actor('hero',760,780,290),m=actor('hamdan',500,790,270),b=actor('mubarak',1070,780,285),n=actor('nasser',1400,850,285);h.dir='r';m.dir='r';b.dir='l';n.dir='l';await fadeTo(0,700);
+ await say('nasser','happy','أول حمولة سلمناها للخواجة! هذا حسابك بعد الديزل: ثمانية عشر ألف ريال.');
+ await walk(n,1800,880,240);n.on=false;
+ await say('hamdan','worried','الخزان الكبير يهرّب. من كل عشرة براميل نخسر واحد، وإصلاحه ثمانية عشر ألف.');
+ await say('mubarak','angry','وأنا والشباب ما قبضنا من ثلاثة شهور. وعدتونا. وثمانية عشر ألف تكفي رواتب الشهر.');
+ await say('hamdan','neutral','الفلوس ما تكفي الاثنين. أنت صاحب الشركة، قرر.');
+ const r=await choose('ثمانية عشر ألف ريال، وين تروح؟',[{t:'رواتب الموظفين',s:'مبارك يبقى، والخزان يكمل يهرّب'},{t:'إصلاح الخزان',s:'الإنتاج يكفي الكمية، بس الموظفين بدون راتب'}]);
+ save.flags.decision=r;store.put();
+ if(r===0){await say('mubarak','happy','هذا كلام ولد سالم. والله ما أنساها لك.');await say('hamdan','worried','بس كل برميل يطيح في الرمل بينقص من تسليم الشهر.');await card('مبارك بقي معك<small>الخزان يخسر برميل من كل عشرة، وتسليم الشهر صار أصعب</small>',2600)}
+ else{await say('mubarak','angry','الحديد عندك أغلى منا؟ طيب.');await walk(b,1800,860,230);b.on=false;await say('hamdan','sad','مبارك يوم يطلع، ما يرجع. والمضخة ما يعرف أسرارها غيره.');await card('مبارك طلع من الشركة<small>الخزان تصلّح، بس المضخة بدون أخبر واحد فيها</small>',2600)}
+ await fadeTo(1,800)}
+async function ch5(){S.mode='cine';startScene();setBg('office');S.bars=1;S.fade=1;S.tint='rgba(15,20,60,.62)';S.lamp=1;await card('الليلة نفسها',1100);
+ const h=actor('hero',520,860,340);h.dir='r';await fadeTo(0,900);await wait(500);
+ await say('hero','neutral','ريحة مكتبك مثل ما هي، يبه.');
+ await walk(h,1195,810,150);h.dir='r';await wait(700);
+ await say('hero','neutral','أول برميل. ثلاثين سنة وما رضيت تبيعه…');
+ await say('hero','worried','وش هذا؟ فيه ورقة وراه.');await wait(400);
+ const l=$('#letter');l.firstElementChild.style.backgroundImage=`url(${ASSETS.s_letter})`;const lines=['إذا قريت هذي، فأنا ما لحقت.','لا توقّع.','باقي على العقد ستة أشهر.'];const d=l.firstElementChild;d.textContent='';l.hidden=false;
+ for(const t of lines){const p=document.createElement('div');p.style.cssText='position:static;width:auto;aspect-ratio:auto;padding:0;display:block';d.style.flexDirection='column';p.style.opacity=0;p.textContent=t;d.appendChild(p);await tween(TEST?5:900,q=>p.style.opacity=q);await wait(650)}
+ await new Promise(r=>{if(TEST)return setTimeout(r,10);const f=()=>{l.removeEventListener('pointerup',f);r()};l.addEventListener('pointerup',f)});l.hidden=true;
+ await say('hero','firm','ستة أشهر.');await fadeTo(1,1200)}
+async function ch6(){S.mode='none';$('#skip').hidden=true;const dec=save.flags.decision;const c=$('#title');c.innerHTML=`<h1 style="font-size:clamp(40px,10vmin,90px)">نهاية الحلقة الأولى</h1><p>${dec===0?'اخترت الناس، وخسرت من الخزان.':'اخترت الخزان، وخسرت مبارك.'}</p><p style="opacity:.8">الحلقة الجاية: الخواجة يعرف إنك ما بتبيع.</p><button class="btn go" id="again">العب مرة ثانية</button>`;c.hidden=false;S.fade=1;$('#again').onclick=()=>{store.clear();save={ch:0,flags:{}};location.reload()}}
+const CH=[ch0,ch1,ch2,ch3,ch4,ch5,ch6];
+async function run(from){for(let i=from;i<CH.length;i++){save.ch=i;store.put();skipOK=(i===0||i===1||i===4)&&!TEST;$('#skip').hidden=true;await CH[i]();if(i===2&&save.ch===3){}save.ch=i+1;store.put()}}
+function titleScreen(){S.mode='cine';setBg('desert');S.fade=0;S.bars=0;S.actors=[];const c=$('#title');const hasSave=save.ch>0;
+ c.innerHTML=`<h1>أول برميل</h1><p>تطوير شادي الصاعدي</p><div class="go" style="display:flex;gap:.7em;flex-wrap:wrap;justify-content:center">${hasSave?'<button class="btn" id="go2">كمّل</button><button class="btn ghost" id="go">من البداية</button>':'<button class="btn" id="go">ابدأ</button>'}</div>`;c.hidden=false;
+ const start=async(n)=>{c.hidden=true;await fadeTo(1,350);run(n)};
+ $('#go').onclick=()=>{save={ch:0,flags:{}};store.clear();start(0)};if(hasSave)$('#go2').onclick=()=>start(save.ch)}
+/* ---------- loop ---------- */
+let last=0;function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;time+=dt;jobs=jobs.filter(j=>!j.u(dt));updDrops(dt);updDust(dt);
+ if(S.mode==='map'){updMap(dt);drawMap()}else if(S.mode==='board'){updBoard(dt);drawBoard()}else if(S.mode==='cine')drawCine();else{X.fillStyle='#000';X.fillRect(0,0,W,H)}
+ if(S.fade>0){X.fillStyle=`rgba(0,0,0,${S.fade})`;X.fillRect(0,0,W,H)}
+ requestAnimationFrame(frame)}
+/*TESTHOOK*/
+document.addEventListener('gesturestart',e=>e.preventDefault());document.addEventListener('contextmenu',e=>e.preventDefault());
+Promise.all([loadAll(),document.fonts?document.fonts.ready:0]).then(()=>{store.load();requestAnimationFrame(frame);titleScreen();window.__ready=true});
+if('serviceWorker'in navigator&&location.protocol==='https:'&&!location.hostname.includes('claude'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script></body></html>
