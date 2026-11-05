@@ -181,7 +181,7 @@ const COMPANIES=['قهوة رمال الفجر','تمور واحة سدرة','م
 const BUYERS=[{id:'caravan',n:'بدو القوافل',p:2,q:15,at:()=>S.sold>=10,d:'كميات صغيرة لوقود القوافل.'},{id:'smith',n:'ورشة الحدادين',p:3,q:40,at:()=>S.sold>=30,d:'تشتري باستمرار بسعر معقول.'},{id:'factory',n:'مصنع الأسمنت',p:10,q:200,at:()=>S.contract,d:'كميات كبيرة، بس لازم مخزون.'},{id:'port',n:'ميناء الساحل',p:14,q:1000,at:()=>S.tier>=2,d:'يصدّر للخارج بسعر عالي.'},{id:'ship',n:'ناقلات البحر',p:22,q:6000,at:()=>S.tier>=3,d:'أكبر مشتري في البلد.'}];
 const MONTH=600,WALLR={x0:40,x1:960,y0:120,y1:790},SLOTS=[[150,762],[330,762],[510,762],[690,762],[860,762]];
 const UP={hut:['يزيد سكن الموظفين 1',60],shop:['ضربة الفأس تعطيك خشب أكثر',80],derrick:['تشيل برميل زيادة',70],nursery:['الشجر يكبر أسرع',70],dock:['سعر البيع يزيد 10%',120],office:['تدريب الموظفين أرخص 10%',150],house:['يزيد السكن 3',120],forklift:['يشيل 3 براميل زيادة',120],farm:['الأكل يزيد 30%',100],security:['الاعتراض أقوى',200],fire:['الإطفاء أسرع',200],radar:['فرصة الاعتراض تزيد',300],defense:['الدفاع الآلي أقوى',600]};
-const WALLS=[{n:'سور خشب',c:{wood:120,stone:60}},{n:'سور حجر',c:{stone:200,money:800}},{n:'سور مقوّى',c:{stone:400,money:5000}},{n:'سور فولاذ',c:{stone:800,money:40000}}];
+const WALLS=[{n:'سور خشب',c:{wood:180}},{n:'سور حجر',c:{stone:200,money:800}},{n:'سور مقوّى',c:{stone:400,money:5000}},{n:'سور فولاذ',c:{stone:800,money:40000}}];
 
 /* ---------- Sound: everything is synthesised, no audio files ---------- */
 const SND=(function(){let k=1,loops={},ac=null,master=null,noiseBuf=null,last={},musicT=null,mi=0,wind=null;let muted=false;try{muted=localStorage.getItem('awwal-mute')==='1'}catch(e){}
@@ -290,18 +290,18 @@ const B={
  yard:{n:'ساحة البراميل',x:415,y:645,img:'yard',c:{wood:12},need:'shop',pass:1},
  dock:{n:'منصة البيع',x:275,y:625,img:'dock',c:{wood:10},need:'yard'},
  nursery:{n:'مشتل',x:625,y:640,img:'nursery',c:{wood:10},need:'derrick',pass:1},
- office:{n:'المكتب الرئيسي',x:500,y:310,img:'office',c:{wood:30,stone:20,money:30},need:'dock'},
- house:{n:'سكن الموظفين',x:695,y:290,img:'house',c:{wood:40,stone:25,money:60},need:'office'},
+ office:{n:'المكتب الرئيسي',x:500,y:310,img:'office',c:{wood:45,money:30},need:'dock'},
+ house:{n:'سكن الموظفين',x:695,y:290,img:'house',c:{wood:60,money:60},need:'office'},
  forklift:{n:'فوركلفت',x:650,y:530,img:'forklift',c:{stone:10,money:60},need:'office',pass:1},
  pump:{n:'مضخة آلية',x:365,y:540,img:'pump',c:{stone:20,money:150},need:'office'},
- farm:{n:'مزرعة أبو سالم',x:790,y:600,img:'farm',c:{wood:25,money:40},need:'office'},
+ farm:{n:'مزرعة أبو سالم',x:790,y:600,img:'farm',c:{wood:30,money:40},need:'office'},
  transport:{n:'شركة نقل ناصر',x:175,y:480,img:'transport',c:{money:120},need:'dock'},
  security:{n:'مركز الأمن',x:270,y:345,img:'security',c:{stone:20,money:250},need:'office'},
  fire:{n:'مركز الإطفاء',x:165,y:690,img:'fire',c:{stone:20,money:300},need:'office'},
  radar:{n:'رادار',x:300,y:195,img:'radar',c:{stone:30,money:400},need:'office'},
  defense:{n:'منظومة دفاع',x:530,y:150,img:'defense',c:{stone:40,money:900},need:'radar'},
 };
-const TIERS=[{n:'ساحة براميل',cap:20,img:'yard'},{n:'خزان خشب',cap:200,img:'tank1',c:{wood:60,stone:40,money:100}},{n:'خزان حديد',cap:5000,img:'tank2',c:{stone:80,money:1500}},{n:'تانكي كبير',cap:100000,img:'tank3',c:{stone:150,money:40000}},{n:'التانكي العملاق',cap:1500000,img:'tank4',c:{stone:300,money:900000}}];
+const TIERS=[{n:'ساحة براميل',cap:20,img:'yard'},{n:'خزان خشب',cap:200,img:'tank1',c:{wood:90,money:100}},{n:'خزان حديد',cap:5000,img:'tank2',c:{stone:80,money:1500}},{n:'تانكي كبير',cap:100000,img:'tank3',c:{stone:150,money:40000}},{n:'التانكي العملاق',cap:1500000,img:'tank4',c:{stone:300,money:900000}}];
 const BRANCHES=[{n:'فرع الواحة',km:280,cost:5000,rate:3},{n:'فرع الساحل',km:450,cost:30000,rate:15},{n:'فرع الشمال',km:720,cost:150000,rate:70},{n:'فرع الجنوب',km:960,cost:700000,rate:300}];
 const FIRST=['سالم','فهد','راشد','مبارك','عبدالله','ناصر','هادي','سعود','ماجد','خالد','طلال','بدر'],LAST=['الجهني','الدوسري','الحربي','الغامدي','الشهري','العتيبي','القحطاني','الزهراني'];
 function seeded(seed){let s=seed;return()=>(s=(s*16807)%2147483647)/2147483647}
@@ -309,10 +309,10 @@ const INTRO_TREE={x:560,y:470};
 function makeWorld(){const r=seeded(4242),trees=[{x:INTRO_TREE.x,y:INTRO_TREE.y,hp:3,st:'t',t:0}],rocks=[];
   [[440,510],[575,540],[540,410],[455,600],[700,450],[350,360]].forEach(p=>{if(dist(p[0],p[1],WELL.x,WELL.y)>55)trees.push({x:p[0],y:p[1],hp:3,st:'t',t:0})});
   const free=(x,y)=>Object.values(B).every(b=>dist(x,y,b.x,b.y)>70)&&dist(x,y,WATER.x,WATER.y)>100;
-  let guard=0;while(trees.length<22&&guard++<400){const a=r()*6.28,d=170+r()*280,x=500+Math.cos(a)*d,y=480+Math.sin(a)*d;if(free(x,y))trees.push({x,y,hp:3,st:'t',t:0})}
-  for(let i=0;i<8;i++)rocks.push({x:70+i%3*58+r()*16,y:250+Math.floor(i/3)*46+r()*14,hp:4,t:0});
+  let guard=0;while(trees.length<42&&guard++<900){const a=r()*6.28,d=170+r()*280,x=500+Math.cos(a)*d,y=480+Math.sin(a)*d;if(free(x,y))trees.push({x,y,hp:3,st:'t',t:0})}
+  for(let i=0;i<8;i++)rocks.push({x:70+i%3*58+r()*16,y:250+Math.floor(i/3)*46+r()*14,hp:4,t:0});for(let i=0;i<6;i++)rocks.push({x:880+i%2*52+r()*14,y:440+Math.floor(i/2)*52+r()*14,hp:4,t:0});for(let i=0;i<4;i++)rocks.push({x:640+i*52+r()*14,y:150+r()*24,hp:4,t:0});
   return{trees,rocks}}
-function fresh(){const w=makeWorld();return{scene:'intro',px:SPAWN.x,py:SPAWN.y,wood:0,stone:0,water:0,money:0,empty:0,carry:0,stored:0,sold:0,planted:0,price:1,startPrice:1,built:{},paid:{},hp:{},fires:{},tier:0,trees:w.trees,rocks:w.rocks,staff:[],apps:[],nid:1,pumpLvl:0,fleetLvl:0,ammo:0,rideF:0,contract:0,branches:[],food:0,herd:0,herdT:30,attackIn:null,attacks:0,stopped:0,played:0,lastSpy:0,accident:50,led:{inc:0,out:0},monthT:600,rep:null,bq:{},bsel:null,bT:120,mkt:1,fx:650,fy:530,dayT:150,breakT:0,lv:{},wallLv:0,contracts:[],offer:null,invT:25,rCool:0}}
+function fresh(){const w=makeWorld();return{scene:'intro',px:SPAWN.x,py:SPAWN.y,wood:0,stone:0,water:0,money:0,empty:0,carry:0,stored:0,sold:0,planted:0,price:1,startPrice:1,built:{},paid:{},hp:{},fires:{},tier:0,trees:w.trees,rocks:w.rocks,staff:[],apps:[],nid:1,pumpLvl:0,fleetLvl:0,ammo:0,rideF:0,contract:0,branches:[],food:0,herd:0,herdT:30,attackIn:null,attacks:0,stopped:0,played:0,lastSpy:0,accident:50,hammer:0,led:{inc:0,out:0},monthT:600,rep:null,bq:{},bsel:null,bT:120,mkt:1,fx:650,fy:530,dayT:150,breakT:0,lv:{},wallLv:0,contracts:[],offer:null,invT:25,rCool:0}}
 let S=fresh();try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(fresh(),JSON.parse(r))}catch(e){}
 let wiped=false;function save(){if(wiped)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function earn(n){S.money+=n;S.led.inc+=n}
@@ -325,6 +325,8 @@ const priceOf=b=>b.q===null?b.p*dockMul():b.p*S.mkt*dockMul();
 const qtyOf=b=>b.q===null?Infinity:(S.bq[b.id]===undefined?(S.bq[b.id]=b.q):S.bq[b.id]);
 /* Sells n barrels: chosen buyer first, then the best remaining price; the main buyer takes any leftover */
 function sell(n){let left=n,got=0;const list=buyers().sort((a,b)=>(b.id===S.bsel)-(a.id===S.bsel)||priceOf(b)-priceOf(a));for(const b of list){if(left<=0)break;const t=Math.min(left,qtyOf(b));if(t<=0)continue;if(b.q!==null)S.bq[b.id]-=t;got+=t*priceOf(b);left-=t}earn(got);S.sold+=n;return got}
+if(!S.hammer&&(S.stone>0||S.wallLv>0||S.built.radar||S.built.pump))S.hammer=1;
+(function(){const w=makeWorld();if(S.trees.length<w.trees.length)S.trees=S.trees.concat(w.trees.slice(S.trees.length));if(S.rocks.length<w.rocks.length)S.rocks=S.rocks.concat(w.rocks.slice(S.rocks.length))})();
 const has=id=>!!S.built[id]&&(S.hp[id]===undefined||S.hp[id]>0);
 const cap=()=>S.built.yard?TIERS[S.tier].cap:0;
 const carryCap=()=>S.rideF?12+3*lv('forklift'):3+lv('derrick');
@@ -358,10 +360,11 @@ const M=[
  {t:'خزّن البراميل في الساحة',h:'امش بها للساحة وتنزل لحالها.',go:()=>B.yard,done:()=>S.stored>=3||S.sold>0},
  {t:'ابن منصة البيع وبع 10 براميل',h:()=>!S.built.dock?'قف عند الدائرة وابن المنصة.':oilStep()[1],go:()=>!S.built.dock?(S.wood<1?nearestTree():B.dock):oilStep()[0],done:()=>S.sold>=10},
  {t:'ازرع 3 أشجار',h:'جيب ماء من البير القديم، ثم قف عند أي جذع مقطوع.',go:()=>S.water<1?WATER:(nearestStump()||WATER),done:()=>S.planted>=3},
- {t:'ابن المكتب الرئيسي',h:'اكسر صخور من الغرب. الورشة أعطتك مطرقة.',go:()=>S.stone<1&&!S.paid.office?(S.rocks.find(r=>r.hp>0)||B.office):B.office,done:()=>S.built.office},
+ {t:'ابن المكتب الرئيسي',h:'كل شي للحين من الخشب. هذا مركز شركتك.',go:()=>B.office,done:()=>S.built.office},
  {t:'وظّف أول موظف وعطه شغلة',h:'افتح المكتب، وافحصه، واختر وش يشتغل. بعدها يشتغل لحاله.',go:()=>B.office,needs:()=>({money:30}),done:()=>S.staff.length>0},
  {t:'ابن مزرعة مع أبو سالم',h:'مطبخه يأكّل موظفينك وقت البريك كل يوم. الجوعان يشتغل بنص سرعته.',go:()=>B.farm,done:()=>S.built.farm},
  {t:'ابن سكن الموظفين',h:'العريش ما يكفي إلا موظفين. السكن يزيدهم 8.',go:()=>B.house,done:()=>S.built.house},
+ {t:'اصنع مطرقة تكسر الحجر',h:'قف عند الورشة واضغط زر المطرقة. بعدها تقدر تكسر الصخور.',go:()=>B.shop,needs:()=>({wood:20,money:50}),done:()=>S.hammer},
  {t:'وقّع مع شركة ناصر للنقل',h:'ناصر يبغى يكلمك في شي مهم عن الخواجة.',go:()=>B.transport,done:()=>S.contract},
  {t:'ابن السور من المكتب',h:'افتح المكتب، ثم التطوير. السور يحمي شركتك، وعليه لوحات المستثمرين.',go:()=>B.office,needs:()=>WALLS[0].c,done:()=>S.wallLv>0},
  {t:'ابن الرادار',h:'بدونه الهجوم يجيك فجأة.',go:()=>B.radar,done:()=>S.built.radar},
@@ -372,7 +375,7 @@ const M=[
 ];
 /* The oil loop, one clear step at a time: make barrels, fill them, store them, sell */
 function oilStep(){if(S.stored>=1)return[B.dock,'قف عند المنصة والخواجة يشتري من مخزونك.'];if(S.carry>0)return[B.yard,'معك براميل مليانة. نزّلها في الساحة.'];if(S.empty>0)return[WELL,'معك براميل فاضية. عبّها من البرج.'];if(S.wood<1)return[nearestTree(),'خلصت البراميل. اكسر شجرة عشان تصنع غيرها.'];return[B.shop,'خلصت البراميل الفاضية. قف عند الورشة واصنع غيرها، كل برميل بخشبة.']}
-const SRC={wood:()=>[nearestTree()||B.nursery,'اكسر شجر'],stone:()=>[S.rocks.find(r=>r.hp>0)||B.shop,S.built.shop?'اكسر صخور من الغرب':'ابن الورشة أول، عشان المطرقة'],money:()=>{const o=S.built.dock?oilStep():[B.dock,'ابن منصة البيع'];return[o[0],o[1]]}};
+const SRC={wood:()=>[nearestTree()||B.nursery,'اكسر شجر'],stone:()=>S.hammer?[S.rocks.find(r=>r.hp>0)||B.shop,'اكسر الصخور']:[B.shop,'اصنع المطرقة من الورشة أول'],money:()=>{const o=S.built.dock?oilStep():[B.dock,'ابن منصة البيع'];return[o[0],o[1]]}};
 function guide(m){if(!m)return[null,''];const go=m.go&&m.go(),hint=typeof m.h==='function'?m.h():m.h;let c=m.needs&&m.needs(),paid={};
   if(!c&&go){const id=Object.keys(B).find(k=>B[k]===go);if(id&&!S.built[id]){c=B[id].c;paid=S.paid[id]||{}}}
   if(c){for(const k of ['wood','stone','money']){const miss=(c[k]||0)-(paid[k]||0)-S[k];if(miss>0){const q=SRC[k]();return[q[0],'ناقصك '+fmt(Math.ceil(miss))+' '+NAMES[k]+'. '+q[1].replace(/\.$/,'')+'.']}}}
@@ -415,7 +418,7 @@ function sim(dt){
     if(t.st==='t'&&d<30&&tick&&!S.rideF){t.hp--;S.wood+=pow;swing=1;SND.play('chop');burst(t.x,t.y-8,4,'#8c5a36',36);float(t.x,t.y-44,'+'+fmt(pow)+' خشب');if(t.hp<=0){t.st='s';shake=reduce?0:1.5}}
     if(t.st==='s'&&d<26&&has('nursery')&&S.water>=1&&tick){S.water--;t.st='g';t.t=28*(1-.12*lv('nursery'));S.planted++;float(t.x,t.y-20,'زرعت شجرة','#b5e8bd')}
   });
-  S.rocks.forEach(r=>{if(r.hp>0&&dist(r.x,r.y,S.px,S.py)<32&&tick&&!S.rideF){if(!S.built.shop){if(!sim.warn){toast('الصخور تحتاج مطرقة من الورشة.');sim.warn=1}return}r.hp--;S.stone+=3;swing=1;SND.play('stone');burst(r.x,r.y-8,5,'#a79aa8',46);float(r.x,r.y-34,'+3 حجر');if(r.hp<=0)r.t=45}if(r.hp<=0){r.t-=dt;if(r.t<=0)r.hp=4}});
+  S.rocks.forEach(r=>{if(r.hp>0&&dist(r.x,r.y,S.px,S.py)<32&&tick&&!S.rideF){if(!S.hammer)return;r.hp--;S.stone+=3;swing=1;SND.play('stone');burst(r.x,r.y-8,5,'#a79aa8',46);float(r.x,r.y-34,'+3 حجر');if(r.hp<=0)r.t=45}if(r.hp<=0){r.t-=dt;if(r.t<=0)r.hp=4}});
   if(dist(WATER.x,WATER.y,S.px,S.py)<46&&tick&&S.water<20){S.water=Math.min(20,S.water+2);SND.play('water');float(WATER.x,WATER.y-58,'+2 ماء','#a6e6f6')}
   if(has('shop')&&nearB('shop',18)&&tick&&S.wood>=1&&S.empty<40){S.wood--;S.empty++;SND.play('barrel');float(B.shop.x,B.shop.y-60,'+1 برميل')}
   if(has('derrick')&&dist(WELL.x,WELL.y,S.px,S.py)<46&&tick){if(S.empty>0&&S.carry<carryCap()){S.empty--;S.carry++;SND.play('oil');float(WELL.x,WELL.y-80,'عبّيت برميل','#d5c6f2')}else if(S.empty<1&&S.carry<carryCap()&&time-(sim.noB||-9)>6){sim.noB=time;toast(has('shop')?'ما عندك براميل فاضية. اصنعها من الورشة، كل برميل بخشبة.':'تحتاج ورشة عشان تصنع براميل.')}}
@@ -430,12 +433,12 @@ function sim(dt){
     const p=S.paid[id]||(S.paid[id]={});let all=true;for(const k in b.c){const need=b.c[k]-(p[k]||0);if(need>0){const g=Math.min(Math.max(1,Math.ceil(b.c[k]/10)),need,Math.floor(S[k]));if(g>0){S[k]-=g;SND.play('hammer');if(k==='money')S.led.out+=g;p[k]=(p[k]||0)+g}if((p[k]||0)<b.c[k])all=false}}if(all)finish(id)});
   Object.keys(S.hp).forEach(id=>{const rc=Math.max(20,Math.round((B[id].c.money||0)*.3));if(S.hp[id]<=0&&nearB(id,20)&&S.money>=rc&&tick){spend(rc);S.hp[id]=100;toast('تم إصلاح '+B[id].n+' بـ'+fmt(rc)+' ريال.')}});
   /* billboards: stand at the slot to build, the first month pays on completion */
-  S.contracts.forEach(c=>{if(c.built)return;const q=SLOTS[c.slot];if(dist(q[0],q[1],S.px,S.py)>=ZONE){c.dw=0;return}c.dw=(c.dw||0)+dt;if(c.dw<.45||!payTick)return;const need={wood:20,stone:10};let all=true;for(const k in need){const n=need[k]-(c.paid[k]||0);if(n>0){const g=Math.min(2,n,Math.floor(S[k]));if(g>0){S[k]-=g;c.paid[k]=(c.paid[k]||0)+g}if((c.paid[k]||0)<need[k])all=false}}if(all){c.built=1;c.left=MONTH;earn(c.pay);SND.play('bigcoin');shake=reduce?0:3;burst(q[0],q[1],14,'#f6dfb4',50);float(q[0],q[1]-40,'+'+fmt(c.pay)+' ريال','#ffc933');toast('تم بناء لوحة '+c.name+' واستلمت أول شهر.');save()}});
+  S.contracts.forEach(c=>{if(c.built)return;const q=SLOTS[c.slot];if(dist(q[0],q[1],S.px,S.py)>=ZONE){c.dw=0;return}c.dw=(c.dw||0)+dt;if(c.dw<.45||!payTick)return;const need={wood:30};let all=true;for(const k in need){const n=need[k]-(c.paid[k]||0);if(n>0){const g=Math.min(2,n,Math.floor(S[k]));if(g>0){S[k]-=g;c.paid[k]=(c.paid[k]||0)+g}if((c.paid[k]||0)<need[k])all=false}}if(all){c.built=1;c.left=MONTH;earn(c.pay);SND.play('bigcoin');shake=reduce?0:3;burst(q[0],q[1],14,'#f6dfb4',50);float(q[0],q[1]-40,'+'+fmt(c.pay)+' ريال','#ffc933');toast('تم بناء لوحة '+c.name+' واستلمت أول شهر.');save()}});
   ambience(dt);monthly(dt);investors(dt);threat(dt);
 }
 function finish(id){SND.play('build');S.built[id]=1;S.hp[id]=100;shake=reduce?0:2.5;burst(B[id].x,B[id].y,16,'#f6dfb4',60);toast('تم بناء '+B[id].n+'.');
   if(id==='derrick'&&!S.attackIn)cineFx.gush=0;
-  if(id==='shop')toast('الورشة جاهزة، ومعها فأس أقوى ومطرقة للصخور.');
+  if(id==='shop')toast('الورشة جاهزة، ومعها فأس أقوى.');
   if(id==='office'){S.attackIn=75;S.apps=newApps()}
   
   if(id==='transport'){SND.play('sign');S.contract=1;S.startPrice=S.price;S.price=8;say('ناصر','p_nasser','الخواجة يشتري منك البرميل '+(S.startPrice===2?'بريالين':'بريال')+' ... ويبيعه في الميناء بأربعين ريال!',[{l:'أربعين؟!',f(){say('ناصر','p_nasser','من اليوم أحمّل بترولك، وأعطيك 8 ريال للبرميل. بس انتبه: اللي خسروا منك ما راح يسكتون. ابن رادار وأمن.',[{l:'فهمت',f(){$('dlg').hidden=true}}])}}])}
@@ -452,7 +455,7 @@ function workers(dt){
     s.t=(s.t||0)+dt*(.55+s.skill*.22)*(hungry(s)?.5:1);const beat=()=>{if(s.t>=1){s.t=0;return true}return false};
     switch(s.role){
       case'wood':{const t=nearIn(s,S.trees,x=>x.st==='t');if(t&&goTo(s,t.x+10,t.y+6,dt)&&beat()){const n=(has('shop')?2:1)+lv('shop');S.wood+=n;t.hp--;burst(t.x,t.y-14,3,'#8c5a36',30);if(t.hp<=0)t.st='s'}break}
-      case'stone':{const r=nearIn(s,S.rocks,x=>x.hp>0);if(S.built.shop&&r&&goTo(s,r.x+12,r.y+6,dt)&&beat()){S.stone+=2;r.hp--;if(r.hp<=0)r.t=45}break}
+      case'stone':{const r=nearIn(s,S.rocks,x=>x.hp>0);if(S.hammer&&r&&goTo(s,r.x+12,r.y+6,dt)&&beat()){S.stone+=2;r.hp--;if(r.hp<=0)r.t=45}break}
       case'plant':{if(!has('nursery'))break;if(S.water<1){if(goTo(s,WATER.x+30,WATER.y+10,dt)&&beat())S.water=Math.min(20,S.water+3)}else{const t=nearIn(s,S.trees,x=>x.st==='s');if(t&&goTo(s,t.x,t.y+6,dt)&&beat()){S.water--;t.st='g';t.t=28*(1-.12*lv('nursery'));S.planted++}}break}
       case'barrel':{if(has('shop')&&goTo(s,B.shop.x,B.shop.y+26,dt)&&beat()&&S.wood>=1&&S.empty<200){S.wood--;S.empty++}break}
       case'haul':{if(!s.load){if(has('derrick')&&S.empty>0&&goTo(s,WELL.x+22,WELL.y+22,dt)&&beat()){const n=Math.min(S.empty,2+s.skill);S.empty-=n;s.load=n}}else if(has('yard')&&goTo(s,B.yard.x+6,B.yard.y+20,dt)&&S.stored<cap()){const n=Math.min(s.load,cap()-S.stored);S.stored+=n;s.load-=n}break}
@@ -484,6 +487,7 @@ function monthly(dt){
 function openReport(){const r=S.rep;if(!r)return;say('التقرير الشهري',null,'الدخل '+fmt(r.inc)+' ريال. المصروف '+fmt(r.out)+' ريال، منها رواتب '+fmt(r.sal)+'. '+(r.inc>=r.out?'الربح ':'الخسارة ')+fmt(Math.abs(r.inc-r.out))+' ريال. الميزانية الحين '+fmt(S.money)+'.',[{l:'تمام',f(){S.rep=null;ctxBtn.s=null;$('dlg').hidden=true;save()}}])}
 function upInfo(id){if(id==='yard'){if(S.tier>=4)return null;return{c:TIERS[S.tier+1].c,n:TIERS[S.tier+1].n}}if(id==='pump')return{c:{money:upCost('pump')},n:'المضخة'};if(id==='transport')return S.contract?{c:{money:upCost('fleet')},n:'أسطول النقل'}:null;if(!UP[id]||lv(id)>=5)return null;return{c:upgCost(id),n:B[id].n}}
 function doUpgrade(id){const u=upInfo(id);if(!u)return;for(const k of Object.keys(u.c))if(S[k]<u.c[k]){toast('ناقصك '+short(Math.ceil(u.c[k]-S[k]))+' '+NAMES[k]+'.');return}if(id==='yard'){upgradeTier();return}for(const k in u.c){S[k]-=u.c[k];if(k==='money')S.led.out+=u.c[k]}if(id==='pump')S.pumpLvl++;else if(id==='transport')S.fleetLvl++;else S.lv[id]=lv(id)+1;SND.play('up');shake=reduce?0:4;const b=B[id];burst(b.x,b.y,22,'#ffd873',70);toast('تطوّر '+u.n+'.');ctxBtn.s=null;save()}
+function makeHammer(){if(S.hammer||S.wood<20||S.money<50)return;S.wood-=20;spend(50);S.hammer=1;SND.play('up');shake=reduce?0:3;toast('صنعت المطرقة. تقدر الحين تكسر الصخور، وتحصل حجر للمباني المتقدمة.');ctxBtn.s=null;save()}
 function buildWall(){const w=WALLS[S.wallLv];if(!w||!Object.keys(w.c).every(k=>S[k]>=w.c[k]))return false;for(const k in w.c){S[k]-=w.c[k];if(k==='money')S.led.out+=w.c[k]}S.wallLv++;S.trees.forEach(t=>{t.x=Math.max(WALLR.x0+24,Math.min(WALLR.x1-24,t.x));t.y=Math.max(WALLR.y0+30,Math.min(WALLR.y1-30,t.y))});shake=reduce?0:4;toast('تم: '+w.n+'.');save();return true}
 function investors(dt){S.rCool=Math.max(0,(S.rCool||0)-dt);
   if(S.wallLv>0&&!S.offer&&S.contracts.length<5){S.invT-=dt;if(S.invT<=0){const used=S.contracts.map(c=>c.name),free=COMPANIES.filter(n=>!used.includes(n)),base=800+S.contracts.length*600+S.tier*1500;S.offer={name:free[Math.floor(Math.random()*free.length)],pay:Math.round(base*(.8+Math.random()*.6)/50)*50};S.invT=120+Math.random()*90;ctxBtn.s=null;toast('مستثمر جديد ينتظرك.')}}
@@ -561,7 +565,7 @@ function render(dt){
   labels.length=0;if(goT&&nearB(goT,22))goT=null;const play=S.scene==='play',m=play?curMission():null,pend=play&&S.contracts.find(c=>!c.built),target=goT?B[goT]:pend?{x:SLOTS[pend.slot][0],y:SLOTS[pend.slot][1]}:guide(m)[0];
   if(play)Object.keys(B).forEach(id=>{if(!S.built[id]&&visible(id))drawPlot(id,target===B[id])});
   const L=[],add=(y,f)=>L.push([y,f]);
-  if(play){drawWall(add,vx,vy,vw+60,vh+60);S.contracts.forEach(c=>{const q=SLOTS[c.slot];if(c.built){add(q[1]+2,()=>{shadow(q[0],q[1]+2,24,4);draw(IMG.billboard,q[0],q[1]+3);label(c.name,q[0],q[1]-24,false,9.5)})}else{ctx.fillStyle='#ffd873';const r=ZONE-2,t=Math.floor(time*3)%2,x=q[0],y=q[1];[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(u=>{const cx=x+u[0]*(r+t),cy=y+u[1]*(r+t);ctx.fillRect(cx-(u[0]>0?8:0),cy,8,2);ctx.fillRect(cx,cy-(u[1]>0?8:0),2,8)});const pd=c.paid||{};label('لوحة '+c.name,x,y-r-14,true);label(fmt(20-(pd.wood||0))+' خشب + '+fmt(10-(pd.stone||0))+' حجر',x,y+r+16,false,10.5)}})}
+  if(play){drawWall(add,vx,vy,vw+60,vh+60);S.contracts.forEach(c=>{const q=SLOTS[c.slot];if(c.built){add(q[1]+2,()=>{shadow(q[0],q[1]+2,24,4);draw(IMG.billboard,q[0],q[1]+3);label(c.name,q[0],q[1]-24,false,9.5)})}else{ctx.fillStyle='#ffd873';const r=ZONE-2,t=Math.floor(time*3)%2,x=q[0],y=q[1];[[-1,-1],[1,-1],[-1,1],[1,1]].forEach(u=>{const cx=x+u[0]*(r+t),cy=y+u[1]*(r+t);ctx.fillRect(cx-(u[0]>0?8:0),cy,8,2);ctx.fillRect(cx,cy-(u[1]>0?8:0),2,8)});const pd=c.paid||{};label('لوحة '+c.name,x,y-r-14,true);label(fmt(30-(pd.wood||0))+' خشب',x,y+r+16,false,10.5)}})}
   if(play)PALMS.forEach(p=>add(p[1],()=>{shadow(p[0]+2,p[1]+1,12,3);draw(IMG.palm,p[0],p[1]+2)}));
   if(play)add(WATER.y,()=>{shadow(WATER.x+3,WATER.y+2,26,6);draw(IMG.well,WATER.x,WATER.y+4);if(play)label('البير القديم',WATER.x,WATER.y-68,target===WATER)});
   S.trees.forEach((t,ti)=>{if(!play&&ti>0)return;add(t.y,()=>{if(t.st==='s'){shadow(t.x+1,t.y+1,13,3);draw(IMG.stump,t.x,t.y+3)}else if(t.st==='g'){shadow(t.x,t.y+1,8,2);draw(IMG.sapling,t.x,t.y+2)}else{shadow(t.x+3,t.y+1,30,7,.26);draw(IMG.acacia,t.x,t.y+4);if(t.hp<3&&dist(t.x,t.y,S.px,S.py)<60){const ty=t.y-(IMG.acacia.naturalHeight||60)-2;ctx.fillStyle='#1c120c';ctx.fillRect(t.x-16,ty,32,4);ctx.fillStyle='#ffd873';ctx.fillRect(t.x-15,ty+1,30*t.hp/3,2)}}})});
@@ -579,7 +583,7 @@ function render(dt){
     add(S.py,()=>{if(S.rideF){shadow(S.px,S.py+1,16,4);draw(IMG.forklift,S.px,S.py+6,pflip||pdir==='e'&&!pflip?false:false);draw(CH.abdullah.s[1],S.px+4,S.py-4);const n=Math.min(S.carry,8);for(let i=0;i<n;i++)draw(OILB,S.px-14+(i%2)*9,S.py-2-Math.floor(i/2)*9)}
       else{drawActor({x:S.px,y:S.py,dir:pdir,flip:pflip,moving,walk:walkT},'abdullah');
         const n=Math.min(S.carry,3),bx=pdir==='e'?(pflip?S.px+9:S.px-9):S.px;for(let i=0;i<n;i++)draw(OILB,bx,S.py-(pdir==='n'?6:6)-i*10-(pdir==='s'?28:0));
-        if(swing>0){const up=swing>.5,hx3=pdir==='e'&&pflip?S.px-11:S.px+11;ctx.fillStyle='#7a4a26';ctx.fillRect(hx3,S.py-26+(up?-5:3),2,12);ctx.fillStyle=S.built.shop?'#8d8693':'#a06a38';ctx.fillRect(hx3-3,S.py-28+(up?-5:3),8,4)}}});
+        if(swing>0){const up=swing>.5,hx3=pdir==='e'&&pflip?S.px-11:S.px+11;ctx.fillStyle='#7a4a26';ctx.fillRect(hx3,S.py-26+(up?-5:3),2,12);ctx.fillStyle=S.hammer?'#8d8693':'#a06a38';ctx.fillRect(hx3-3,S.py-28+(up?-5:3),8,4)}}});
   }else{
     if(A.show)add(A.y,()=>drawActor(A,'abdullah'));
     if(K.show)add(K.y,()=>{shadow(K.x,K.y+1,20,4);draw(IMG.camel,K.x,K.y+3-(K.moving?Math.abs(Math.sin(K.walk))*1.5:0),K.flip)});
@@ -617,16 +621,17 @@ function ctxBtn(){const L=[];
   if(S.rideF)L.push(['انزل من الفوركلفت',()=>{if(S.carry>3){toast('نزّل البراميل في الساحة أول.');return}S.rideF=0;S.fx=S.px;S.fy=S.py;syncFork();ctxBtn.s=null;save()}]);
   else if(has('forklift')&&dist(S.fx,S.fy,S.px,S.py)<34)L.push(['اركب الفوركلفت',()=>{S.rideF=1;ctxBtn.s=null;save()}]);
   Object.keys(B).forEach(id=>{if(has(id)&&nearB(id,22)&&!(S.rideF&&id==='forklift')){const u=upInfo(id);if(u)L.push(['طوّر '+B[id].n+': '+Object.keys(u.c).map(k=>short(u.c[k])+' '+NAMES[k]).join(' + '),()=>doUpgrade(id)])}});
+  if(has('shop')&&S.built.office&&!S.hammer&&nearB('shop',24))L.push(['اصنع مطرقة: 20 خشب + 50 ريال',makeHammer]);
   if(has('office')&&nearB('office',24))L.push(['افتح المكتب',()=>openSheet('office')]);
   if(has('radar')&&nearB('radar',24))L.push(['افتح شاشة الرادار',()=>openSheet('radar')]);
   if(has('dock')&&nearB('dock',24))L.push(['افتح السوق',()=>openSheet('market')]);
-  const sig=L.map(k=>k[0]).join();if(ctxBtn.s===sig)return;ctxBtn.s=sig;const box=$('ctx');box.innerHTML='';L.forEach(k=>{const b=document.createElement('button');b.className='primary';const n=/طوّر/.test(k[0])?'upgrade':/المكتب/.test(k[0])?'ledger':/الرادار/.test(k[0])?'radar':/السوق/.test(k[0])?'market':/مستثمر|عقد/.test(k[0])?'deal':/التقرير/.test(k[0])?'ledger':'wrench';b.innerHTML=ic(n,'bi');b.append(k[0]);b.addEventListener('click',k[1]);box.appendChild(b)})}
+  const sig=L.map(k=>k[0]).join();if(ctxBtn.s===sig)return;ctxBtn.s=sig;const box=$('ctx');box.innerHTML='';L.forEach(k=>{const b=document.createElement('button');b.className='primary';const n=/مطرقة/.test(k[0])?'wrench':/طوّر/.test(k[0])?'upgrade':/المكتب/.test(k[0])?'ledger':/الرادار/.test(k[0])?'radar':/السوق/.test(k[0])?'market':/مستثمر|عقد/.test(k[0])?'deal':/التقرير/.test(k[0])?'ledger':'wrench';b.innerHTML=ic(n,'bi');b.append(k[0]);b.addEventListener('click',k[1]);box.appendChild(b)})}
 function openSheet(t){sheet=t;$('scrim').hidden=false;radarSig=null;renderSheet()}
 function closeSheet(){sheet=null;$('scrim').hidden=true}
 $('scrim').addEventListener('click',e=>{if(e.target===$('scrim'))closeSheet()});
 let wpor=null;const WPOR=()=>wpor||(wpor=CH.worker.s[1].toDataURL());
 const trainCost=s=>Math.round(40*s.skill*s.skill*(1-.1*lv('office')));
-const upgCost=id=>({money:Math.round(UP[id][1]*Math.pow(2.2,lv(id))),stone:10*(lv(id)+1)});
+const upgCost=id=>S.hammer?({money:Math.round(UP[id][1]*Math.pow(2.2,lv(id))),stone:10*(lv(id)+1)}):({money:Math.round(UP[id][1]*Math.pow(2.2,lv(id))),wood:15*(lv(id)+1)});
 const upCost=k=>k==='pump'?Math.round(200*Math.pow(2.6,S.pumpLvl)):Math.round(300*Math.pow(2.6,S.fleetLvl));
 function staffRow(s){const c=trainCost(s);return'<div class="item"><h3><img alt="" class="pxl" src="'+WPOR()+'">'+s.name+'، مهارة '+fmt(s.skill)+' من 5'+(s.away?'، مدير فرع':'')+'</h3>'+(s.away?'':'<label class="job"><span>شغلته</span><select id="job'+s.id+'" data-job="'+s.id+'">'+Object.keys(JOBS).map(k=>'<option value="'+k+'"'+(s.role===k?' selected':'')+'>'+JOBS[k]+'</option>').join('')+'</select></label>')+(s.vet?(s.spy?'<span class="bad">طلع عميل لجهة ثانية!</span>':'<span class="ok">خلفيته نظيفة</span>'):'<span class="note">ما انفحصت خلفيته</span>')+'<div class="acts">'+(s.skill<5&&!s.away?'<button class="ghost" data-train="'+s.id+'"'+(S.money>=c?'':' disabled')+'>درّب: '+fmt(c)+' ريال</button>':'')+(!s.vet?'<button class="ghost" data-vet="'+s.id+'"'+(S.money>=20?'':' disabled')+'>افحص: 20 ريال</button>':'')+(!s.away?'<button class="danger" data-fire="'+s.id+'">افصله</button>':'')+'</div></div>'}
 function renderSheet(){const sh=$('sheet');let h='';
