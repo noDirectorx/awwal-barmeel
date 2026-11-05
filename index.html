@@ -105,11 +105,13 @@ button,.panel,.item{box-sizing:border-box}.panel{border:14px solid transparent}
 .ok{color:var(--good);font-weight:800;font-size:12.5px}.bad{color:var(--bad);font-weight:800;font-size:12.5px}
 @media (orientation:landscape) and (max-height:600px){
   #app{max-width:none}
-  #top{inset:0 0 auto auto;width:min(36vw,280px);gap:6px;padding-top:max(8px,env(safe-area-inset-top,0px));padding-left:0;padding-right:max(10px,env(safe-area-inset-right,0px))}
-  .chip img{width:18px;height:18px}.chip b{font-size:12px}.budget{font-size:11.5px;padding-top:3px}.budget b{font-size:13px}
-  #mission{padding:0}#mission b{font-size:14px}#mission span{font-size:10.5px;line-height:1.35}#goal{height:12px}.chip small{display:none}
-  #alarm{font-size:11.5px;padding:6px 9px}
-  #toast{bottom:74px;inset-inline:auto;left:50%;transform:translateX(-50%);width:min(58vw,460px)}
+  #top{gap:5px;padding-top:max(5px,env(safe-area-inset-top,0px));padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:max(10px,env(safe-area-inset-right,0px))}
+  #hud.panel{display:flex;align-items:center;justify-content:space-between;gap:6px;border-width:7px;border-image-width:7px;padding:0 8px}
+  .chip{display:flex;align-items:center;gap:5px}.chip img{width:20px;height:20px;margin:0}.chip b{font-size:13.5px}.chip small{display:none}
+  .budget{border:0;padding:0;font-size:12px;order:-1;margin-inline-end:14px}.budget span{display:none}.budget b{font-size:15px}
+  #mission.panel{justify-self:start;width:min(32vw,250px);padding:0;border-width:9px;border-image-width:9px}#mission b{font-size:14px}#mission span{font-size:10.5px;line-height:1.35}#goal{height:12px}#gc{font-size:11.5px}
+  #alarm{justify-self:start;width:min(32vw,250px);box-sizing:border-box;font-size:11px;padding:5px 8px}
+  #toast{top:50px;bottom:auto;left:max(12px,env(safe-area-inset-left,0px));right:auto;inset-inline:auto;text-align:left;width:min(44vw,380px)}
   #toast span{font-size:12.5px;padding:7px 12px}
   #ctx{bottom:max(12px,env(safe-area-inset-bottom,0px))}
   .primary{min-height:44px;font-size:14px}.panel{border-width:10px}
@@ -498,7 +500,7 @@ function stepParts(dt){parts=parts.filter(p=>{if(p.fire){p.fire-=dt;p.z+=p.vz*dt
 function drawDrone(d){const y=d.y,alt=d.missile?30:48;shadow(d.x,y,7,2,.22);const b=B[d.t],a=Math.atan2(b.y-d.y,b.x-d.x);ctx.save();ctx.translate(Math.round(d.x),Math.round(y-alt));ctx.rotate(a);if(d.missile){ctx.fillStyle='#d9dde2';ctx.fillRect(-10,-2,18,4);ctx.fillStyle='#d92d3a';ctx.fillRect(6,-2,4,4);ctx.fillStyle='#ffb347';ctx.fillRect(-14,-1,4,2)}else{ctx.fillStyle='#39303f';ctx.fillRect(-7,-1,16,3);ctx.fillRect(-4,-9,4,19);ctx.fillRect(-9,-3,3,7)}ctx.restore()}
 function render(dt){
   /* camera */
-  if(!cam.manual){const tx=W>H?S.px+(Math.min(W*.36,280)/2)/baseZ:S.px,ty=W>H?S.py:S.py-34/baseZ;cam.x+=(tx-cam.x)*Math.min(1,dt*7);cam.y+=(ty-cam.y)*Math.min(1,dt*7);cam.z+=(baseZ-cam.z)*Math.min(1,dt*2)}
+  if(!cam.manual){const tx=S.px,ty=W>H?S.py-13:S.py-34/baseZ;cam.x+=(tx-cam.x)*Math.min(1,dt*7);cam.y+=(ty-cam.y)*Math.min(1,dt*7);cam.z+=(baseZ-cam.z)*Math.min(1,dt*2)}
   else{const k=Math.min(1,dt*cam.ease);cam.x+=(cam.tx-cam.x)*k;cam.y+=(cam.ty-cam.y)*k;cam.z+=(cam.tz-cam.z)*k}
   Z=cam.z;const vw=W/Z,vh=H/Z;
   let ox=Math.round((W/2-cam.x*Z)*dpr)/dpr,oy=Math.round((H/2-cam.y*Z)*dpr)/dpr;if(shake>0){ox+=(Math.random()-.5)*shake;oy+=(Math.random()-.5)*shake;shake=Math.max(0,shake-dt*18)}
@@ -545,10 +547,9 @@ function render(dt){
   const ws=(x,y)=>[x*Z+ox,y*Z+oy];
   labels.forEach(l=>{const q=ws(l[1],l[2]);if(q[0]<-40||q[0]>W+40||q[1]<-20||q[1]>H+20)return;ctx.font='700 '+(l[4]||11.5)+'px Almarai,system-ui,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.direction='rtl';const w=ctx.measureText(l[0]).width+12,X=Math.round(q[0]),Y=Math.round(q[1]);ctx.fillStyle=l[3]?'#ffd873':'rgba(28,18,12,.82)';ctx.fillRect(X-w/2,Y-10,w,20);ctx.fillStyle=l[3]?'#2a1806':'#f7e3bd';ctx.fillText(l[0],X,Y+.5)});
   floats=floats.filter(f=>(f.a+=dt)<1);ctx.textAlign='center';ctx.direction='rtl';for(const f of floats){const q=ws(f.x,f.y);ctx.globalAlpha=1-f.a*f.a;ctx.font='800 14px Almarai,sans-serif';ctx.lineWidth=3;ctx.strokeStyle='#1c120c';const y=q[1]-f.a*32;ctx.strokeText(f.t,q[0],y);ctx.fillStyle=f.c;ctx.fillText(f.t,q[0],y);ctx.globalAlpha=1}
-  if(play&&target&&$('scrim').hidden&&$('dlg').hidden){const land=W>H,dx=(target.x-cam.x)*Z,dy=(target.y-cam.y)*Z,padY=land?34:130,in_=Math.abs(dx)<W/2-30&&Math.abs(dy)<H/2-(land?30:120),b=reduce?0:Math.sin(time*5)*4;ctx.save();
+  if(play&&target&&$('scrim').hidden&&$('dlg').hidden){const land=W>H,dx=(target.x-cam.x)*Z,dy=(target.y-cam.y)*Z,padY=land?52:130,in_=Math.abs(dx)<W/2-30&&Math.abs(dy)<H/2-(land?30:120),b=reduce?0:Math.sin(time*5)*4;ctx.save();
     if(in_){ctx.translate(W/2+dx,H/2+dy-(30*Z)+b);ctx.rotate(Math.PI/2)}else{const a=Math.atan2(dy,dx),k=Math.min((W/2-26)/Math.abs(Math.cos(a)||.001),(H/2-padY)/Math.abs(Math.sin(a)||.001));ctx.translate(W/2+Math.cos(a)*(k+b),H/2+Math.sin(a)*(k+b)+(!land&&Math.sin(a)<0?30:0));ctx.rotate(a)}
     ctx.fillStyle='#1c120c';ctx.fillRect(-13,-5,18,10);ctx.fillRect(1,-10,6,20);ctx.fillRect(7,-7,4,14);ctx.fillRect(11,-3,3,6);ctx.fillStyle='#ffd873';ctx.fillRect(-11,-3,14,6);ctx.fillRect(3,-8,2,16);ctx.fillRect(5,-6,4,12);ctx.fillRect(9,-2,3,4);ctx.restore()}
-  if(joy){const r=$('app').getBoundingClientRect(),jx=joy.ox-r.left,jy=joy.oy-r.top,mm=Math.hypot(joy.dx,joy.dy),k=Math.min(1,42/Math.max(mm,1));ctx.fillStyle='rgba(28,18,12,.3)';ctx.beginPath();ctx.arc(jx,jy,42,0,7);ctx.fill();ctx.fillStyle='rgba(255,216,115,.9)';ctx.fillRect(jx+joy.dx*k-11,jy+joy.dy*k-11,22,22);ctx.fillStyle='#1c120c';ctx.fillRect(jx+joy.dx*k-11,jy+joy.dy*k-13,22,2);ctx.fillRect(jx+joy.dx*k-11,jy+joy.dy*k+11,22,2);ctx.fillRect(jx+joy.dx*k-13,jy+joy.dy*k-11,2,22);ctx.fillRect(jx+joy.dx*k+11,jy+joy.dy*k-11,2,22)}
 }
 
 /* ---------- UI ---------- */
