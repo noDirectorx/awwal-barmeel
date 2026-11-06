@@ -31,7 +31,7 @@ R(" if(S.tint&&S.bg!==img.bg_office_night){sun.a*=.15;"," if(m==='map'&&M.night)
 R(" {const tr=img.truck_side,tw=tr.width*1.2,"," if(!M.night){const tr=img.truck_side,tw=tr.width*1.2,")
 R("if(x+r>M.truck.x-190&&","if(!M.night&&x+r>M.truck.x-190&&")
 R(" list.push({y:M.truck.y,d(){"," if(!M.night)list.push({y:M.truck.y,d(){")
-R("c.drawImage(im,k*cw,0,cw,ch,-dw/2,-dh,dw,dh);c.restore()}","c.drawImage(im,k*cw,0,cw,ch,-dw/2,-dh,dw,dh);if(S.mode==='map'&&M.night){c.globalAlpha=.42;c.drawImage(sil('w_'+a.name),k*cw,0,cw,ch,-dw/2,-dh,dw,dh)}c.restore()}")/* no truck at night */
+R("c.drawImage(im,k*cw,0,cw,ch,-dw/2,-dh,dw,dh);c.restore()}","c.drawImage(im,k*cw,0,cw,ch,-dw/2,-dh,dw,dh);if(S.mode==='map'&&M.night){c.globalAlpha=.42;c.drawImage(sil('w_'+a.name),k*cw,0,cw,ch,-dw/2,-dh,dw,dh)}c.restore()}")
 s=s.replace('/*ASSETS*/null',json.dumps(d)).replace('/*META*/null',json.dumps(m))
 open('www/ep2t.html','w',encoding='utf8').write(s.replace('/*TESTHOOK*/','window.__g={M,S,PT,tapPatch,get save(){return save}};'))
 open('ep2.html','w',encoding='utf8').write(s.replace('/*TESTHOOK*/\n',''));print(len(s)//1024)
