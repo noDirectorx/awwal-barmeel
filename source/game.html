@@ -204,7 +204,7 @@ async function ch0(){S.mode='cine';startScene();setBg('desert');S.fade=1;S.bars=
  A.music('music_desert',.7);
  await say('salem','joy','نفط! نفـــط يا عالم!');
  await fadeTo(1,800);S.shake=0;await card('بعد أيام',1000);S.drops=22;S.noFront=true;A.music('music_tension',.65);
- s.y=762;const y=actor('young',-90,762);await fadeTo(0,600);await walk(y,170,762,190);y.dir='r';s.dir='l';
+ s.y=745;const y=actor('young',-90,745);await fadeTo(0,600);await walk(y,170,745,190);y.dir='r';s.dir='l';
  await say('young','smile','مستر سالم. أنت عندك نفط، بس ما عندك مكينة.');
  await say('salem','tired','وما معي ريال أشتري فيه حبل.');
  await say('young','neutral','أنا أجيب مكينة، أجيب عمال. أنت تعطيني كل النفط، ثلاثين سنة، سعر واحد.');
@@ -220,8 +220,8 @@ async function ch0(){S.mode='cine';startScene();setBg('desert');S.fade=1;S.bars=
  await card('أول برميل',1500);
 }
 async function ch1(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;A.music('music_sad',.55);A.ambience({amb_wind:.45});await card('بعد ثلاثين سنة',1200);
- const h=actor('hero',1290,1000,290),m=actor('hamdan',1320,640,235);m.dir='f';m.on=false;
- fadeTo(0,1000);await walk(h,820,770,190);h.dir='r';m.on=true;await walk(m,1040,750,130);m.dir='l';
+ const h=actor('hero',1290,1000,285),m=actor('hamdan',1780,745,285);m.dir='f';m.on=false;
+ fadeTo(0,1000);await walk(h,820,745,190);h.dir='r';m.on=true;await walk(m,1040,745,130);m.dir='l';
  await say('hamdan','neutral','تأخرت يا ولد سالم.');
  await say('hero','worried','جيت أول ما وصلتني رسالتك.');
  await say('hamdan','sad','رسالتي لفّت نص الدنيا قبل توصلك. دفنّاه قبل أربعين يوم.');
@@ -233,7 +233,7 @@ async function ch1(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;
  await say('hamdan','angry','والخواجة جالس في مكتب أبوك، ينتظرك من الصبح.');
  await fadeTo(1,700);
  S.actors=[];setBg('office');A.music('music_tension',.6);A.ambience({amb_room:.5});
- const o=actor('old',420,840,330),e=actor('hero',1300,860,340),hh=actor('hamdan',1130,830,320);o.dir='r';e.dir='l';hh.dir='l';await fadeTo(0,700);
+ const o=actor('old',420,850,335),e=actor('hero',1300,850,335),hh=actor('hamdan',1130,850,335);o.dir='r';e.dir='l';hh.dir='l';await fadeTo(0,700);
  await say('old','polite','الله يرحم أبوك. كان رجل عنيد، وأنا أحترم العناد.');
  await say('old','neutral','بدون لف. أشتري الشركة بنص مليون ريال. توقّع اليوم، وتسدد الديون، وترجع لحياتك اللي اخترتها.');
  await say('hamdan','worried','عقد أبوك باقي عليه ست شهور، والشركة رهن عنده.');
@@ -249,7 +249,7 @@ async function ch1(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;
  save.flags.firstAnswer=r;
  if(r===0)await say('old','polite','طبعًا. فكّر على راحتك. بس ما راح أنتظرك كثير.');
  else{await say('old','surprised','ما شاء الله، لسانك لسان أبوك.');await say('old','cunning','بس أبوك كان عنده مضخة شغالة.')}
- await walk(o,-120,840,200);
+ await walk(o,-120,850,200);
  await say('hamdan','warm','إذا بتقعد، خلنا نشغل المضخة قبل كل شي. مبارك عندها.');
  await fadeTo(1,600);
 }
@@ -452,10 +452,10 @@ async function ch3(){startScene();setupBoard();S.mode='board';S.bars=0;A.music(n
  S.mode='cine';S.actors=[];setBg('site');S.bars=1;S.truck={x:-420};A.music('music_desert',.5);A.ambience({amb_wind:.4,amb_site:.25});await fadeTo(0,700);const eng=A.loopFx('drv_engine',.6);
  await tween(TEST?5:4200,p=>S.truck.x=-420+p*(W+900));A.stop(eng,.7);S.truck=null;await fadeTo(1,700);S.mode='none'}
 async function ch4(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;A.music('music_tension',.55);A.ambience({amb_site:.25,amb_wind:.3});await card('بعد شهر<small>باقي على العقد: 5 شهور</small>',1600);
- const f=save.flags,h=actor('hero',760,780,290),m=actor('hamdan',500,790,270),b=actor('mubarak',1070,780,285),n=actor('nasser',1400,850,285);h.dir='r';m.dir='r';b.dir='l';n.dir='l';await fadeTo(0,700);
+ const f=save.flags,h=actor('hero',760,745,285),m=actor('hamdan',500,745,285),b=actor('mubarak',1070,745,285),n=actor('nasser',1400,745,285);h.dir='r';m.dir='r';b.dir='l';n.dir='l';await fadeTo(0,700);
  await say('nasser','happy','سلمنا كمية الشهر للخواجة! وهذا حسابك بعد الديزل وقسط الديون: ثمانية عشر ألف ريال.');
  if(f.q2)await say('nasser','happy','وهذي الألفين اللي وعدتك فيها.');
- await walk(n,1800,880,240);n.on=false;
+ await walk(n,1800,745,240);n.on=false;
  await say('hamdan','worried',f.q1?'الوصلة صارت تمام، بس الشرخ باقي. من كل عشرين برميل نخسر واحد. وإصلاحه ثمانية عشر ألف.':'الوصلة تسرّب والخزان مشروخ. من كل عشرة براميل نخسر واحد. وإصلاحهم ثمانية عشر ألف.');
  await say('mubarak','angry','وأنا والشباب لنا أربعة شهور ما قبضنا. الثمانية عشر ألف تكفي راتب شهر واحد.');
  await say('mubarak','angry','وأقولها من الحين: هالمرة إذا ما قبضنا، أنا طالع.');
@@ -464,7 +464,7 @@ async function ch4(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;
  f.decision=r;store.put();
  if(r===0){A.music('music_desert',.5);await say('mubarak','happy','ما توقعتك توقف معنا… بس وقفت.');await say('hamdan','worried','بس كل برميل يطيح في الرمل بينقص من تسليم الشهر.');await card(`مبارك بقي معك<small>نفقد برميل من كل ${f.q1?'عشرين':'عشرة'}</small>`,2400)}
  else if(f.q2){f.mubarakAdvance=1;await say('hero','firm','مبارك، باقي معي ألفين. هذي دفعة من راتبك، والباقي بعد التسليم الجاي، وعد.');await say('mubarak','neutral','ألفين… طيب. أصبر للتسليم الجاي بس. وهالمرة عشانك، مو عشان أبوك.');await card('الخزان تصلّح، ومبارك عطاك فرصة أخيرة<small>بس الشباب شافوا إنه الوحيد اللي قبض</small>',2800)}
- else{f.mubarakLeft=1;A.music('music_sad',.55);await say('mubarak','angry','الحديد عندك أغلى منا؟ طيب.');await walk(b,1800,860,230);b.on=false;await say('hamdan','sad','مبارك كبير الشباب. يوم يطلع ما يرجع، والباقين بيعيدون حساباتهم.');await card('الخزان تصلّح<small>بس راح أكثر واحد يعرف للمضخة</small>',2600)}
+ else{f.mubarakLeft=1;A.music('music_sad',.55);await say('mubarak','angry','الحديد عندك أغلى منا؟ طيب.');await walk(b,1800,745,230);b.on=false;await say('hamdan','sad','مبارك كبير الشباب. يوم يطلع ما يرجع، والباقين بيعيدون حساباتهم.');await card('الخزان تصلّح<small>بس راح أكثر واحد يعرف للمضخة</small>',2600)}
  store.put();await fadeTo(1,800)}
 async function ch5(){S.mode='cine';startScene();setBg('office_night');S.bars=1;S.fade=1;S.tint='rgba(15,20,60,.2)';A.music('music_sad',.5);A.ambience({amb_room:.55});await card('الليلة نفسها',1000);
  const f=save.flags,h=actor('hero',520,860,340);h.dir='r';await fadeTo(0,900);await wait(500);
