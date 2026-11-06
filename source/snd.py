@@ -29,3 +29,5 @@ ff('-ss','15','-t','45','-i',S+'amb_market.mp3','-af','loudnorm=I=-20:TP=-3','-a
 ff('-i',S+'fx_radio.mp3','-af','loudnorm=I=-20:TP=-3','-ar','44100','-ac','1','-b:a','56k',O+'fx_radio.mp3')
 ff('-ss','14','-t','6','-i',S+'fx_cut.mp3','-af','loudnorm=I=-18:TP=-3','-ar','44100','-ac','1','-b:a','64k',O+'fx_cut.mp3')
 print(sum(os.path.getsize(O+f) for f in os.listdir(O))//1024,'KB',len(os.listdir(O)))
+# قص الصمت من بداية المؤثرات القصيرة
+shot('fx_pickup',.85);shot('fx_assemble',.7);shot('fx_paper',.8,-16,.2)
