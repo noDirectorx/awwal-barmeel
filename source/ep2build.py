@@ -26,6 +26,7 @@ R("function cover(c,im){c.drawImage(im,0,0,W,H)}","function cover(c,im){if(Math.
 R(" drawDust();\n if(S.tint){"," if(S.over)S.over();\n drawDust();\n if(S.tint){")
 R(" const t=nextPoint();if(t)edgeArrow"," if(M.night){X.fillStyle='rgba(12,18,60,.62)';X.fillRect(0,0,W,H)}\n const t=nextPoint();if(t)edgeArrow") if False else None
 R("const fl=save.flags;if(fl.q1on&&!fl.q1)marker","if(M.night){X.fillStyle='rgba(12,18,60,.62)';X.fillRect(0,0,W,H)}const fl=save.flags;if(fl.q1on&&!fl.q1)marker")
+R("const t=nextPoint();if(t)edgeArrow(t.x-cx,t.y-cy);","const t=nextPoint();if(t)edgeArrow(t.x-cx,t.y-cy);if(t&&M.spots)marker(t.x-cx,t.y-cy-95);/* on-screen objective */")
 s=s.replace('/*ASSETS*/null',json.dumps(d)).replace('/*META*/null',json.dumps(m))
 open('www/ep2t.html','w',encoding='utf8').write(s.replace('/*TESTHOOK*/','window.__g={M,S,PT,tapPatch,get save(){return save}};'))
 open('ep2.html','w',encoding='utf8').write(s.replace('/*TESTHOOK*/\n',''));print(len(s)//1024)
