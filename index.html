@@ -159,11 +159,11 @@ function drawCine(){X.save();
  X.restore();
 }
 const oil=[];
-function drawDrops(front){for(const d of oil){if((d.z>0)!==front)continue;X.fillStyle=d.c;X.fillRect(d.x|0,d.y|0,d.s,d.s*1.5)}}
+function drawDrops(front){if(front&&S.noFront)return;for(const d of oil){if((d.z>0)!==front)continue;X.fillStyle=d.c;X.beginPath();X.ellipse(d.x,d.y,d.s*.5,d.s*.8,0,0,6.283);X.fill()}}
 function updDrops(dt){if(S.drops>0){for(let n=0;n<S.drops*dt*(meta.quality==='low'?.45:1);n++){oil.push({x:Math.random()*W,y:-20,v:360+Math.random()*420,s:3+Math.random()*7|0,z:Math.random()-.4,c:Math.random()<.2?'#6d3a14':'#1d0d05'})}}
  for(let i=oil.length-1;i>=0;i--){const d=oil[i];d.y+=d.v*dt;if(d.y>H)oil.splice(i,1)}}
 function puff(x,y,n=8,c='rgba(235,190,120,.7)',up=80){for(let i=0;i<n;i++)S.dust.push({x:x+(Math.random()-.5)*30,y:y+(Math.random()-.5)*12,vx:(Math.random()-.5)*160,vy:-Math.random()*up,l:.5+Math.random()*.5,t:0,s:6+Math.random()*12|0,c})}
-function drawDust(){for(const p of S.dust){X.globalAlpha=clamp(1-p.t/p.l,0,1);X.fillStyle=p.c;X.fillRect(p.x|0,p.y|0,p.s,p.s)}X.globalAlpha=1}
+function drawDust(){for(const p of S.dust){X.globalAlpha=clamp(1-p.t/p.l,0,1);X.fillStyle=p.c;X.beginPath();X.arc(p.x,p.y,p.s*.5,0,6.283);X.fill()}X.globalAlpha=1}
 function updDust(dt){for(let i=S.dust.length-1;i>=0;i--){const p=S.dust[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.t>p.l)S.dust.splice(i,1)}}
 const fadeTo=(a,ms=700)=>{const s=S.fade;return tween(TEST?10:ms,p=>S.fade=s+(a-s)*ease(p))};
 const bars=(a,ms=500)=>{const s=S.bars;return tween(TEST?10:ms,p=>S.bars=s+(a-s)*ease(p))};
@@ -184,7 +184,7 @@ function choose(title,opts){return new Promise(res=>{skipping=false;$('#skip').h
 async function card(html,ms=2200){const c=$('#card');c.innerHTML=html;c.hidden=false;c.style.opacity=0;await tween(TEST?5:450,p=>c.style.opacity=p);await wait(ms);await tween(TEST?5:450,p=>c.style.opacity=1-p);c.hidden=true}
 function subtitle(who,mood,text,ms){const d=$('#dlg'),im=d.querySelector('img');if(skipping)return;im.src=ASSETS[`p_${who}_${mood}`]||'';im.hidden=false;d.querySelector('b').textContent=NAMES[who];d.querySelector('b').hidden=false;d.querySelector('span').textContent=text;d.querySelector('i').hidden=true;d.hidden=false;setTimeout(()=>{if(!advance)d.hidden=true},TEST?20:ms)}
 function toast(t){const f=$('#float');f.textContent=t;f.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>f.style.opacity=0,1700)}
-function startScene(){S.actors=[];S.tint=null;S.lamp=0;S.drops=0;S.shake=0;oil.length=0;S.dust=[];skipping=false;$('#skip').hidden=!skipOK}
+function startScene(){S.actors=[];S.tint=null;S.lamp=0;S.drops=0;S.noFront=false;S.shake=0;oil.length=0;S.dust=[];skipping=false;$('#skip').hidden=!skipOK}
 $('#skip').onclick=e=>{e.stopPropagation();skipping=true;if(advance){const a=advance;advance=null;$('#dlg').hidden=true;const sp=$('#dlg span');sp.textContent='';forceRes(a)}};
 function forceRes(a){a();a()}
 /* ---------- chapters ---------- */
@@ -193,7 +193,7 @@ async function ch0(){S.mode='cine';startScene();setBg('desert');S.fade=1;S.bars=
  const s=actor('salem',-90,720);fadeTo(0,1100);await walk(s,560,720,190);s.dir='r';
  A.play('pump_dig');puff(760,720,8);
  await say('salem','tired','لي شهر أحفر… والبير ناشف.');
- await say('salem','pain','هذي آخر نقطة مويه في القربة.');
+ await say('salem','pain','ما بقى معي مويه إلا جغمة.');
  A.play('pump_dig');puff(760,720,10);S.shake=4;await wait(250);S.shake=0;
  await say('salem','hope','يا رب… ضربة وحدة بعد.');
  await walk(s,610,720,160);A.play('pump_dig');puff(700,715,14);S.shake=6;await wait(220);S.shake=0;await wait(250);
@@ -205,8 +205,8 @@ async function ch0(){S.mode='cine';startScene();setBg('desert');S.fade=1;S.bars=
  await say('salem','shock','هذي مو مويه…');
  A.music('music_desert',.7);
  await say('salem','joy','نفط! نفـــط يا عالم!');
- await fadeTo(1,800);S.shake=0;await card('بعد أسبوعين',1000);S.drops=80;A.music('music_tension',.65);
- const y=actor('young',-90,770);await fadeTo(0,600);await walk(y,170,775,190);y.dir='r';s.dir='l';
+ await fadeTo(1,800);S.shake=0;await card('بعد أيام',1000);S.drops=22;S.noFront=true;A.music('music_tension',.65);
+ const y=actor('young',-90,770);await fadeTo(0,600);await walk(y,215,775,190);y.dir='r';s.dir='l';
  await say('young','smile','مستر سالم. أنت عندك نفط، بس ما عندك مكينة.');
  await say('salem','tired','وما معي ريال أشتري فيه حبل.');
  await say('young','neutral','أنا أجيب مكينة، أجيب عمال. أنت تعطيني كل النفط، ثلاثين سنة، سعر واحد.');
@@ -218,7 +218,7 @@ async function ch0(){S.mode='cine';startScene();setBg('desert');S.fade=1;S.bars=
  await wait(1100);
  await say('salem','firm','وأول برميل يطلع يبقى لي، ذكرى. ما ينباع.');
  await say('young','laugh','Deal!‎');
- await fadeTo(1,1000);S.drops=0;$('#skip').hidden=true;
+ await fadeTo(1,1000);S.drops=0;S.noFront=false;$('#skip').hidden=true;
  await card('أول برميل',1500);
 }
 async function ch1(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;A.music('music_sad',.55);A.ambience({amb_wind:.45});await card('بعد ثلاثين سنة',1200);
