@@ -206,7 +206,7 @@ async function ch0(){S.mode='cine';startScene();setBg('desert');S.fade=1;S.bars=
  A.music('music_desert',.7);
  await say('salem','joy','نفط! نفـــط يا عالم!');
  await fadeTo(1,800);S.shake=0;await card('بعد أيام',1000);S.drops=22;S.noFront=true;A.music('music_tension',.65);
- const y=actor('young',-90,770);await fadeTo(0,600);await walk(y,215,775,190);y.dir='r';s.dir='l';
+ s.y=762;const y=actor('young',-90,762);await fadeTo(0,600);await walk(y,170,762,190);y.dir='r';s.dir='l';
  await say('young','smile','مستر سالم. أنت عندك نفط، بس ما عندك مكينة.');
  await say('salem','tired','وما معي ريال أشتري فيه حبل.');
  await say('young','neutral','أنا أجيب مكينة، أجيب عمال. أنت تعطيني كل النفط، ثلاثين سنة، سعر واحد.');
