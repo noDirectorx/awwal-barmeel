@@ -238,7 +238,7 @@ async function ch1(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;
  await say('hamdan','worried','المضخة خربانة من ثلاثة شهور، والموظفين ما قبضوا، والديون فوق راسنا.');
  await say('hamdan','angry','والخواجة جالس في مكتب أبوك، ينتظرك من الصبح.');
  await fadeTo(1,700);
- S.actors=[];setBg('office');A.music('music_tension',.6);A.ambience({amb_room:.5});
+ S.actors=[];setBg('office');A.music('music_tension',.6);A.ambience({amb_room:.5});if(skipping){skipping=false;S.fade=1;$('#skip').hidden=!skipOK}
  const o=actor('old',420,850,335),e=actor('hero',1300,850,335),hh=actor('hamdan',1130,850,335);o.dir='r';e.dir='l';hh.dir='l';await fadeTo(0,700);
  await say('old','polite','الله يرحم أبوك. Direct to the point.‎ أشتري الشركة بنص مليون ريال. توقّع اليوم، وتسدد ديونك، وترجع لحياتك.');
  await say('hero','neutral','ولو ما بعت؟');
