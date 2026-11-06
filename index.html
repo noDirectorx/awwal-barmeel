@@ -327,7 +327,7 @@ function drawMap(){const c=M.cam,cx=Math.round(c.x*RS)/RS,cy=Math.round(c.y*RS)/
  for(const i of M.pick){if(!pickOn(i))continue;const im=img[i.k];list.push({y:i.y,d(){const b=Math.sin(time*3.2+i.x)*5,w=im.width*i.s,h=im.height*i.s;X.fillStyle='rgba(40,14,0,.25)';X.beginPath();X.ellipse(i.x-cx,i.y-cy,w*.4,8,0,0,7);X.fill();X.drawImage(im,i.x-w/2-cx,i.y-h-10+b-cy,w,h);const g=.45+.35*Math.sin(time*4+i.y);X.fillStyle=`rgba(255,240,180,${g})`;X.fillRect(i.x-cx+w*.2,i.y-h-12+b-cy,5,5)}})}
  for(const n of Object.values(M.npc))list.push({y:n.y,d(){drawWalker(X,n,cx,cy);if(n===nextTarget())marker(n.x-cx,n.y-n.h-26-cy)}});
  list.push({y:M.truck.y,d(){const im=img.truck_side,w=im.width*1.2,h=im.height*1.2;X.drawImage(im,M.truck.x-w/2-cx,M.truck.y-h+24-cy,w,h)}});
- if(M.barrel){M.barrel.r+=M.vx*.002;const b=img.o_barrel,w=b.width*.8,h=b.height*.8,px=M.p.x+(M.p.dir.slice(-1)==='l'?-58:58),py=M.p.y+10;list.push({y:py,d(){X.save();X.translate(px-cx,py-h/2-cy);X.rotate(M.barrel.r);X.drawImage(b,-w/2,-h/2,w,h);X.restore()}})}
+ if(M.barrel){M.barrel.r+=M.vx*.002;const b=img.o_barrel,w=OW.barrel*.8,h=w*b.height/b.width,px=M.p.x+(M.p.dir.slice(-1)==='l'?-58:58),py=M.p.y+10;list.push({y:py,d(){X.save();X.translate(px-cx,py-h/2-cy);X.rotate(M.barrel.r);X.drawImage(b,-w/2,-h/2,w,h);X.restore()}})}
  list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});
  list.sort((a,b)=>a.y-b.y);for(const l of list)l.d();
  const fl=save.flags;if(fl.q1on&&!fl.q1)marker(3380-cx,760-cy);if(fl.q2on&&!fl.q2)marker(M.truck.x-cx,M.truck.y-190-cy);const t=nextPoint();if(t)edgeArrow(t.x-cx,t.y-cy);if(t&&M.spots)marker(t.x-cx,t.y-cy-95);/* on-screen objective */}
