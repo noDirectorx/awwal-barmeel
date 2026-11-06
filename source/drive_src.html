@@ -4,7 +4,7 @@
 <style>*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}html,body{margin:0;height:100%;position:fixed;inset:0;width:100%;background:#000;overflow:hidden;touch-action:none;font-family:Almarai,Tahoma,sans-serif;color:#fff4d8}
 canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%)}
 .pad{position:fixed;bottom:max(4vmin,env(safe-area-inset-bottom));width:clamp(92px,20vmin,150px);height:clamp(92px,20vmin,150px);border-radius:50%;border:3px solid rgba(255,244,216,.65);background:rgba(24,12,6,.42);display:flex;align-items:center;justify-content:center;font:800 clamp(15px,3.2vmin,24px) Almarai,sans-serif;color:#fff4d8;touch-action:none}.pad.on{background:rgba(242,184,75,.65);color:#2b1205}
-#gas{right:max(4vw,env(safe-area-inset-right))}#brk{left:max(4vw,env(safe-area-inset-left))}
+
 #hud{position:fixed;top:max(1.5vmin,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:1em;background:rgba(24,12,6,.72);padding:.4em 1em;border-radius:.6em;font-weight:800;font-size:clamp(14px,2.8vmin,22px);white-space:nowrap}
 #prog{width:clamp(110px,26vw,320px);height:9px;background:rgba(255,244,216,.2);border-radius:5px;overflow:hidden;direction:ltr}#prog i{display:block;height:100%;background:#f2b84b;width:0}
 #say{position:fixed;left:50%;bottom:max(5vmin,env(safe-area-inset-bottom));transform:translateX(-50%);background:rgba(24,12,6,.86);padding:.45em 1em;border-radius:.5em;font-weight:700;font-size:clamp(14px,2.7vmin,21px);opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none}
@@ -13,61 +13,60 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%)}
 #start{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4em;background:rgba(10,4,1,.72);text-align:center;padding:1em}#start h2{font:400 clamp(34px,8vmin,64px) Lalezar,serif;color:#f2b84b;margin:0}#start p{margin:.1em;font-size:clamp(15px,3vmin,22px);line-height:1.6}
 [hidden]{display:none!important}#rot{display:none;position:fixed;inset:0;background:#120803;z-index:9;align-items:center;justify-content:center;font:400 28px Lalezar,serif;color:#f2b84b}@media(orientation:portrait){#rot{display:flex}}</style></head><body>
 <canvas id="c" width="1672" height="941"></canvas>
-<div id="hud"><span id="bar">🛢</span><div id="prog"><i></i></div><span id="tm">0:00</span></div>
-<div id="brk" class="pad">فرامل</div><div id="gas" class="pad">بنزين</div><div id="say"></div>
-<div id="start"><h2>آخر حمولة</h2><p>وصّل البراميل الست للميناء، ولا تخليها تطيح.</p><p style="opacity:.75">في الجو: البنزين يرفع مقدمة الشاحنة، والفرامل تنزلها.</p><button id="go">انطلق</button></div>
+<div id="hud"><span id="bar">🛢</span><span>السرعة</span><div id="prog"><i id="spd"></i></div><span id="tm">0:00</span></div>
+<button id="brk" class="pad" style="right:max(4vw,env(safe-area-inset-right))">فرامل</button><div id="say"></div>
+<div id="start"><h2>آخر حمولة</h2><p>الشاحنة تمشي لحالها. هدّي قبل كل مطب عشان ما تطيح البراميل.</p><p style="opacity:.75">اضغط في أي مكان للفرامل. والأخضر في العداد يعني المطب آمن.</p><button id="go">انطلق</button></div>
 <div id="end" hidden></div><div id="rot">لفّ جهازك بالعرض</div>
 <script>
 const ASSETS=/*ASSETS*/null;const $=s=>document.querySelector(s),cv=$('#c'),X=cv.getContext('2d',{alpha:false}),W=1672,H=941,img={};
-const fit=()=>{const s=Math.max(innerWidth/W,innerHeight/H)*0+Math.min(innerWidth/W,innerHeight/H);cv.style.width=W*s+'px';cv.style.height=H*s+'px'};addEventListener('resize',fit);addEventListener('orientationchange',()=>[100,400,900].forEach(t=>setTimeout(fit,t)));fit();
-const LEN=32000,STORM=[.46,.64];let state='ready',t=0,fx=0;const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-function ground(x){const k=clamp(x/LEN,0,1),amp=.55+k*.8;let y=640-amp*1.12*(62*Math.sin(x/430)+30*Math.sin(x/173+1)+11*Math.sin(x/67+2));for(const[b,w,h]of BUMPS){const d=(x-b)/w;if(d>-1&&d<1)y-=h*(1-d*d)}return y}
-const BUMPS=[];{let x=1400;let s=9;while(x<LEN-700){s=(s*16807)%2147483647;const r=s/2147483647;BUMPS.push([x,110+r*120,28+r*58]);x+=620+r*900}}
-const slope=x=>Math.atan2(ground(x+24)-ground(x-24),48);
-const T={x:220,y:0,vx:0,vy:0,a:0,va:0,g:false,spin:0,lastImp:0},WB=136,RIDE=36;
-let barrels=[],debris=[],lost=0,camX=0,camY=0,dust=[],sand=[];
-function reset(){Object.assign(T,{x:220,vx:0,vy:0,a:slope(220),va:0,g:true,spin:0});T.y=(ground(T.x-WB)+ground(T.x+WB))/2-RIDE;barrels=[0,1,2,3,4,5].map(i=>({u:-190+i*33,h:0,vh:0,vu:0,on:true,i}));debris=[];lost=0;t=0;camX=T.x-500;camY=0;dust=[];state='ready';sand=Array.from({length:90},()=>({x:Math.random()*W,y:Math.random()*H,v:700+Math.random()*700,l:40+Math.random()*90}))}
-const inp={gas:false,brk:false};function bind(id,k){const e=$(id),on=v=>{inp[k]=v;e.classList.toggle('on',v)};e.addEventListener('pointerdown',x=>{x.preventDefault();e.setPointerCapture&&e.setPointerCapture(x.pointerId);on(true)});for(const n of['pointerup','pointercancel','lostpointercapture'])e.addEventListener(n,()=>on(false))}bind('#gas','gas');bind('#brk','brk');
-addEventListener('keydown',e=>{if(e.code==='ArrowRight'||e.code==='KeyD')inp.gas=true;if(e.code==='ArrowLeft'||e.code==='KeyA')inp.brk=true});addEventListener('keyup',e=>{if(e.code==='ArrowRight'||e.code==='KeyD')inp.gas=false;if(e.code==='ArrowLeft'||e.code==='KeyA')inp.brk=false});
-function say(s){const e=$('#say');e.textContent=s;e.style.opacity=1;clearTimeout(say.t);say.t=setTimeout(()=>e.style.opacity=0,2000)}
-const LINES=['ناصر: هذا واحد طاح من حسابك.','ناصر: بشويش! هذي فلوس.','ناصر: كذا بنوصل بشاحنة فاضية!','ناصر: خلاص، لا تتكلم معي.','ناصر: الله يعوضنا.','ناصر: رجعنا فاضيين.'];
-function step(dt){if(state!=='run')return;t+=dt;const prev=T.vx;const sl=slope(T.x);
- if(T.g){if(inp.gas)T.vx+=(T.vx<520?520:300)*dt;if(inp.brk)T.vx-=(T.vx>0?980:320)*dt;T.vx+=Math.sin(sl)*520*dt;T.vx-=T.vx*.14*dt;T.vx=clamp(T.vx,-160,700)}else{T.va+=(inp.gas?-3.6:inp.brk?3.6:0)*dt}
- T.vy+=1700*dt;T.x+=T.vx*dt;T.y+=T.vy*dt;T.spin+=T.vx*dt/34;
- const want=Math.atan2(ground(T.x+WB)-ground(T.x-WB),WB*2);T.a+=T.va*dt;T.a=clamp(T.a,-.5,.5);
- const c2=Math.sin(T.a)*WB,pr=(T.y-c2+RIDE)-ground(T.x-WB),pf=(T.y+c2+RIDE)-ground(T.x+WB),pen=Math.max(pr,pf);let imp=0;
- if(pen>=0){imp=T.vy;T.y-=pen;T.vy=imp>260?-imp*.15:0;T.g=true;if(imp>240){for(let i=0;i<10;i++)dust.push({x:T.x+(Math.random()-.5)*280,y:T.y+RIDE,vx:(Math.random()-.5)*200,vy:-Math.random()*150,t:0,l:.5+Math.random()*.4,s:5+Math.random()*9|0})}}else if(pen<-10)T.g=false;
- if(T.g){T.va+=(want-T.a)*70*dt;T.va*=Math.exp(-dt*11)}else T.va*=Math.exp(-dt*.9);
- const ax=(T.vx-prev)/Math.max(dt,.001);
- if(T.g&&T.vx>30&&Math.random()<dt*20)dust.push({x:T.x-WB-20,y:ground(T.x-WB),vx:-T.vx*.2,vy:-30-Math.random()*50,t:0,l:.5,s:4+Math.random()*7|0});
- const shake=imp>0?imp:0;
- for(const b of barrels){if(!b.on)continue;const gravT=Math.sin(T.a)*1250;b.vu+=(-ax*.32+gravT)*dt;const fric=b.h<=0?4.2:.5;b.vu*=Math.exp(-dt*fric);
-  if(shake>150&&b.h<=0)b.vh=(shake-95)*(.62+Math.random()*.36)+T.vx*.1;b.vh-=1500*dt;b.h+=b.vh*dt;if(b.h<=0){b.h=0;if(b.vh<-120)b.vh=-b.vh*.22;else b.vh=0}
-  b.u+=b.vu*dt;const lo=-205,hi=-8,rail=38;if(b.u<lo){if(b.h<rail){b.u=lo;b.vu=Math.abs(b.vu)*.3}else fall(b,-1)}else if(b.u>hi){b.u=hi;b.vu=-Math.abs(b.vu)*.3}if(b.on&&b.h>108){fall(b,-1)}
-  for(const o of barrels){if(o!==b&&o.on&&Math.abs(o.u-b.u)<32&&b.h<26&&o.h<26){const d=(32-Math.abs(o.u-b.u))*Math.sign(b.u-o.u||1)*.5;b.u+=d;o.u-=d;const m=(b.vu+o.vu)/2;b.vu=o.vu=m}}}
- for(const d of debris){d.vy+=1500*dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.r+=d.vr*dt;const g=ground(d.x)-22;if(d.y>g){d.y=g;d.vy*=-.3;d.vx*=.55;d.vr*=.5}}
- for(const p of dust){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt}dust=dust.filter(p=>p.t<p.l);
- if(T.x>=LEN)finish();}
-function wp(u,h){const c=Math.cos(T.a),s=Math.sin(T.a);const lx=u,ly=-110-h;return{x:T.x+lx*c-ly*s,y:T.y+lx*s+ly*c}}
-function fall(b,dir){b.on=false;const p=wp(b.u,b.h);debris.push({x:p.x,y:p.y,vx:T.vx*.7+dir*170,vy:-180,r:0,vr:dir*5});say(LINES[lost]||LINES[0]);lost++;if(lost>=6)finish()}
-function finish(){if(state!=='run')return;state='end';const kept=6-lost,m=Math.floor(t/60),s=String(Math.floor(t%60)).padStart(2,'0');const e=$('#end');e.innerHTML=`<h2>${kept===6?'ما طاح شي!':kept===0?'رجعتوا فاضيين':'وصلت الحمولة'}</h2><p>البراميل: ${kept} من 6 · الوقت: ${m}:${s}</p><p>${kept===6?'ناصر: والله تصلح سواق. أبوك ما كان يصلح.':kept>=3?'ناصر: ما هي بطالة، بس الناقص من حسابك.':'ناصر: المرة الجاية أنا أسوق.'}</p><button id="again">جرّب مرة ثانية</button>`;e.hidden=false;$('#again').onclick=()=>{e.hidden=true;reset();state='run'};window.__res={kept,t}}
-function draw(){const k=clamp(T.x/LEN,0,1),st=k>STORM[0]&&k<STORM[1]?Math.min(1,Math.min(k-STORM[0],STORM[1]-k)/.03):0;
- camX+=(T.x-W*.34+T.vx*.25-camX)*.09;camY+=((T.y-600)*.55-camY)*.06;const cx=camX,cy=camY;
- X.fillStyle='#9a5270';X.fillRect(0,0,W,H);const sky=img.menu_bg;X.drawImage(sky,0,0,W,300,0,0,W,470);const hill=(par,base,amp,col,w1,w2)=>{X.fillStyle=col;X.beginPath();X.moveTo(0,H);for(let sx=0;sx<=W+16;sx+=16){const wx=(sx+cx*par)|0,y=base-cy*par*.5-amp*(Math.sin(wx/w1)+.45*Math.sin(wx/w2+1.3));X.lineTo(sx,Math.round(y/6)*6)}X.lineTo(W,H);X.closePath();X.fill()};hill(.08,440,34,'#9a5270',360,150);hill(.18,478,30,'#d98c4c',520,210);hill(.34,520,36,'#e7a255',760,270);
- const step=10;X.beginPath();X.moveTo(-10,H+10);for(let sx=-10;sx<=W+step;sx+=step)X.lineTo(sx,ground(cx+sx)-cy);X.lineTo(W+10,H+10);X.closePath();X.fillStyle='#e49a45';X.fill();
- X.save();X.clip();const g=X.createLinearGradient(0,380,0,H);if(lowFx){g.addColorStop(0,'rgba(255,214,140,.25)');g.addColorStop(1,'rgba(120,52,12,.4)')}else{g.addColorStop(0,'rgba(255,214,140,.5)');g.addColorStop(1,'rgba(120,52,12,.55)')}X.fillStyle=g;X.fillRect(0,0,W,H);X.fillStyle='rgba(120,60,15,.22)';for(let i=0;i<70;i++){const sx=((i*173.3-cx*1)%(W+80)+W+80)%(W+80)-40,gy=ground(cx+sx)-cy;X.fillRect(sx|0,gy+18+(i*37)%240,20+(i%4)*14,4)}X.restore();
- X.strokeStyle='#7a3b12';X.lineWidth=5;X.beginPath();for(let sx=-10;sx<=W+step;sx+=step){const y=ground(cx+sx)-cy;sx===-10?X.moveTo(sx,y):X.lineTo(sx,y)}X.stroke();
- if(k>.97||T.x>LEN-1300){const fxx=LEN-cx,fy=ground(LEN)-cy;X.fillStyle='#3b1c08';X.fillRect(fxx,fy-210,10,210);X.fillStyle='#c8401f';X.fillRect(fxx+10,fy-210,110,60);X.fillStyle='#fff4d8';X.font='400 34px Lalezar,serif';X.textAlign='center';X.fillText('الميناء',fxx+65,fy-168)}
- const tr=img.q_truck,Q=.363,tw=tr.width*Q;
- X.save();X.fillStyle='rgba(40,14,0,.3)';X.beginPath();X.ellipse(T.x-cx,ground(T.x)-cy+6,tw*.45,12,0,0,7);X.fill();X.restore();
- for(const d of debris){X.save();X.translate(d.x-cx,d.y-cy);X.rotate(d.r);const b=img.q_barrel,w=b.width*.2,h=b.height*.2;X.drawImage(b,-w/2,-h/2,w,h);X.restore()}
- X.save();X.translate(T.x-cx,T.y-cy);X.rotate(T.a);
- for(const b of barrels){if(!b.on)continue;const im=img.q_barrel,w=im.width*.185,h=im.height*.185;X.save();X.translate(b.u,-110-b.h);X.rotate(clamp(b.vu*.0006,-.25,.25));X.drawImage(im,-w/2,-h/2,w,h);X.restore()}
- X.drawImage(tr,-591*Q,-417*Q,tr.width*Q,tr.height*Q);const ti=img.s_tire,tl=72;for(const wx of[-136,136]){X.save();X.translate(wx,0);X.rotate(T.spin);X.drawImage(ti,-tl/2,-tl/2,tl,tl);X.restore()}X.restore();
- for(const p of dust){X.globalAlpha=clamp(1-p.t/p.l,0,.8);X.fillStyle='#e8c490';X.fillRect(p.x-cx|0,p.y-cy|0,p.s,p.s)}X.globalAlpha=1;
- if(st>0){X.fillStyle=`rgba(214,150,84,${st*.64})`;X.fillRect(0,0,W,H);X.fillStyle=`rgba(255,226,170,${st*.45})`;for(const s of sand){s.x-=s.v/60;if(s.x<-100){s.x=W+50;s.y=Math.random()*H}X.fillRect(s.x|0,s.y|0,s.l,2)}}
- if(!lowFx){X.save();X.globalCompositeOperation='multiply';const v=X.createRadialGradient(W/2,H*.48,H*.38,W/2,H*.5,W*.7);v.addColorStop(0,'#fff');v.addColorStop(1,'#a07a7a');X.fillStyle=v;X.fillRect(0,0,W,H);X.restore()}
- $('#prog i').style.width=(k*100)+'%';$('#bar').textContent='براميل: '+(6-lost);const m=Math.floor(t/60);$('#tm').textContent=m+':'+String(Math.floor(t%60)).padStart(2,'0')}
-let last=0,fpsT=0,fpsN=0,lowFx=false;function frame(ts){let dt=Math.min(.25,(ts-last)/1000||0);last=ts;fpsT+=dt;fpsN++;if(fpsT>2){const fps=fpsN/fpsT;window.__fps=Math.round(fps);if(fps<28)lowFx=true;fpsT=0;fpsN=0;if(/[?&]fps/.test(location.search))say(fps.toFixed(0)+' fps')}const n=Math.max(1,Math.ceil(dt/.008));for(let i=0;i<n;i++)step(dt/n);draw();requestAnimationFrame(frame)}
-Promise.all(Object.keys(ASSETS).map(k=>new Promise(r=>{const i=new Image();i.onload=()=>{img[k]=i;r()};i.src=ASSETS[k]}))).then(()=>{reset();$('#go').onclick=()=>{$('#start').hidden=true;state='run'};requestAnimationFrame(frame);window.__d={T,inp,get barrels(){return barrels},get lost(){return lost},get state(){return state},LEN};window.__ready=true});
+const fit=()=>{const s=Math.min(innerWidth/W,innerHeight/H);cv.style.width=W*s+'px';cv.style.height=H*s+'px'};addEventListener('resize',fit);addEventListener('orientationchange',()=>[100,400,900].forEach(t=>setTimeout(fit,t)));fit();
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const CRUISE=620,SAFE=300,HARD=440,BW=62,BH=24,WB=101,R=27,Q=.27;
+const BUMPS=[];let LEN=0;{let x=1900,sd=11;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647;for(let i=0;i<26;i++){const k=i/26;BUMPS.push({x,done:false});if(i>7&&rnd()<.3){x+=330;BUMPS.push({x,done:false})}x+=1500-k*620+rnd()*520}LEN=x+500}
+function hill(x){return 660-22*Math.sin(x/1500)-12*Math.sin(x/640+1)}
+function ground(x){let y=hill(x);for(const b of BUMPS){const d=(x-b.x)/BW;if(d>-1&&d<1)y-=BH*(1-d*d)*(1-d*d)}return y}
+const T={x:220,v:0,y:0,a:0,spin:0};let state='ready',t=0,barrels=[],debris=[],lost=0,streak=0,warn=0,camX=0,shake=0,dust=[],clean=0,total=0,brake=false,sand=[];
+function place(){const yr=ground(T.x-WB),yf=ground(T.x+WB);T.y=(yr+yf)/2-R;T.a=Math.atan2(yf-yr,WB*2)}
+function reset(){T.x=220;T.v=0;T.spin=0;place();barrels=[0,1,2,3,4,5].map(i=>({u:-141+i*24.5,h:0,vh:0,on:true}));debris=[];lost=0;streak=0;warn=0;clean=0;total=0;t=0;camX=T.x-W*.2;dust=[];for(const b of BUMPS)b.done=false;state='ready';sand=Array.from({length:70},()=>({x:Math.random()*W,y:Math.random()*H,v:700+Math.random()*700,l:40+Math.random()*90}))}
+const B=$('#brk'),setB=v=>{brake=v;B.classList.toggle('on',v)};
+addEventListener('pointerdown',e=>{if(state==='run'&&!e.target.closest('button'))setB(true)});addEventListener('pointerup',()=>setB(false));addEventListener('pointercancel',()=>setB(false));
+addEventListener('keydown',e=>{if(['Space','ArrowLeft','KeyA'].includes(e.code))setB(true)});addEventListener('keyup',e=>{if(['Space','ArrowLeft','KeyA'].includes(e.code))setB(false)});
+function say(s,ms=1500){const e=$('#say');e.textContent=s;e.style.opacity=1;clearTimeout(say.t);say.t=setTimeout(()=>e.style.opacity=0,ms)}
+const FALL=['ناصر: هذا واحد طاح من حسابك.','ناصر: هدّي عند المطب!','ناصر: كذا بنوصل بشاحنة فاضية!','ناصر: يا ولد، الفرامل وين؟','ناصر: الله يعوضنا.','ناصر: رجعنا فاضيين.'];
+function hop(p){for(const b of barrels)if(b.on)b.vh=p*(.7+Math.random()*.5)}
+function drop(n){for(let i=0;i<n;i++){const c=barrels.filter(b=>b.on);if(!c.length)return;const b=c[0];b.on=false;const co=Math.cos(T.a),si=Math.sin(T.a),ly=-82-b.h;debris.push({x:T.x+b.u*co-ly*si,y:T.y+b.u*si+ly*co,vx:T.v*.55-90,vy:-260,r:0,vr:-6});lost++;say(FALL[Math.min(lost-1,5)],1900)}}
+function hit(){total++;for(let i=0;i<8;i++)dust.push({x:T.x+WB,y:ground(T.x+WB),vx:(Math.random()-.5)*160,vy:-Math.random()*120,t:0,l:.5,s:4+Math.random()*7|0});
+ if(T.v<=SAFE){clean++;streak++;warn=0;hop(70);shake=2;if(streak%4===0)say('ناصر: زين، كذا السواقة!')}
+ else if(T.v<=HARD){streak=0;hop(230);shake=8;warn++;if(warn>=2){warn=0;drop(1)}else say('ناصر: بشويش! كان بيطيح برميل.')}
+ else{streak=0;warn=0;hop(330);shake=14;drop(T.v>560?2:1)}}
+function step(dt){if(state!=='run')return;t+=dt;if(brake)T.v-=950*dt;else T.v+=(T.v<CRUISE?300:0)*dt;T.v=clamp(T.v,70,CRUISE);T.x+=T.v*dt;T.spin+=T.v*dt/R;place();
+ for(const b of BUMPS)if(!b.done&&T.x+WB>=b.x){b.done=true;hit()}
+ for(const b of barrels){if(!b.on)continue;b.vh-=1300*dt;b.h+=b.vh*dt;if(b.h<=0){b.h=0;b.vh=0}}
+ for(const d of debris){d.vy+=1500*dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.r+=d.vr*dt;const g=ground(d.x)-14;if(d.y>g){d.y=g;d.vy*=-.3;d.vx*=.6;d.vr*=.5}}
+ for(const p of dust){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt}dust=dust.filter(p=>p.t<p.l);shake=Math.max(0,shake-dt*34);
+ if(T.x>=LEN-300)finish()}
+function finish(){if(state!=='run')return;state='end';setB(false);const kept=6-lost,m=Math.floor(t/60),s=String(Math.floor(t%60)).padStart(2,'0');const e=$('#end');e.innerHTML=`<h2>${kept===6?'ما طاح شي!':kept===0?'رجعتوا فاضيين':'وصلت الحمولة'}</h2><p>البراميل: ${kept} من 6 · مطبات نظيفة: ${clean} من ${total} · الوقت: ${m}:${s}</p><p>${kept===6?'ناصر: والله تصلح سواق. أبوك ما كان يصلح.':kept>=3?'ناصر: ما هي بطالة، بس الناقص من حسابك.':'ناصر: المرة الجاية أنا أسوق.'}</p><button id="again">جرّب مرة ثانية</button>`;e.hidden=false;$('#again').onclick=()=>{e.hidden=true;reset();state='run'};window.__res={kept,clean,total,t}}
+function draw(){const k=clamp(T.x/LEN,0,1),st=k>.46&&k<.62?Math.min(1,Math.min(k-.46,.62-k)/.03):0;camX+=(T.x-W*.2-camX)*.14;const sx0=shake?(Math.random()-.5)*shake:0,sy0=shake?(Math.random()-.5)*shake:0,cx=camX;X.save();X.translate(sx0,sy0);
+ X.fillStyle='#9a5270';X.fillRect(-20,-20,W+40,H+40);X.drawImage(img.menu_bg,0,0,W,300,0,0,W,470);
+ const far=(par,base,amp,col,w1,w2)=>{X.fillStyle=col;X.beginPath();X.moveTo(-20,H);for(let sx=-20;sx<=W+36;sx+=16){const wx=sx+cx*par,y=base-amp*(Math.sin(wx/w1)+.45*Math.sin(wx/w2+1.3));X.lineTo(sx,Math.round(y/6)*6)}X.lineTo(W+20,H);X.closePath();X.fill()};far(.08,440,34,'#9a5270',360,150);far(.18,478,30,'#d98c4c',520,210);far(.34,530,28,'#e7a255',760,270);
+ const stp=8,pathTop=(off)=>{for(let sx=-24;sx<=W+24;sx+=stp)X.lineTo(sx,ground(cx+sx)+off)};
+ X.fillStyle='#d98f46';X.beginPath();X.moveTo(-24,H+24);pathTop(-14);X.lineTo(W+24,H+24);X.closePath();X.fill();
+ X.fillStyle='#8a5a34';X.beginPath();X.moveTo(-24,H+24);pathTop(0);X.lineTo(W+24,H+24);X.closePath();X.fill();
+ X.fillStyle='#c97f3e';X.beginPath();X.moveTo(-24,H+24);for(let sx=-24;sx<=W+24;sx+=stp)X.lineTo(sx,hill(cx+sx)+70);X.lineTo(W+24,H+24);X.closePath();X.fill();
+ X.fillStyle='rgba(255,226,170,.5)';for(let wx=Math.floor(cx/190)*190;wx<cx+W+40;wx+=190)X.fillRect(wx-cx,hill(wx)+33,88,5);
+ X.fillStyle='rgba(100,55,20,.28)';for(let i=0;i<46;i++){const sx=((i*173.3-cx)%(W+80)+W+80)%(W+80)-40;X.fillRect(sx|0,hill(cx+sx)+84+(i*37)%170,18+(i%4)*14,4)}
+ for(const b of BUMPS){const sx=b.x-cx;if(sx<-120||sx>W+120)continue;for(let i=-3;i<3;i++){const x0=sx+i*BW/3,x1=x0+BW/3;X.fillStyle=(i&1)?'#f2b84b':'#2a1a12';X.beginPath();X.moveTo(x0,ground(b.x+i*BW/3)+1);X.lineTo(x1,ground(b.x+(i+1)*BW/3)+1);X.lineTo(x1,hill(b.x)+6);X.lineTo(x0,hill(b.x)+6);X.closePath();X.fill()}
+  const px=sx-300,py=hill(b.x-300)-6;if(!b.done&&px>-40){X.fillStyle='#4a2c18';X.fillRect(px-3,py-74,6,74);X.save();X.translate(px,py-88);X.rotate(.785);X.fillStyle='#f2b84b';X.strokeStyle='#2a1a12';X.lineWidth=4;X.fillRect(-21,-21,42,42);X.strokeRect(-21,-21,42,42);X.restore();X.fillStyle='#2a1a12';X.font='800 26px Almarai,sans-serif';X.textAlign='center';X.fillText('!',px,py-78)}}
+ const fxx=LEN-300-cx;if(fxx<W+160){const fy=hill(LEN-300);X.fillStyle='#3b1c08';X.fillRect(fxx,fy-210,10,210);X.fillStyle='#c8401f';X.fillRect(fxx+10,fy-210,120,60);X.fillStyle='#fff4d8';X.font='400 34px Lalezar,serif';X.textAlign='center';X.fillText('الميناء',fxx+70,fy-168)}
+ const tr=img.q_truck;X.fillStyle='rgba(40,14,0,.3)';X.beginPath();X.ellipse(T.x-cx,hill(T.x)+6,tr.width*Q*.45,9,0,0,7);X.fill();
+ for(const d of debris){const q=img.q_barrel,w=q.width*.15,h=q.height*.15;X.save();X.translate(d.x-cx,d.y-cy0());X.rotate(d.r);X.drawImage(q,-w/2,-h/2,w,h);X.restore()}
+ X.save();X.translate(T.x-cx,T.y);X.rotate(T.a);for(const b of barrels){if(!b.on)continue;const q=img.q_barrel,w=q.width*.137,h=q.height*.137;X.drawImage(q,b.u-w/2,-82-b.h-h/2,w,h)}
+ X.drawImage(tr,-591*Q,-417*Q,tr.width*Q,tr.height*Q);const ti=img.s_tire,tl=R*2;for(const wx of[-WB,WB]){X.save();X.translate(wx,0);X.rotate(T.spin);X.drawImage(ti,-tl/2,-tl/2,tl,tl);X.restore()}X.restore();
+ for(const p of dust){X.globalAlpha=clamp(1-p.t/p.l,0,.8);X.fillStyle='#e8c490';X.fillRect(p.x-cx|0,p.y|0,p.s,p.s)}X.globalAlpha=1;
+ if(st>0){X.fillStyle=`rgba(214,150,84,${st*.5})`;X.fillRect(-20,-20,W+40,H+40);X.fillStyle=`rgba(255,226,170,${st*.4})`;for(const s of sand){s.x-=s.v/60;if(s.x<-100){s.x=W+50;s.y=Math.random()*H}X.fillRect(s.x|0,s.y|0,s.l,2)}}
+ X.restore();
+ const v=clamp(T.v/CRUISE,0,1),spd=$('#spd');spd.style.width=(v*100)+'%';spd.style.background=T.v<=SAFE?'#57a23a':T.v<=HARD?'#f2b84b':'#c8401f';$('#bar').textContent='براميل: '+(6-lost);const m=Math.floor(t/60);$('#tm').textContent=m+':'+String(Math.floor(t%60)).padStart(2,'0')}
+const cy0=()=>0;
+let last=0;function frame(ts){let dt=Math.min(.25,(ts-last)/1000||0);last=ts;const n=Math.max(1,Math.ceil(dt/.008));for(let i=0;i<n;i++)step(dt/n);draw();requestAnimationFrame(frame)}
+Promise.all(Object.keys(ASSETS).map(k=>new Promise(r=>{const i=new Image();i.onload=()=>{img[k]=i;r()};i.src=ASSETS[k]}))).then(()=>{reset();$('#go').onclick=()=>{$('#start').hidden=true;state='run'};requestAnimationFrame(frame);window.__d={T,setB,get next(){return BUMPS.find(b=>!b.done)},get state(){return state},get lost(){return lost}};window.__ready=true});
 </script></body></html>
