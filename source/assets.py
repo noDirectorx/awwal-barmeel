@@ -199,6 +199,11 @@ def sprite(n,mask):
     ys,xs=np.where(mask);x0,y0,x1,y1=xs.min(),ys.min(),xs.max()+1,ys.max()+1
     o=np.dstack([a[y0:y1,x0:x1],(mask[y0:y1,x0:x1]*255).astype('uint8')]);save(n,Image.fromarray(o,'RGBA'),q=92);meta[n+'_at']=(int(x0),int(y0))
 sprite('pump_beam',bmask);sprite('pump_saddle',saddle&(ni.binary_dilation(pm)|True));sprite('pump_prod',prodk)
+# redrawn walk sheets (one row of 9)
+def row9(name,i,hero=False):
+    w=L(i);m2,lab2=key(w,1500);w=despill(w,m2);bx=sorted(bboxes(m2,lab2),key=lambda b:b[0]);assert len(bx)==9,len(bx)
+    strip(name,[crop(w,m2,b) for b in bx],hero)
+row9('nasser','89ae01d4')
 json.dump(meta,open('meta.json','w'))
 print(len(meta),sum(os.path.getsize(OUT+f) for f in os.listdir(OUT))//1024,'KB')
 # review sheets
