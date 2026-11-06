@@ -3,3 +3,5 @@ source/rv_*.png
 source/shots/
 __pycache__/
 node_modules/
+source/tests/shots/
+source/tests/*.png
