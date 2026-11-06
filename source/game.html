@@ -306,7 +306,7 @@ function updMap(dt){if(M.lock){M.vx=M.vy=0;M.p.moving=false}else{const v=inputVe
  A.walk(M.p.moving&&!M.lock,.14);
  const p=M.p,tx=clamp(p.x-W/2,0,MW-W),ty=clamp(p.y-H/2-20,0,MH-H),k=1-Math.exp(-dt*7);M.cam.x+=(tx-M.cam.x)*k;M.cam.y+=(ty-M.cam.y)*k;
  let best=null,bd=1e9;const look=(x,y,r,fn,label)=>{const d=Math.hypot(p.x-x,p.y-y);if(d<r&&d<bd){bd=d;best={fn,label}}};
- for(const i of M.pick)look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);
+ for(const i of M.pick)if(pickOn(i))look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);
  const g=stage();
  look(2900,1530,120,enterOffice,'ادخل المكتب');
  if(!save.flags.sec_stone)look(1830,1400,105,()=>findSecret('stone'),'فتّش عند الحجر');if(!save.flags.sec_pile)look(470,1490,125,()=>findSecret('pile'),'فتّش الخردة');
@@ -320,7 +320,7 @@ $('#act').addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefaul
 function stage(){const f=save.flags,sc=[1,2,3,4,5,6].filter(i=>f['got_s'+i]).length,mp=['head','rod','weight'].filter(i=>f['got_'+i]).length;return{sc,mp,sold:f.sold,met:f.metMubarak}}
 function drawMap(){const c=M.cam,cx=c.x|0,cy=c.y|0;X.fillStyle='#e8b673';X.fillRect(0,0,W,H);X.drawImage(M.tiles,0,0,MW/2,MH/2,-cx,-cy,MW,MH);
  const list=[];for(const o of M.objs)list.push({y:o.y,d(){X.drawImage(o.im,o.x-o.w/2-cx,o.y-o.h-cy,o.w,o.h)}});
- for(const i of M.pick){const im=img[i.k];list.push({y:i.y,d(){const b=Math.sin(time*3.2+i.x)*5,w=im.width*i.s,h=im.height*i.s;X.fillStyle='rgba(40,14,0,.25)';X.beginPath();X.ellipse(i.x-cx,i.y-cy,w*.4,8,0,0,7);X.fill();X.drawImage(im,i.x-w/2-cx,i.y-h-10+b-cy,w,h);const g=.45+.35*Math.sin(time*4+i.y);X.fillStyle=`rgba(255,240,180,${g})`;X.fillRect(i.x-cx+w*.2,i.y-h-12+b-cy,5,5)}})}
+ for(const i of M.pick){if(!pickOn(i))continue;const im=img[i.k];list.push({y:i.y,d(){const b=Math.sin(time*3.2+i.x)*5,w=im.width*i.s,h=im.height*i.s;X.fillStyle='rgba(40,14,0,.25)';X.beginPath();X.ellipse(i.x-cx,i.y-cy,w*.4,8,0,0,7);X.fill();X.drawImage(im,i.x-w/2-cx,i.y-h-10+b-cy,w,h);const g=.45+.35*Math.sin(time*4+i.y);X.fillStyle=`rgba(255,240,180,${g})`;X.fillRect(i.x-cx+w*.2,i.y-h-12+b-cy,5,5)}})}
  for(const n of Object.values(M.npc))list.push({y:n.y,d(){drawWalker(X,n,cx,cy);if(n===nextTarget())marker(n.x-cx,n.y-n.h-26-cy)}});
  list.push({y:M.truck.y,d(){const im=img.truck_side,w=im.width*1.2,h=im.height*1.2;X.drawImage(im,M.truck.x-w/2-cx,M.truck.y-h+24-cy,w,h)}});
  list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});
@@ -335,6 +335,7 @@ function renderTasks(){const g=stage(),T=$('#tasks');const line=(t,d)=>`<div cla
  const f=save.flags;if(f.q1on||f.q2on){h+='<b>جانبية</b>';if(f.q1on)h+=line('صلّح وصلة الخزان',f.q1);if(f.q2on)h+=line(f.got_tire?'ركّب الكفر لناصر':'دوّر الكفر الاحتياطي لناصر',f.q2)}h+=`<div style="opacity:.8">أسرار ${SECRETS.filter(s=>f['sec_'+s.id]).length}/${SECRETS.length}</div>`;T.innerHTML=h;
  $('#stat').textContent='باقي على العقد: 6 أشهر'}
 async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;await fn();M.lock=!!M.leaving;renderTasks();store.put()}
+function pickOn(i){return M.spots||save.flags.metMubarak||i===TIRE}
 function takeItem(i){M.pick=M.pick.filter(x=>x!==i);save.flags['got_'+i.id]=1;A.play('fx_pickup',.9);toast('حصلت: '+i.name);renderTasks();store.put()}
 function talkHamdan(){talk(async()=>{const g=stage(),f=save.flags;
  if(!g.met)await say('hamdan','neutral','مبارك عند المضخة. هو أدرى منا كلنا فيها.');

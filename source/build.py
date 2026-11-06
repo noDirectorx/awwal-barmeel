@@ -10,7 +10,7 @@ def R(a,b):
     s=s.replace(a,b,1)
 R("const CH=[ch0,ch1,ch2,ch3,ch4,ch5,ch6];",c+"\nconst CH=[ch0,ch1,ch2,ch3,ch4,ch5,ch6,eIntro2,eMorning,eHide,eVisit,eMunira,eWeeks,eDrive,eMarket,eMubarak,eOpen,eEnd];")
 # generic spots on the map
-R(" for(const i of M.pick)look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);"," if(M.spots){for(const sp of M.spots){if(!sp.cond||sp.cond())look(sp.x,sp.y,sp.r,sp.fn,sp.label)}}else{for(const i of M.pick)look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);")
+R(" for(const i of M.pick)if(pickOn(i))look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);"," if(M.spots){for(const sp of M.spots){if(!sp.cond||sp.cond())look(sp.x,sp.y,sp.r,sp.fn,sp.label)}}else{for(const i of M.pick)if(pickOn(i))look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);")
 R(" look(M.npc.hamdan.x,M.npc.hamdan.y,135,talkHamdan,'كلّم حمدان');look(M.npc.mubarak.x,M.npc.mubarak.y,135,talkMubarak,'كلّم مبارك');look(M.npc.nasser.x,M.npc.nasser.y,145,talkNasser,'كلّم ناصر');"," look(M.npc.hamdan.x,M.npc.hamdan.y,135,talkHamdan,'كلّم حمدان');look(M.npc.mubarak.x,M.npc.mubarak.y,135,talkMubarak,'كلّم مبارك');look(M.npc.nasser.x,M.npc.nasser.y,145,talkNasser,'كلّم ناصر')}")
 R("const v=inputVec(),SP=450,","if(M.tick)M.tick(dt);const v=inputVec(),SP=M.slow?290:450,")
 R(" list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});"," if(M.barrel){M.barrel.r+=M.vx*.002;const b=img.o_barrel,w=b.width*.8,h=b.height*.8,px=M.p.x+(M.p.dir==='l'?-58:58),py=M.p.y+10;list.push({y:py,d(){X.save();X.translate(px-cx,py-h/2-cy);X.rotate(M.barrel.r);X.drawImage(b,-w/2,-h/2,w,h);X.restore()}})}\n list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});")
