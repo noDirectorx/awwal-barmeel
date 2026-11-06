@@ -91,7 +91,7 @@ const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));const $=s=>document.querySelector
 const W=1672;let H=941;const KEY='awwal-barmeel-ep2test';
 const img={};
 function loadAll(){return Promise.all(Object.keys(ASSETS).map(k=>new Promise(r=>{const i=new Image();i.onload=()=>{img[k]=i;r()};i.onerror=r;i.src=ASSETS[k]})))}
-function setView(full){const want=full?Math.round(clamp(W*innerHeight/innerWidth,720,1260)):941;if(want!==H||cv.height!==want){H=want;cv.height=want}fit()}
+let RS=1;function applyRes(){cv.width=Math.round(W*RS);cv.height=Math.round(H*RS)}function setView(full){const want=full?Math.round(clamp(W*innerHeight/innerWidth,720,1260)):941;if(want!==H){H=want;applyRes()}fit()}
 function fit(){const s=(window.__cover?Math.max:Math.min)(innerWidth/W,innerHeight/H);cv.style.width=W*s+'px';cv.style.height=H*s+'px'}
 const refit=()=>setView(S.mode==='map');addEventListener('resize',refit);
 const lateRefit=()=>{refit();for(const t of [80,250,500,900])setTimeout(refit,t)};addEventListener('orientationchange',lateRefit);if(window.visualViewport)visualViewport.addEventListener('resize',refit);document.addEventListener('visibilitychange',()=>{if(!document.hidden)lateRefit()});fit();
@@ -177,7 +177,7 @@ function say(who,mood,text){return new Promise(res=>{if(skipping){res();return}
  if(TEST)setTimeout(()=>{if(advance){advance();advance&&advance()}},5)})}
 $('#dlg').addEventListener('pointerup',e=>{e.stopPropagation();advance&&advance()});
 function choose(title,opts){return new Promise(res=>{skipping=false;$('#skip').hidden=true;const c=$('#choices');c.innerHTML=`<h3>${title}</h3>`;
- opts.forEach((o,i)=>{const b=document.createElement('button');b.className='btn';b.innerHTML=o.t+(o.s?`<small>${o.s}</small>`:'');b.onclick=()=>{c.hidden=true;res(i)};c.appendChild(b)});c.hidden=false;
+ const shown=performance.now();opts.forEach((o,i)=>{const b=document.createElement('button');b.className='btn';b.innerHTML=o.t+(o.s?`<small>${o.s}</small>`:'');b.onclick=()=>{if(performance.now()-shown<500)return;c.hidden=true;res(i)};c.appendChild(b)});c.hidden=false;
  if(TEST){window.__choice=res;const k=window.__pick||0;setTimeout(()=>{c.hidden=true;res(k)},10)}})}
 async function card(html,ms=2200){const c=$('#card');c.innerHTML=html;c.hidden=false;c.style.opacity=0;await tween(TEST?5:450,p=>c.style.opacity=p);await wait(ms);await tween(TEST?5:450,p=>c.style.opacity=1-p);c.hidden=true}
 function subtitle(who,mood,text,ms){const d=$('#dlg'),im=d.querySelector('img');if(skipping)return;im.src=ASSETS[`p_${who}_${mood}`]||'';im.hidden=false;d.querySelector('b').textContent=NAMES[who];d.querySelector('b').hidden=false;d.querySelector('span').textContent=text;d.querySelector('i').hidden=true;d.hidden=false;setTimeout(()=>{if(!advance)d.hidden=true},TEST?20:ms)}
@@ -526,7 +526,7 @@ async function eVisit(){const f=save.flags;S.mode='cine';startScene();setBg(f.hi
  else if(f.caught){await say('old','cunning','قالوا لي إن البرميل ما له حركة.');await say('old','neutral','خمسين ألف مقابله. تغطي رواتب كم شهر.');await say('hero','firm','وأبوي رفض ثلاثة ريالات عشانه. قبل أبيع، أبي أعرف ليش.');f.khawajaSuspect=1}
  else{await say('old','surprised','ما شاء الله. لقيتوا له مكان أحسن؟');await say('old','neutral','خمسين ألف مقابله، وين ما كان. تغطي رواتب كم شهر.');await say('hero','firm','وأبوي رفض ثلاثة ريالات عشانه. قبل أبيع، أبي أعرف ليش.');o.name='oldnh';S.prop={k:'i_helmet',x:META.office_stand[0],y:META.office_stand[1],w:105};A.play('fx_assemble',.5);await say('old','cunning','احتفظ بخوذتي. يوم ترجع البرميل مكانه، رجّعها لي.');f.khawajaSuspect=1;f.helmetLeft=1}
  store.put();await walk(o,-120,840,200);await fadeTo(1,700);S.prop=null}
-function timedChoice(title,opts,ms){return new Promise(res=>{const c=$('#choices');c.innerHTML=`<h3>${title}</h3>`;let done=false;const go=i=>{if(done)return;done=true;clearTimeout(tm);c.hidden=true;res(i)};opts.forEach((t,i)=>{const b=document.createElement('button');b.className='btn';b.textContent=t;b.onclick=()=>go(i);c.appendChild(b)});const s=document.createElement('button');s.className='btn ghost';s.textContent='تسكت';s.onclick=()=>go(2);c.appendChild(s);c.hidden=false;const tm=setTimeout(()=>go(2),ms)})}
+function timedChoice(title,opts,ms){return new Promise(res=>{const c=$('#choices');c.innerHTML=`<h3>${title}</h3>`;let done=false;const shown=performance.now();const go=i=>{if(done||(i!==2&&performance.now()-shown<500))return;done=true;clearTimeout(tm);c.hidden=true;res(i)};opts.forEach((t,i)=>{const b=document.createElement('button');b.className='btn';b.textContent=t;b.onclick=()=>go(i);c.appendChild(b)});const s=document.createElement('button');s.className='btn ghost';s.textContent='تسكت';s.onclick=()=>go(2);c.appendChild(s);c.hidden=false;const tm=setTimeout(()=>go(2),ms)})}
 async function eMunira(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;A.music('music_desert',.5);A.ambience({amb_wind:.4,amb_site:.2});
  const h=actor('hero',760,780,290),m=actor('hamdan',1020,780,270),n=actor('munira',1660,800,285);h.dir='r';m.dir='l';await fadeTo(0,700);await walk(n,1240,800,200);n.dir='l';
  await say('hamdan','warm','هذي بنتي منيرة، مهندسة في الميناء.');
@@ -600,12 +600,12 @@ function panelSettings(){panel(`<h2>الإعدادات</h2>
  <div class="row"><b>الجودة</b><div class="seg"><button id="qh" class="${meta.quality==='high'?'on':''}">عالية</button><button id="ql" class="${meta.quality==='low'?'on':''}">موفرة</button></div></div>`);
  $('#sm').oninput=e=>{meta.music=+e.target.value;putMeta();A.vol()};$('#se').oninput=e=>{meta.sfx=+e.target.value;putMeta();A.vol()};
  const side=v=>{meta.actSide=v;putMeta();applySide();$('#sr').className=v==='right'?'on':'';$('#sl').className=v==='left'?'on':''};$('#sr').onclick=()=>side('right');$('#sl').onclick=()=>side('left');
- const q=v=>{meta.quality=v;putMeta();$('#qh').className=v==='high'?'on':'';$('#ql').className=v==='low'?'on':''};$('#qh').onclick=()=>q('high');$('#ql').onclick=()=>q('low')}
+ const q=v=>{meta.qset=1;setQuality(v);$('#qh').className=v==='high'?'on':'';$('#ql').className=v==='low'?'on':''};$('#qh').onclick=()=>q('high');$('#ql').onclick=()=>q('low')}
 function panelContact(){panel(`<h2>تواصل معنا</h2><div class="note" style="opacity:1;font-size:1em">عندك فكرة أو لقيت مشكلة؟ راسلنا على:</div><p><a href="mailto:${DEV_EMAIL}?subject=${encodeURIComponent('أول برميل')}">${DEV_EMAIL}</a></p>`)}
 function askNew(){if(save.ch>0){panel(`<h2>تبدأ من جديد؟</h2><div class="note" style="opacity:1;font-size:1em">تقدمك الحالي بينمسح. الأسرار والإنجازات تبقى لك.</div><button class="btn" id="yes">إيه، من البداية</button> `);$('#yes').onclick=()=>{$('#panel').hidden=true;startNew()}}else startNew()}
 function startNew(){save={ch:0,flags:{}};store.clear();beginAt(0)}
 function beginAt(n){const c=$('#title');c.style.opacity=0;A.ambience({});let f=0;const id=setInterval(()=>{f=Math.min(1,f+.07);S.fade=f;if(f>=1)clearInterval(id)},40);setTimeout(()=>{clearInterval(id);S.fade=1;S.mode='none';window.__cover=false;setView(false);c.hidden=true;c.style.opacity=1;run(n)},TEST?10:720)}
-function titleScreen(){applySide();A.music('music_menu',.8);const c=$('#title');const has=save.ch>0;S.mode='menu';S.fade=0;window.__cover=true;Menu.start();setView(false);
+function titleScreen(){applySide();if(meta.quality==='low'){RS=.68;applyRes()}A.music('music_menu',.8);const c=$('#title');const has=save.ch>0;S.mode='menu';S.fade=0;window.__cover=true;Menu.start();setView(false);
  c.innerHTML=`<h1>أول برميل</h1><nav class="menu">${has?'<button class="mi first" id="go2">استمرار</button>':''}<button class="mi ${has?'':'first'}" id="go">${has?'لعبة جديدة':'ابدأ'}</button><button class="mi" id="eps">الحلقات</button><button class="mi" id="set">الإعدادات</button><button class="mi" id="con">تواصل معنا</button></nav>`;c.hidden=false;
  $('#go').onclick=askNew;if(has)$('#go2').onclick=()=>beginAt(save.ch);$('#eps').onclick=panelEpisodes;$('#set').onclick=panelSettings;$('#con').onclick=panelContact}
 const motes=Array.from({length:34},()=>({x:Math.random()*1672,y:Math.random()*941,s:2+Math.random()*3|0,v:6+Math.random()*16,p:Math.random()*6}));
@@ -642,7 +642,8 @@ let paused=false;function setPause(on){if(!$('#title').hidden&&on)return;paused=
 addEventListener('keydown',e=>{if((e.code==='Escape'||e.code==='KeyP')&&!e.repeat)setPause(!paused)},true);
 window.__pad={x:0,y:0};let padStart=false,padA=false;function pollPad(){const gp=navigator.getGamepads&&[...navigator.getGamepads()].find(Boolean);if(!gp){window.__pad.x=window.__pad.y=0;return}const dz=v=>Math.abs(v)<.18?0:v;window.__pad.x=dz(gp.axes[0]||0);window.__pad.y=dz(gp.axes[1]||0);const s=gp.buttons[9]&&gp.buttons[9].pressed;if(s&&!padStart)setPause(!paused);padStart=s;const a=gp.buttons[0]&&gp.buttons[0].pressed;if(a&&!padA&&!paused){if(advance)advance();else if((S.mode==='map'||S.mode==='room')&&M.act)doAct()}padA=a}
 /* ---------- loop ---------- */
-let last=0;function frame(ts){pollPad();const dt=Math.min(.05,(ts-last)/1000||0);last=ts;$('#pause').hidden=!$('#title').hidden;if(paused){requestAnimationFrame(frame);return}time+=dt;jobs=jobs.filter(j=>!j.u(dt));updDrops(dt);updDust(dt);
+let last=0,fT=0,fN=0,fBad=0;function setQuality(q){meta.quality=q;RS=q==='low'?.68:1;applyRes();putMeta()}
+function frame(ts){pollPad();const raw=(ts-last)/1000||0,dt=Math.min(.05,raw);last=ts;X.setTransform(RS,0,0,RS,0,0);if(!document.hidden&&raw<1){fT+=raw;fN++;if(fT>=2){const fps=fN/fT;window.__fps=Math.round(fps);if(!meta.qset&&meta.quality!=='low'&&fps<34){if(++fBad>=2){setQuality('low');toast('خففنا الجودة عشان تصير اللعبة أسلس')}}else fBad=0;fT=0;fN=0}}$('#pause').hidden=!$('#title').hidden;if(paused){requestAnimationFrame(frame);return}time+=dt;jobs=jobs.filter(j=>!j.u(dt));updDrops(dt);updDust(dt);
  if(S.mode==='patch'){updPatch(dt);drawPatch()}else if(S.mode==='menu'){Menu.upd(dt);Menu.draw()}else if(S.mode==='map'){updMap(dt);drawMap()}else if(S.mode==='room'){updRoom(dt);drawRoom()}else if(S.mode==='pipes'){if(S.shake)S.shake=0;drawPipes()}else if(S.mode==='jack'){updJack(dt);S.shake=Math.max(0,S.shake-dt*30);drawJack()}else if(S.mode==='board'){updBoard(dt);drawBoard()}else if(S.mode==='cine')drawCine();else{X.fillStyle='#000';X.fillRect(0,0,W,H)}
  grade();
  if(S.bars>0&&S.mode==='cine'){X.fillStyle='#000';const b=62*S.bars;X.fillRect(0,0,W,b);X.fillRect(0,H-b,W,b)}
