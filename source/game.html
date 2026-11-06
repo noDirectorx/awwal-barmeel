@@ -105,7 +105,7 @@ const TEST=/[?&]test/.test(location.search);
 const ease=t=>t*t*(3-2*t);
 let time=0,skipping=false,skipOK=false;
 /* ---------- audio ---------- */
-const A=(()=>{let ctx=null,mg,fg;const buf={},load={};const log=window.__alog=[];let cur=null,amb={};const SFX=['fx_pickup','fx_assemble','fx_paper','fx_trophy','pump_dig','pump_gusher','pump_quake_blast','pump_motor','pump_loop','fx_steps','fx_phone','fx_rumble','amb_wind','amb_room','amb_site'];
+const A=(()=>{let ctx=null,mg,fg;const buf={},load={};const log=window.__alog=[];let cur=null,amb={};const SFX=['fx_pickup','fx_assemble','fx_paper','fx_trophy','pump_dig','pump_gusher','pump_quake_blast','pump_motor','pump_loop','fx_steps','fx_phone','fx_rumble','drv_engine','fx_radio','fx_tape','fx_cut','fx_sand','amb_wind','amb_room','amb_site'];
  const vol=()=>{if(!ctx)return;mg.gain.value=meta.music/100;fg.gain.value=meta.sfx/100};
  function init(){if(ctx)return;const C=window.AudioContext||window.webkitAudioContext;if(!C)return;try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}ctx=new C({latencyHint:'interactive'});mg=ctx.createGain();fg=ctx.createGain();mg.connect(ctx.destination);fg.connect(ctx.destination);vol();SFX.forEach(get);if(want)music(want.n,want.v);if(wantAmb){ambience(wantAmb);wantAmb=null}}
  function get(n){if(buf[n])return Promise.resolve(buf[n]);if(load[n])return load[n];return load[n]=fetch('snd/'+n+'.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((ok,no)=>ctx.decodeAudioData(b,ok,no))).then(d=>{buf[n]=d;log.push('ok:'+n);return d}).catch(()=>{log.push('fail:'+n);load[n]=null;return null})}
@@ -447,8 +447,8 @@ async function ch3(){startScene();setupBoard();S.mode='board';S.bars=0;A.music(n
  await say('hero','smile','أول مرة أركب شي بيدي.');
  await say('mubarak','neutral','ما توقعتها منك. بس لا تفرح، كل برميل يطلع نخسر فيه. لازم نصمد لين يخلص العقد.');
  await fadeTo(1,800);if(B.loop){A.stop(B.loop,.8);B.loop=null}
- S.mode='cine';S.actors=[];setBg('site');S.bars=1;S.truck={x:-420};A.music('music_desert',.5);A.ambience({amb_wind:.4,amb_site:.25});await fadeTo(0,700);
- await tween(TEST?5:4200,p=>S.truck.x=-420+p*(W+900));S.truck=null;await fadeTo(1,700);S.mode='none'}
+ S.mode='cine';S.actors=[];setBg('site');S.bars=1;S.truck={x:-420};A.music('music_desert',.5);A.ambience({amb_wind:.4,amb_site:.25});await fadeTo(0,700);const eng=A.loopFx('drv_engine',.6);
+ await tween(TEST?5:4200,p=>S.truck.x=-420+p*(W+900));A.stop(eng,.7);S.truck=null;await fadeTo(1,700);S.mode='none'}
 async function ch4(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;A.music('music_tension',.55);A.ambience({amb_site:.25,amb_wind:.3});await card('بعد شهر<small>باقي على العقد: 5 شهور</small>',1600);
  const f=save.flags,h=actor('hero',760,780,290),m=actor('hamdan',500,790,270),b=actor('mubarak',1070,780,285),n=actor('nasser',1400,850,285);h.dir='r';m.dir='r';b.dir='l';n.dir='l';await fadeTo(0,700);
  await say('nasser','happy','سلمنا كمية الشهر للخواجة! وهذا حسابك بعد الديزل وقسط الديون: ثمانية عشر ألف ريال.');
