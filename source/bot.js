@@ -8,7 +8,7 @@ await p.waitForTimeout(300);await shot('title');for(const[id,n]of[['#eps','eps']
 let seen=new Set(),t0=Date.now(),boarded=false,mapped=false,log=[];
 while(Date.now()-t0<400000){
  const st=await p.evaluate(()=>({mode:__g.S.mode,dlg:!document.querySelector('#dlg').hidden,txt:document.querySelector('#dlg span').textContent,cho:!document.querySelector('#choices').hidden,card:document.querySelector('#card').hidden?'':document.querySelector('#card').textContent,letter:!document.querySelector('#letter').hidden,title:!document.querySelector('#title').hidden,ch:__g.save.ch,t:document.querySelector('#title').textContent}));
- if(st.title&&st.t.includes('نهاية')){await shot('end');log.push('END '+st.t);break}
+ if(st.title&&st.t.includes('نهاية')){await shot('end');log.push('END '+st.t);await p.click('#next');await p.waitForTimeout(3500);await shot('ep2card');await p.waitForTimeout(3000);log.push('NEXT ch'+await p.evaluate(()=>__g.save.ch)+' '+await p.evaluate(()=>__g.S.mode));await shot('ep2morning');break}
  if(st.card&&!seen.has(st.card)){seen.add(st.card);await p.waitForTimeout(700);await shot('card');}
  if(st.cho){await p.waitForTimeout(150);await shot('choice');const bs=await p.$$('#choices .btn');await bs[pick].click();await p.waitForTimeout(100);continue}
  if(st.letter){await p.waitForTimeout(6000);await shot('letter');await p.click('#letter');continue}
