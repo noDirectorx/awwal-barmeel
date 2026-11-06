@@ -22,7 +22,7 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:bl
 .mi:hover,.mi:active{color:var(--gold)}
 .mi.first{color:var(--gold);font-weight:800;font-size:clamp(25px,5.4vmin,44px)}
 .mi.first:before{content:"";position:absolute;right:.05em;top:50%;transform:translateY(-50%);border-style:solid;border-width:.26em .36em .26em 0;border-color:transparent var(--gold) transparent transparent}
-#tapgo{position:absolute!important;bottom:max(9vh,env(safe-area-inset-bottom));left:0;right:0;font:800 clamp(18px,4.2vmin,32px) Almarai,sans-serif;color:#fff4d8;animation:tapg 1.6s ease-in-out infinite}@keyframes tapg{50%{opacity:.35}}
+#tapgo{position:absolute!important;bottom:max(9vh,env(safe-area-inset-bottom));left:0;right:0;font:800 clamp(18px,4.2vmin,32px) Almarai,sans-serif;color:#fff4d8;text-shadow:0 2px 0 #4b1f07,0 0 12px #000;animation:tapg 1.6s ease-in-out infinite}@keyframes tapg{50%{opacity:.6}}
 #panel{position:absolute;inset:0;background:rgba(14,6,2,.86);display:flex;align-items:center;justify-content:center;padding:1em;overflow:auto;touch-action:auto}
 #panel>div{width:min(36em,96%);max-height:96%;overflow:auto;touch-action:pan-y}
 #panel h2{font:400 1.9em Lalezar,serif;color:var(--gold);margin:0 0 .4em}
@@ -106,10 +106,11 @@ const TEST=/[?&]test/.test(location.search);
 const ease=t=>t*t*(3-2*t);
 let time=0,skipping=false,skipOK=false;
 /* ---------- audio ---------- */
+const preMenu=/^http/.test(location.protocol)?fetch('snd/music_menu.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).catch(()=>null):null;
 const A=(()=>{let ctx=null,mg,fg;const buf={},load={};const log=window.__alog=[];let cur=null,amb={};const SFX=['fx_pickup','fx_assemble','fx_paper','fx_trophy','pump_dig','pump_gusher','pump_quake_blast','pump_motor','pump_loop','fx_steps','fx_phone','fx_rumble','drv_engine','fx_radio','fx_tape','fx_cut','fx_sand','amb_wind','amb_room','amb_site'];
  const vol=()=>{if(!ctx)return;mg.gain.value=meta.music/100;fg.gain.value=meta.sfx/100};
  function init(){if(ctx)return;const C=window.AudioContext||window.webkitAudioContext;if(!C)return;try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}ctx=new C({latencyHint:'interactive'});mg=ctx.createGain();fg=ctx.createGain();mg.connect(ctx.destination);fg.connect(ctx.destination);vol();SFX.forEach(get);if(want)music(want.n,want.v);if(wantAmb){ambience(wantAmb);wantAmb=null}}
- function get(n){if(buf[n])return Promise.resolve(buf[n]);if(load[n])return load[n];return load[n]=fetch('snd/'+n+'.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).then(b=>new Promise((ok,no)=>ctx.decodeAudioData(b,ok,no))).then(d=>{buf[n]=d;log.push('ok:'+n);return d}).catch(()=>{log.push('fail:'+n);load[n]=null;return null})}
+ function get(n){if(buf[n])return Promise.resolve(buf[n]);if(load[n])return load[n];return load[n]=(n==='music_menu'&&preMenu?preMenu:fetch('snd/'+n+'.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()})).then(b=>new Promise((ok,no)=>ctx.decodeAudioData(b,ok,no))).then(d=>{buf[n]=d;log.push('ok:'+n);return d}).catch(()=>{log.push('fail:'+n);load[n]=null;return null})}
  function resume(){init();if(ctx&&ctx.state!=='running')ctx.resume().catch(()=>{})}
  addEventListener('pointerdown',resume,true);addEventListener('keydown',resume,true);
  document.addEventListener('visibilitychange',()=>{if(ctx){if(document.hidden)ctx.suspend().catch(()=>{});else if(!window.__paused)ctx.resume().catch(()=>{})}});

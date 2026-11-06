@@ -4,7 +4,7 @@ const b=await chromium.launch();const c=await b.newContext({viewport:{width:vw,h
 p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!/fonts|ERR_/.test(m.text()))errs.push(m.text())});
 await p.goto('http://127.0.0.1:8765/test.html');await p.waitForFunction('window.__ready',{timeout:60000});
 fs.mkdirSync('shots',{recursive:true});let n=0;const shot=async s=>{await p.screenshot({path:`shots/${tag}_${String(n++).padStart(2,'0')}_${s}.png`})};
-await p.waitForTimeout(300);await shot('title');for(const[id,n]of[['#eps','eps'],['#set','set'],['#con','con']]){await p.click(id);await p.waitForTimeout(150);await shot(n);await p.click('#pback')}await p.click('#go');await p.waitForTimeout(1500);await shot('prod');await p.waitForTimeout(2200);await shot('ep_title');
+await p.waitForTimeout(300);await shot('title');await p.mouse.click(300,200);await p.waitForTimeout(500);for(const[id,n]of[['#eps','eps'],['#set','set'],['#con','con']]){await p.click(id);await p.waitForTimeout(150);await shot(n);await p.click('#pback')}await p.click('#go');await p.waitForTimeout(1500);await shot('prod');await p.waitForTimeout(2200);await shot('ep_title');
 let seen=new Set(),t0=Date.now(),boarded=false,mapped=false,log=[];
 while(Date.now()-t0<400000){
  const st=await p.evaluate(()=>({mode:__g.S.mode,dlg:!document.querySelector('#dlg').hidden,txt:document.querySelector('#dlg span').textContent,cho:!document.querySelector('#choices').hidden,card:document.querySelector('#card').hidden?'':document.querySelector('#card').textContent,letter:!document.querySelector('#letter').hidden,title:!document.querySelector('#title').hidden,ch:__g.save.ch,t:document.querySelector('#title').textContent}));
