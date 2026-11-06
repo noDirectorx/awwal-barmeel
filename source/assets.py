@@ -206,6 +206,9 @@ def row9(name,i,hero=False,n=9,pre='w_'):
 row9('nasser','89ae01d4')
 row9('hero','03051b8c',True)
 row9('hero','39142331',True,6,'wd_')  # diagonals: down-right x3, up-right x3
+for _n,_i in dict(hamdan='28b1ab26',mubarak='f53cb616',munira='c299997e',old='ea678c10',salem='48e387fa',young='2cbaf024',oldnh='f609b1b3').items():row9(_n,_i)
+# منيرة أقصر 5%: حشوة شفافة فوق
+_m=Image.open(OUT+'w_munira.webp');_c=meta['w_munira_cell'];_p=round(_c[1]*.053);_n=Image.new('RGBA',(_m.width,_m.height+_p),(0,0,0,0));_n.paste(_m,(0,_p));save('w_munira',_n,q=90);meta['w_munira_cell']=(_c[0],_c[1]+_p)
 json.dump(meta,open('meta.json','w'))
 print(len(meta),sum(os.path.getsize(OUT+f) for f in os.listdir(OUT))//1024,'KB')
 # review sheets
