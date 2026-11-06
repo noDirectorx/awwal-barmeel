@@ -135,7 +135,7 @@ def walk4(i):
 strip('munira',walk4('9248cde5'));strip('oldnh',walk4('fb5accaa'))
 # Episode 2 art
 for _n,_i in dict(market='eb99eb29',workshop='a0b66145').items():save('bg_'+_n,Image.fromarray(L(_i)[...,:3].astype('uint8')),q=86)
-_bz=L('e5b52726')[...,:3].astype('uint8');save('bg_barrel1',Image.fromarray(_bz[10:877,10:877]),q=86);save('bg_barrel2',Image.fromarray(_bz[10:877,897:1764]),q=86)
+_bz=L('e5b52726')[...,:3].astype('uint8');save('bg_barrel1',Image.fromarray(_bz[10:877,10:877]),q=86);save('bg_barrel2',Image.fromarray(_bz[10:877,897:1764]),q=86);save('bg_barrel3',Image.open(A+'4c7ca054-image.png').convert('RGB').resize((1000,1000),Image.BOX),q=88)
 _t=L('f9ffa46d');_mt,_=key(_t,1500);_t=despill(_t,_mt);save('q_truck',crop(_t,_mt,(74,223,1323,668)),q=92);save('q_barrel',crop(_t,_mt,(1523,485,1699,700)),q=92)
 _it=L('c8093133');_mi,_=key(_it,800);_it=despill(_it,_mi)
 for _n,_b in dict(tarp=(20,84,350,333),rope=(391,78,694,342),radio=(755,50,1081,341),antenna=(1173,39,1391,342),speaker=(50,410,337,701),knob=(436,438,641,639),receipts=(745,392,1011,694),notebook=(1104,399,1411,694),stone=(1120,732,1407,1051),tape=(20,777,333,1023),box=(375,760,694,1032),helmet=(728,765,1086,1025)).items():save('i_'+_n,crop(_it,_mi,_b),q=90)
