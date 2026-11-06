@@ -271,9 +271,9 @@ function buildMap(){M.objs=[];M.pick=[];M.npc={};
   }
  for(const [x,y,rot] of rows.sort((a,b)=>a[2]-b[2])){c.save();c.translate(x*TS+TS/2,y*TS+TS/2);c.rotate(rot*Math.PI/180);c.drawImage(img.t_band,-TS/2,-TS/2,TS+1,TS+1);c.restore()}
  M.tiles=t;M.truck={x:2430,y:2190};
- const fw=img.o_fence.width*OBJ_SCALE.fence-4;
+ const fw=OW.fence*OBJ_SCALE.fence*.875;
  for(let x=150;x<MW-100;x+=fw)place('fence',x,300);
- for(let x=150;x<MW-100;x+=fw){if(Math.abs(x-(10*TS+96))<fw*.9)continue;place('fence',x,MH-140)}
+ {const gx=10*TS+96,gh=OW.gate*OBJ_SCALE.gate*.45+fw/2;for(let x=gx-gh;x>60;x-=fw)place('fence',x,MH-140);for(let x=gx+gh;x<MW-60;x+=fw)place('fence',x,MH-140)}
  place('gate',10*TS+96,MH-140);
  place('office',2900,1500);place('tanks',3380,1050);place('pump',1940,1250);place('shed',760,1420);place('scrappile',470,1450);place('scrappile',900,620);place('marker',1830,1370);
  for(const [n,x,y] of [['barrels',1130,1400],['barrel',1240,1455],['crate',2590,1560],['pipes',3050,860],['crate',3250,1620],['rock',340,800],['rock',3560,2050],['pebble',1500,750],['pebble',2500,2050],['shrub',620,2020],['shrub',1450,2060],['shrub',3100,2120],['shrub',2450,620],['rock',1250,2000],['barrel',3560,1370]])place(n,x,y);
