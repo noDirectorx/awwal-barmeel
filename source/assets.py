@@ -122,6 +122,15 @@ save('t_band',Image.fromarray(np.dstack([rgb[34:288,905:1159],(np.tile(bw,(254,1
 m,lab=key(a,300);a=despill(a,m)
 O=dict(office=(29,364,297,615),tanks=(337,394,547,607),pump=(576,337,903,615),shed=(919,371,1206,609),fence=(1242,419,1460,552),gate=(1500,417,1735,552),barrel=(60,720,139,846),barrels=(215,678,361,846),crate=(432,719,558,846),pipes=(613,698,788,846),marker=(845,736,986,838),rock=(1040,732,1192,838),pebble=(1245,768,1322,822),shrub=(1376,732,1484,828),scrappile=(1538,710,1722,841))
 for n,b in O.items():save('o_'+n,crop(a,m,b),q=90)
+# Munira (temporary: standing poses until her walk sheet arrives)
+_a=L('0051108d');_m,_l=key(_a,3000);_a=despill(_a,_m);_bb=bboxes(_m,_l)
+_low=sorted([b for b in _bb if b[1]>600],key=lambda b:b[0]);_top=sorted([b for b in _bb if b[1]<600],key=lambda b:b[0])
+for _b,_n in zip(_low,['neutral','firm','annoyed','worried','smile']):
+    _i=crop(_a,_m,_b);_s=PH/_i.height;save(f'p_munira_{_n}',_i.resize((round(_i.width*_s),PH),Image.BOX),q=88)
+_f,_bk,_sd=crop(_a,_m,_top[1]),crop(_a,_m,_top[3]),crop(_a,_m,_top[2])
+strip('munira',[_f,_f,_f,_bk,_bk,_bk,_sd,_sd,_sd])
+# real wheel art
+_w=L('b31563f7');print('wheel alpha0',int((_w[...,3]<10).mean()*100));_mw=_w[...,3]>120;_ys,_xs=np.where(_mw);_wi=crop(_w,_mw,(int(_xs.min()),int(_ys.min()),int(_xs.max())+1,int(_ys.max())+1));_wn=np.array(_wi.resize((128,128),Image.LANCZOS));_yy,_xx=np.mgrid[:128,:128];_wn[...,3]=np.where((_xx-63.5)**2+(_yy-63.5)**2<64**2,_wn[...,3],0);save('s_tire',Image.fromarray(_wn,'RGBA'),q=92)
 # parts
 a=L('03945519');m,lab=key(a,300);a=despill(a,m)
 for n,b in dict(head=(135,311,348,653),rod=(481,327,552,628),weight=(684,311,930,653),belt=(1013,421,1283,546),valve=(1362,380,1540,587)).items():save('q_'+n,crop(a,m,b),q=92)
