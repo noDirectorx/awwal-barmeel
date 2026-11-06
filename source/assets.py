@@ -141,6 +141,12 @@ _it=L('c8093133');_mi,_=key(_it,800);_it=despill(_it,_mi)
 for _n,_b in dict(tarp=(20,84,350,333),rope=(391,78,694,342),radio=(755,50,1081,341),antenna=(1173,39,1391,342),speaker=(50,410,337,701),knob=(436,438,641,639),receipts=(745,392,1011,694),notebook=(1104,399,1411,694),stone=(1120,732,1407,1051),tape=(20,777,333,1023),box=(375,760,694,1032),helmet=(728,765,1086,1025)).items():save('i_'+_n,crop(_it,_mi,_b),q=90)
 # office without the barrel (Episode 2, hidden path)
 save('bg_office_empty',Image.fromarray(L('fb42533c')[...,:3].astype('uint8')),q=86);meta['office_stand']=(1365,566)
+# tank patch scene
+_tk=L('02b74886')[...,:3].astype('uint8');save('bg_tank',Image.fromarray(_tk),q=88)
+for _n,_b in zip(['p1','p2','p3'],[(190,632,525,748),(605,634,1065,750),(1142,632,1480,748)]):
+    _c=_tk[_b[1]:_b[3],_b[0]:_b[2]].astype(int);_sandm=(_c[...,0]>205)&(_c[...,1]>125)&(_c[...,2]<120)
+    _lb,_cn=ni.label(~_sandm);_sz=ni.sum(~_sandm,_lb,range(1,_cn+1));_big=_lb==(int(np.argmax(_sz))+1);_big=ni.binary_fill_holes(_big)
+    save('tp_'+_n,Image.fromarray(np.dstack([_c.astype('uint8'),(_big*255).astype('uint8')]),'RGBA'),q=92);meta['tp_'+_n+'_at']=(_b[0],_b[1])
 # real wheel art
 _w=L('b31563f7');print('wheel alpha0',int((_w[...,3]<10).mean()*100));_mw=_w[...,3]>120;_ys,_xs=np.where(_mw);_wi=crop(_w,_mw,(int(_xs.min()),int(_ys.min()),int(_xs.max())+1,int(_ys.max())+1));_wn=np.array(_wi.resize((128,128),Image.LANCZOS));_yy,_xx=np.mgrid[:128,:128];_wn[...,3]=np.where((_xx-63.5)**2+(_yy-63.5)**2<64**2,_wn[...,3],0);save('s_tire',Image.fromarray(_wn,'RGBA'),q=92)
 # parts
