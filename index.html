@@ -107,11 +107,12 @@ const TEST=/[?&]test/.test(location.search);
 const ease=t=>t*t*(3-2*t);
 let time=0,skipping=false,skipOK=false;
 /* ---------- audio ---------- */
-const preMenu=/^http/.test(location.protocol)?fetch('snd/music_menu.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).catch(()=>null):null;
+const preMenu=/^http/.test(location.protocol)?fetch('snd/music_menu.bin').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()}).catch(()=>null):null;
+try{if(navigator.audioSession)navigator.audioSession.type='ambient'}catch(e){}
 const A=(()=>{let ctx=null,mg,fg;const buf={},load={};const log=window.__alog=[];let cur=null,amb={};const SFX=['fx_pickup','fx_assemble','fx_paper','fx_trophy','pump_dig','pump_gusher','pump_quake_blast','pump_motor','pump_loop','fx_steps','fx_phone','fx_rumble','drv_engine','fx_radio','fx_tape','fx_cut','fx_sand','amb_wind','amb_room','amb_site'];
  const vol=()=>{if(!ctx)return;mg.gain.value=meta.music/100;fg.gain.value=meta.sfx/100};
  function init(){if(ctx)return;const C=window.AudioContext||window.webkitAudioContext;if(!C)return;try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}ctx=new C({latencyHint:'interactive'});mg=ctx.createGain();fg=ctx.createGain();mg.connect(ctx.destination);fg.connect(ctx.destination);vol();SFX.forEach(get);if(want)music(want.n,want.v);if(wantAmb){ambience(wantAmb);wantAmb=null}}
- function get(n){if(buf[n])return Promise.resolve(buf[n]);if(load[n])return load[n];return load[n]=(n==='music_menu'&&preMenu?preMenu.then(b=>{if(!b)throw 0;return b.slice(0)}):fetch('snd/'+n+'.mp3').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()})).then(b=>new Promise((ok,no)=>ctx.decodeAudioData(b,ok,no))).then(d=>{buf[n]=d;log.push('ok:'+n);return d}).catch(()=>{log.push('fail:'+n);load[n]=null;return null})}
+ function get(n){if(buf[n])return Promise.resolve(buf[n]);if(load[n])return load[n];return load[n]=(n==='music_menu'&&preMenu?preMenu.then(b=>{if(!b)throw 0;return b.slice(0)}):fetch('snd/'+n+'.bin').then(r=>{if(!r.ok)throw 0;return r.arrayBuffer()})).then(b=>new Promise((ok,no)=>ctx.decodeAudioData(b,ok,no))).then(d=>{buf[n]=d;log.push('ok:'+n);return d}).catch(()=>{log.push('fail:'+n);load[n]=null;return null})}
  function resume(){init();if(ctx&&ctx.state!=='running')ctx.resume().catch(()=>{})}
  addEventListener('pointerdown',resume,true);addEventListener('keydown',resume,true);
  document.addEventListener('visibilitychange',()=>{if(ctx){if(document.hidden)ctx.suspend().catch(()=>{});else if(!window.__paused)ctx.resume().catch(()=>{})}});

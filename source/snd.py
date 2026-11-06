@@ -31,3 +31,6 @@ ff('-ss','14','-t','6','-i',S+'fx_cut.mp3','-af','loudnorm=I=-18:TP=-3','-ar','4
 print(sum(os.path.getsize(O+f) for f in os.listdir(O))//1024,'KB',len(os.listdir(O)))
 # قص الصمت من بداية المؤثرات القصيرة
 shot('fx_pickup',.85);shot('fx_assemble',.7);shot('fx_paper',.8,-16,.2)
+# الأسماء .bin عشان برامج التحميل مثل IDM ما تلقطها
+for f in os.listdir(O):
+    if f.endswith('.mp3'):os.replace(O+f,O+f[:-4]+'.bin')

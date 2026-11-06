@@ -20,7 +20,7 @@
 |---|---|
 | `index.html`, `drive.html` | **ناتج بناء، لا تعدلهم يدويًا.** الصور مدمجة داخلهم |
 | `sw.js`, `manifest.webmanifest`, `vercel.json`, `icon-*` | PWA والنشر |
-| `snd/` | الأصوات المنشورة (ناتج `snd.py`، ما عدا `fx_rumble`) |
+| `snd/` | الأصوات المنشورة بامتداد .bin (عشان IDM)، ناتج `snd.py` ما عدا `fx_rumble` |
 | `source/game.html` | المحرك + الحلقة الأولى (ch0..ch6) |
 | `source/ep2_ch.js` | فصول الحلقة الثانية |
 | `source/build.py` | يدمج ep2 في game بتبديلات `R(a,b)` ويبني `index.html` و`test.html` |

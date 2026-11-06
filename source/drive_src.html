@@ -21,12 +21,13 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%)}
 <button id="pz" aria-label="إيقاف مؤقت"><i></i><i></i></button><button id="retry" hidden>↺ إعادة المحاولة</button><div id="route"><span id="km"></span><div id="line"><i id="fill"></i><b id="mark"></b></div><span>الميناء</span></div><button id="brk" class="pad" style="right:max(4vw,env(safe-area-inset-right))">فرامل</button><div id="say"></div>
 <div id="start"><h2>آخر حمولة</h2><p>الشاحنة تمشي لحالها. هدّي قبل كل مطب عشان ما تطيح البراميل.</p><p style="opacity:.75">اضغط في أي مكان للفرامل. والأخضر في العداد يعني المطب آمن.</p><button id="go">انطلق</button></div>
 <div id="rm" hidden><div><h2>إيقاف مؤقت</h2><button id="rmRetry">إعادة المحاولة</button><button id="rmFree" class="g">الرجوع للعب الحر</button><button id="rmMenu" class="g">القائمة الرئيسية</button><button id="rmBack" class="g">كمّل السواقة</button></div></div><div id="end" hidden></div><div id="rot">لفّ جهازك بالعرض</div>
-<script>
+<script>try{if(navigator.audioSession)navigator.audioSession.type='ambient'}catch(e){}
+
 const ASSETS=/*ASSETS*/null;const $=s=>document.querySelector(s),cv=$('#c'),X=cv.getContext('2d',{alpha:false}),W=1672,H=941,img={};
 const fit=()=>{const s=Math.min(innerWidth/W,innerHeight/H);cv.style.width=W*s+'px';cv.style.height=H*s+'px'};addEventListener('resize',fit);addEventListener('orientationchange',()=>[100,400,900].forEach(t=>setTimeout(fit,t)));fit();
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const SND=(()=>{let ctx=null,mg,fg,eng,wind;const buf={};let vm=.7,vf=.8;try{const m=JSON.parse(localStorage.getItem('awwal-barmeel-meta'))||{};if(m.music!=null)vm=m.music/100;if(m.sfx!=null)vf=m.sfx/100}catch(e){}
- const get=n=>fetch('snd/'+n+'.mp3').then(r=>r.arrayBuffer()).then(b=>new Promise((o,x)=>ctx.decodeAudioData(b,o,x))).then(d=>{buf[n]=d;return d}).catch(()=>null);
+ const get=n=>fetch('snd/'+n+'.bin').then(r=>r.arrayBuffer()).then(b=>new Promise((o,x)=>ctx.decodeAudioData(b,o,x))).then(d=>{buf[n]=d;return d}).catch(()=>null);
  const loop=(d,dst,v)=>{const a=ctx.createBufferSource(),g=ctx.createGain();a.buffer=d;a.loop=true;g.gain.value=v;a.connect(g);g.connect(dst);a.start();return{a,g}};
  return{start(){if(ctx)return;const C=window.AudioContext||window.webkitAudioContext;if(!C)return;ctx=new C({latencyHint:'interactive'});ctx.resume();mg=ctx.createGain();fg=ctx.createGain();mg.gain.value=vm;fg.gain.value=vf;mg.connect(ctx.destination);fg.connect(ctx.destination);['drv_bump','drv_rattle','drv_barrel'].forEach(get);get('drv_engine').then(d=>{if(d)eng=loop(d,fg,.5)});get('amb_wind').then(d=>{if(d)wind=loop(d,fg,0)});get('music_drive').then(d=>{if(d)loop(d,mg,.45)})},
  play(n,v=1){if(!ctx||!buf[n])return;const a=ctx.createBufferSource(),g=ctx.createGain();a.buffer=buf[n];g.gain.value=v;a.connect(g);g.connect(fg);a.start(0,.03)},
