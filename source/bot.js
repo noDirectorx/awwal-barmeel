@@ -2,9 +2,9 @@ const {chromium}=require('playwright');const fs=require('fs');
 (async()=>{const vw=+process.argv[2]||1180,vh=+process.argv[3]||820,pick=+process.argv[4]||0,tag=process.argv[5]||'ipad';
 const b=await chromium.launch();const c=await b.newContext({viewport:{width:vw,height:vh},hasTouch:false});const p=await c.newPage();const errs=[];
 p.on('pageerror',e=>errs.push(e.message));p.on('console',m=>{if(m.type()==='error'&&!/fonts|ERR_/.test(m.text()))errs.push(m.text())});
-await p.goto('file://'+process.cwd()+'/test.html');await p.waitForFunction('window.__ready',{timeout:60000});
+await p.goto('http://127.0.0.1:8765/test.html');await p.waitForFunction('window.__ready',{timeout:60000});
 fs.mkdirSync('shots',{recursive:true});let n=0;const shot=async s=>{await p.screenshot({path:`shots/${tag}_${String(n++).padStart(2,'0')}_${s}.png`})};
-await p.waitForTimeout(300);await shot('title');for(const[id,n]of[['#eps','eps'],['#set','set'],['#con','con']]){await p.click(id);await p.waitForTimeout(150);await shot(n);await p.click('#pback')}await p.click('#go');await p.waitForTimeout(1600);await shot('prod');await p.waitForTimeout(3300);await shot('ep_title');
+await p.waitForTimeout(300);await shot('title');for(const[id,n]of[['#eps','eps'],['#set','set'],['#con','con']]){await p.click(id);await p.waitForTimeout(150);await shot(n);await p.click('#pback')}await p.click('#go');await p.waitForTimeout(1500);await shot('prod');await p.waitForTimeout(2200);await shot('ep_title');
 let seen=new Set(),t0=Date.now(),boarded=false,mapped=false,log=[];
 while(Date.now()-t0<400000){
  const st=await p.evaluate(()=>({mode:__g.S.mode,dlg:!document.querySelector('#dlg').hidden,txt:document.querySelector('#dlg span').textContent,cho:!document.querySelector('#choices').hidden,card:document.querySelector('#card').hidden?'':document.querySelector('#card').textContent,letter:!document.querySelector('#letter').hidden,title:!document.querySelector('#title').hidden,ch:__g.save.ch,t:document.querySelector('#title').textContent}));
@@ -30,7 +30,8 @@ while(Date.now()-t0<400000){
   if(process.env.FULL&&!fl.q1on){await go(2600,1620);await act();continue}
   if(process.env.FULL&&!fl.q2on){await go(2130,2120);await act();continue}
   if(process.env.FULL&&!fl.q1){await go(3380,1250);await shot('near_tank');await act();await p.waitForTimeout(900);await shot('pipes');await p.evaluate(()=>{const P=__g.PZ,S=__g.SOL;for(const c of P.g){const k=S[c.x+','+c.y];if(k)c.r=k[1]}});await p.waitForTimeout(100);await shot('pipes_solved');await p.evaluate(()=>__g.checkPipes());await p.waitForTimeout(900);continue}
-  if(process.env.FULL&&!fl.q2){await go(2300,2260);await shot('near_truck');await act();await p.waitForTimeout(900);await shot('jack');for(let i=0;i<3;i++){await p.evaluate(()=>{__g.JK.n=.5;__g.tapJack()});await p.waitForTimeout(150)}await p.waitForTimeout(900);continue}
+  if(process.env.FULL&&!fl.got_tire){await go(1560,970);await act();await p.waitForTimeout(150);continue}
+  if(process.env.FULL&&!fl.q2){await go(2300,2260);await shot('near_truck');await act();await p.waitForTimeout(900);await shot('jack');for(let i=0;i<3;i++){await p.evaluate(()=>{__g.JK.n=.5;__g.tapJack()});await p.waitForTimeout(150)}await p.waitForTimeout(900);await shot('tireswap');await p.waitForTimeout(2200);continue}
   if(process.env.FULL&&!fl.sec_stone){await go(1830,1405);await act();await p.waitForTimeout(400);await shot('secret');await p.click('#letter');await p.waitForTimeout(600);continue}
   if(process.env.FULL&&!fl.sec_pile){await go(470,1500);await act();await p.waitForTimeout(400);await p.click('#letter');await p.waitForTimeout(600);continue}
   if(process.env.FULL&&!fl.sec_cab){await go(2900,1560);await shot('near_door');await act();await p.waitForTimeout(900);await shot('room');await p.evaluate(()=>{__g.ROOM.p.x=230});await p.waitForTimeout(200);await act();await p.waitForTimeout(400);await p.click('#letter');await p.waitForTimeout(1600);await shot('trophy');continue}
@@ -46,4 +47,4 @@ while(Date.now()-t0<400000){
   await p.waitForTimeout(700);await shot('run1');await p.waitForTimeout(500);await shot('run2');await p.waitForTimeout(500);await shot('run3');continue}
  await p.waitForTimeout(80);
 }
-console.log('errors',errs);console.log(log.slice(-4).join('\n'));console.log('elapsed',(Date.now()-t0)/1000,'shots',n);await b.close()})();
+console.log('errors',errs);const al=await p.evaluate(()=>window.__alog);console.log('audio',[...new Set(al)].join(' '));console.log(log.slice(-14).join('\n'));console.log('elapsed',(Date.now()-t0)/1000,'shots',n);await b.close()})();

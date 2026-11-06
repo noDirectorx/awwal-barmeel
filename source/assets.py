@@ -70,9 +70,6 @@ def strip(name,frames,hero=False):
         x=round(W/2-hx);x=max(0,min(W-f.width,x));S.paste(f,(k*W+x,H-f.height),f)
     if hero:S=charcoal(S)
     k=1
-    if not hero:
-        k=2;S=S.resize((S.width*2,S.height*2),Image.LANCZOS);from PIL import ImageFilter
-        al=S.getchannel('A');S=S.filter(ImageFilter.UnsharpMask(radius=2.2,percent=130,threshold=2));S.putalpha(al)
     save('w_'+name,S,q=90);meta['w_'+name+'_cell']=(W*k,H*k)
 a=L('781de63d');m,lab=key(a,1500);a=despill(a,m);bb=bboxes(m,lab);assert len(bb)==16
 G={}
@@ -84,15 +81,17 @@ Hh,Ww=a.shape[:2];G={}
 for b in bb:
     if b[3]-b[1]>400:continue
     G.setdefault((int(((b[1]+b[3])/2)//(Hh/7)),int(((b[0]+b[2])/2)//(Ww/9))),[]).append(b)
-names=['salem','young','old','hamdan','nasser','mubarak']
-for r,nm in enumerate(names):
-    fs=[]
-    for c in range(9):
-        bs=G[(r,c)];b=(min(x[0] for x in bs),min(x[1] for x in bs),max(x[2] for x in bs),max(x[3] for x in bs));fs.append(crop(a,m,b))
+WALK=dict(salem='02ec4eeb',young='f1f1142a',old='d5f225d7',hamdan='ebc1e6ed',nasser='8752a95a',mubarak='54fb9a6a')
+for nm,i in WALK.items():
+    w=L(i);m2,lab2=key(w,1500);w=despill(w,m2);bx=bboxes(m2,lab2);assert len(bx)==16,(nm,len(bx))
+    Gg={}
+    for b_ in bx:Gg[(int(((b_[1]+b_[3])/2)//(w.shape[0]/4)),int(((b_[0]+b_[2])/2)//(w.shape[1]/4)))]=b_
+    fs=[crop(w,m2,Gg[(0,c)]) for c in range(3)]+[crop(w,m2,Gg[(1,c)]) for c in range(3)]+[crop(w,m2,Gg[(2,c)]).transpose(Image.FLIP_LEFT_RIGHT) for c in range(3)]
     strip(nm,fs)
 tr=sorted([b for b in bb if b[1]>940 and b[2]-b[0]>120],key=lambda b:b[0])
 print('truck',tr)
 for b,n in zip(tr,['front','back','side']):save('truck_'+n,crop(a,m,b),q=90)
+tb=tr[2];tc=crop(a,m,tb);tw=tc.crop((40,72,102,129));ta=np.array(tw);yy,xx=np.mgrid[:ta.shape[0],:ta.shape[1]];ta[...,3]=np.where((xx-31)**2+(yy-28)**2<30**2,ta[...,3],0);save('s_tire',Image.fromarray(ta,'RGBA'),q=92)
 # map
 def seamless(arr,B=44):
     a=arr.astype(float);h,w=a.shape[:2]
