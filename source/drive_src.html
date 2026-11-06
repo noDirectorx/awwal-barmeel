@@ -21,7 +21,7 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%)}
 const ASSETS=/*ASSETS*/null;const $=s=>document.querySelector(s),cv=$('#c'),X=cv.getContext('2d',{alpha:false}),W=1672,H=941,img={};
 const fit=()=>{const s=Math.max(innerWidth/W,innerHeight/H)*0+Math.min(innerWidth/W,innerHeight/H);cv.style.width=W*s+'px';cv.style.height=H*s+'px'};addEventListener('resize',fit);addEventListener('orientationchange',()=>[100,400,900].forEach(t=>setTimeout(fit,t)));fit();
 const LEN=32000,STORM=[.46,.64];let state='ready',t=0,fx=0;const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-function ground(x){const k=clamp(x/LEN,0,1),amp=.55+k*.8;let y=640-amp*(62*Math.sin(x/430)+30*Math.sin(x/173+1)+11*Math.sin(x/67+2));for(const[b,w,h]of BUMPS){const d=(x-b)/w;if(d>-1&&d<1)y-=h*(1-d*d)}return y}
+function ground(x){const k=clamp(x/LEN,0,1),amp=.55+k*.8;let y=640-amp*1.12*(62*Math.sin(x/430)+30*Math.sin(x/173+1)+11*Math.sin(x/67+2));for(const[b,w,h]of BUMPS){const d=(x-b)/w;if(d>-1&&d<1)y-=h*(1-d*d)}return y}
 const BUMPS=[];{let x=1400;let s=9;while(x<LEN-700){s=(s*16807)%2147483647;const r=s/2147483647;BUMPS.push([x,110+r*120,28+r*58]);x+=620+r*900}}
 const slope=x=>Math.atan2(ground(x+24)-ground(x-24),48);
 const T={x:220,y:0,vx:0,vy:0,a:0,va:0,g:false,spin:0,lastImp:0},WB=136,RIDE=36;
@@ -41,8 +41,8 @@ function step(dt){if(state!=='run')return;t+=dt;const prev=T.vx;const sl=slope(T
  const ax=(T.vx-prev)/Math.max(dt,.001);
  if(T.g&&T.vx>30&&Math.random()<dt*20)dust.push({x:T.x-WB-20,y:ground(T.x-WB),vx:-T.vx*.2,vy:-30-Math.random()*50,t:0,l:.5,s:4+Math.random()*7|0});
  const shake=imp>0?imp:0;
- for(const b of barrels){if(!b.on)continue;const gravT=Math.sin(T.a)*1050;b.vu+=(-ax*.32+gravT)*dt;const fric=b.h<=0?4.2:.5;b.vu*=Math.exp(-dt*fric);
-  if(shake>230&&b.h<=0)b.vh=(shake-180)*(.52+Math.random()*.34);b.vh-=1500*dt;b.h+=b.vh*dt;if(b.h<=0){b.h=0;if(b.vh<-120)b.vh=-b.vh*.22;else b.vh=0}
+ for(const b of barrels){if(!b.on)continue;const gravT=Math.sin(T.a)*1250;b.vu+=(-ax*.32+gravT)*dt;const fric=b.h<=0?4.2:.5;b.vu*=Math.exp(-dt*fric);
+  if(shake>150&&b.h<=0)b.vh=(shake-90)*(.62+Math.random()*.4)+T.vx*.12;b.vh-=1500*dt;b.h+=b.vh*dt;if(b.h<=0){b.h=0;if(b.vh<-120)b.vh=-b.vh*.22;else b.vh=0}
   b.u+=b.vu*dt;const lo=-128,hi=100,rail=38;if(b.u<lo){if(b.h<rail){b.u=lo;b.vu=Math.abs(b.vu)*.3}else fall(b,-1)}else if(b.u>hi){if(b.h<rail){b.u=hi;b.vu=-Math.abs(b.vu)*.3}else fall(b,1)}
   for(const o of barrels){if(o!==b&&o.on&&Math.abs(o.u-b.u)<34&&b.h<26&&o.h<26){const d=(34-Math.abs(o.u-b.u))*Math.sign(b.u-o.u||1)*.5;b.u+=d;o.u-=d;const m=(b.vu+o.vu)/2;b.vu=o.vu=m}}}
  for(const d of debris){d.vy+=1500*dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.r+=d.vr*dt;const g=ground(d.x)-22;if(d.y>g){d.y=g;d.vy*=-.3;d.vx*=.55;d.vr*=.5}}
