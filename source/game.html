@@ -183,6 +183,7 @@ function choose(title,opts){return new Promise(res=>{skipping=false;$('#skip').h
  if(TEST){window.__choice=res;const k=window.__pick||0;setTimeout(()=>{c.hidden=true;res(k)},10)}})}
 async function card(html,ms=2200){const c=$('#card');c.innerHTML=html;c.hidden=false;c.style.opacity=0;await tween(TEST?5:450,p=>c.style.opacity=p);await wait(ms);await tween(TEST?5:450,p=>c.style.opacity=1-p);c.hidden=true}
 function subtitle(who,mood,text,ms){const d=$('#dlg'),im=d.querySelector('img');if(skipping)return;im.src=ASSETS[`p_${who}_${mood}`]||'';im.hidden=false;d.querySelector('b').textContent=NAMES[who];d.querySelector('b').hidden=false;d.querySelector('span').textContent=text;d.querySelector('i').hidden=true;d.hidden=false;setTimeout(()=>{if(!advance)d.hidden=true},TEST?20:ms)}
+function toastImg(t,k){const f=$('#float');f.innerHTML='';if(ASSETS[k]){const im=document.createElement('img');im.src=ASSETS[k];im.style.cssText='height:2.6em;vertical-align:middle;margin-inline-end:.5em;filter:drop-shadow(0 2px 3px #0008)';f.appendChild(im)}f.appendChild(document.createTextNode(t));f.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>f.style.opacity=0,2300)}
 function toast(t){const f=$('#float');f.textContent=t;f.style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>f.style.opacity=0,1700)}
 function startScene(){S.actors=[];S.tint=null;S.lamp=0;S.drops=0;S.noFront=false;S.shake=0;oil.length=0;S.dust=[];skipping=false;$('#skip').hidden=!skipOK}
 $('#skip').onclick=e=>{e.stopPropagation();skipping=true;if(advance){const a=advance;advance=null;$('#dlg').hidden=true;const sp=$('#dlg span');sp.textContent='';forceRes(a)}};
@@ -340,7 +341,7 @@ function renderTasks(){const g=stage(),T=$('#tasks');const line=(t,d)=>`<div cla
 function faceTalk(){if(S.mode!=='map'||!M.npc||!M.p)return null;let n=null,bd=260;for(const q of Object.values(M.npc)){const d=Math.hypot(q.x-M.p.x,q.y-M.p.y);if(d<bd){bd=d;n=q}}if(!n)return null;const old=n.dir;M.p.moving=false;const dx=n.x-M.p.x,dy=n.y-M.p.y;if(Math.abs(dy)>Math.abs(dx)){M.p.dir=dy<0?'b':'f';n.dir=dy<0?'f':'b'}else{M.p.dir=dx>=0?'r':'l';n.dir=dx>=0?'l':'r'}return()=>{n.dir=old}}
 async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;const un=faceTalk();await fn();if(un)un();M.lock=!!M.leaving;renderTasks();store.put()}
 function pickOn(i){return M.spots||(i===TIRE?save.flags.q2on:save.flags.metMubarak)}
-function takeItem(i){M.pick=M.pick.filter(x=>x!==i);save.flags['got_'+i.id]=1;A.play('fx_pickup',.9);toast('حصلت: '+i.name);renderTasks();store.put()}
+function takeItem(i){M.pick=M.pick.filter(x=>x!==i);save.flags['got_'+i.id]=1;A.play('fx_pickup',.9);toastImg('حصلت: '+i.name,i.k);renderTasks();store.put()}
 async function topics(who,title,list){for(;;){const L=list().filter(x=>x);const r=await choose(title,L.map(x=>({t:x.t,s:x.s})).concat([{t:'برجع لك بعدين'}]));if(r>=L.length)return;const end=await L[r].fn();renderTasks();store.put();if(end)return}}
 const HINTS=[['pile','كان يهوجس دايم عند الخردة.'],['stone','ذيك الصخرة اللي عند المضخة، منعنا نكسرها ونشيلها. مدري وش يبي فيها.'],['cab','كان يقعد في المكتب حتى بعد ما يخلص الدوام. وفي أيام تلقاه راقد فيه لليوم الثاني.']];
 function secretHint(){const f=save.flags,left=HINTS.filter(h=>!f['sec_'+h[0]]);if(!left.length)return null;const n=left.find(h=>!f['h_'+h[0]])||left[0];f['h_'+n[0]]=1;return n[1]}
@@ -365,7 +366,7 @@ function talkNasser(){talk(async()=>{const f=save.flags;
  if(!f.metNasser){f.metNasser=1;await say('nasser','happy','ولد سالم! الله يرحم أبوك، كان يدفع متأخر بس يدفع.')}
  await topics('nasser','ناصر',()=>{const g=stage();return[
   g.sold?{t:'عن الحمولة',fn:async()=>{await say('nasser','happy','إذا شغلتها، حمولتك أنا اللي أوديها. أول مرة أخصم الديزل من الحساب، عشان أبوك. بعدها الكاش قبل الديزل!')}}
-   :g.sc>=6?{t:'جبت لك الخردة',fn:async()=>{await say('nasser','happy','هذي خردة تسوى ذهب! خذ السير والصمام.');await say('nasser','happy','وإذا شغلتها، حمولتك أنا اللي أوديها. أول مرة أخصم الديزل من الحساب، عشان أبوك. بعدها الكاش قبل الديزل!');f.sold=1;A.play('fx_pickup',.9);toast('حصلت: السير والصمام')}}
+   :g.sc>=6?{t:'جبت لك الخردة',fn:async()=>{await say('nasser','happy','هذي خردة تسوى ذهب! خذ السير والصمام.');await say('nasser','happy','وإذا شغلتها، حمولتك أنا اللي أوديها. أول مرة أخصم الديزل من الحساب، عشان أبوك. بعدها الكاش قبل الديزل!');f.sold=1;A.play('fx_pickup',.9);toastImg('حصلت: السير والصمام','q_belt')}}
    :{t:'أبي السير والصمام',fn:async()=>{await say('nasser','neutral',`أبغى ست قطع خردة، وأعطيك سير وصمام. معك ${g.sc} للحين.`)}},
   !f.q2?{t:'وش فيه كفر الشاحنة؟',s:f.q2on?'الكفر الاحتياطي':'',fn:async()=>{if(!f.q2on){await say('nasser','happy','كفر الشاحنة نايم، وعندي حمولة لازم تطلع اليوم. الاحتياطي ضايع في الموقع، والجك يبغى له واحد يعرف له. ساعدني وأعوضك.');f.q2on=1;toast('مهمة جانبية: دوّر الكفر الاحتياطي')}else if(!f.got_tire)await say('nasser','neutral','ها، لقيت الكفر؟ يا خي، تحصله حول المضخة!');else await say('nasser','happy','لقيته؟ ركّبه عند الشاحنة، وأنا أمسك لك.')}}:null,
   {t:'كيف الشغل معك؟',fn:async()=>{await say('nasser','neutral','الطريق طويل، والديزل غالي، والخواجة ما يحب التأخير. بس الحمد لله، الشاحنة للحين تمشي.')}}]})})}
