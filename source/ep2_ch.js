@@ -44,7 +44,7 @@ async function eMunira(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fad
  await say('hero','neutral','حياك.');
  await fadeTo(1,700)}
 const PT={n:0,t:0,hits:0,need:3,zone:.17,title:'',bg:'site',res:null};
-function timing(title,bg,need=3){return new Promise(r=>{Object.assign(PT,{n:0,t:0,hits:0,need,zone:.17,title,bg,res:r});S.mode='patch'})}
+function timing(title,bg,need=3){return new Promise(r=>{const hud=$('#hud'),had=!hud.hidden;hud.hidden=true;$('#act').hidden=true;Object.assign(PT,{n:0,t:0,hits:0,need,zone:.17,title,bg,res:()=>{hud.hidden=!had;r()}});S.mode='patch';setView(false)})}
 function updPatch(dt){PT.t+=dt*(2.1+PT.hits*.45);PT.n=.5+.5*Math.sin(PT.t)}
 function drawPatch(){X.drawImage(img['bg_'+PT.bg],0,0,W,H);X.fillStyle='rgba(20,8,2,.45)';X.fillRect(0,0,W,H);X.fillStyle='#fff4d8';X.textAlign='center';X.direction='rtl';X.font='400 46px Lalezar,serif';X.fillText(PT.title,W/2,110);X.font='700 28px Almarai,sans-serif';X.fillText('اضغط لما يوصل المؤشر للأخضر',W/2,160);const bx=W/2-420,by=730,bw=840,zw=bw*PT.zone;X.fillStyle='#23110a';X.fillRect(bx,by,bw,48);X.fillStyle='#57a23a';X.fillRect(bx+bw/2-zw/2,by,zw,48);X.fillStyle='#fff';X.fillRect(bx+PT.n*bw-5,by-10,10,68);X.fillStyle='#fff4d8';X.fillText(PT.hits+'/'+PT.need,W/2,830)}
 function tapPatch(){if(S.mode!=='patch'||!PT.res)return;if(Math.abs(PT.n-.5)<PT.zone/2){PT.hits++;PT.zone=Math.max(.1,PT.zone-.02);A.play('fx_assemble',.8);if(PT.hits>=PT.need){const r=PT.res;PT.res=null;r()}}else{PT.hits=Math.max(0,PT.hits-1);toast('فاتك، جرب مرة ثانية')}}
