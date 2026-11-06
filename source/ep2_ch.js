@@ -77,7 +77,7 @@ async function eWeeks(){const f=save.flags;S.mode='none';S.fade=1;A.music('music
   const v=await roadRun(f.nq+1);if(v==='menu'){store.put();location.reload();return}if(v==='free'){task();return}
   f.nq++;A.play('fx_paper',.5);store.put();task();
   if(f.nq===1)await say('nasser','happy','هذي علامة أبوي! فيه سهم ثاني محفور عليها، يودي أبعد.');
-  else{await say('nasser','happy','شف! الميناء من ورا الكثبان. كذا نختصر ثلث الطريق.');f.oldRoad=1;rm('nq');store.put();task();A.play('fx_gem',.95);trophy('إنجاز: الطريق القديم','آخر حمولة صارت أقصر')}});
+  else{await say('nasser','happy','شف! الميناء من ورا الكثبان. كذا نختصر ثلث الطريق.');f.oldRoad=1;meta.ach.road=1;putMeta();rm('nq');store.put();task();A.play('fx_gem',.95);trophy('إنجاز: الطريق القديم','آخر حمولة صارت أقصر')}});
  if(!f.oldRoad)M.spots.push({k:'nq',opt:1,x:2190,y:2060,r:140,label:'كلّم ناصر عن الطريق',fn:roadQuest});
  const sec2=meta.secrets2||{};for(const k of ['receipts','notebook'])if(sec2[k]&&save.flags['s2'+k]){rm(k)}
  for(const[a,x,y]of[['antenna',1050,880],['speaker',2380,880],['knob',3480,1780]])if(!f.wkGot[a])part(a,x,y);

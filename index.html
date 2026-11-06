@@ -590,7 +590,7 @@ async function eWeeks(){const f=save.flags;S.mode='none';S.fade=1;A.music('music
   const v=await roadRun(f.nq+1);if(v==='menu'){store.put();location.reload();return}if(v==='free'){task();return}
   f.nq++;A.play('fx_paper',.5);store.put();task();
   if(f.nq===1)await say('nasser','happy','هذي علامة أبوي! فيه سهم ثاني محفور عليها، يودي أبعد.');
-  else{await say('nasser','happy','شف! الميناء من ورا الكثبان. كذا نختصر ثلث الطريق.');f.oldRoad=1;rm('nq');store.put();task();A.play('fx_gem',.95);trophy('إنجاز: الطريق القديم','آخر حمولة صارت أقصر')}});
+  else{await say('nasser','happy','شف! الميناء من ورا الكثبان. كذا نختصر ثلث الطريق.');f.oldRoad=1;meta.ach.road=1;putMeta();rm('nq');store.put();task();A.play('fx_gem',.95);trophy('إنجاز: الطريق القديم','آخر حمولة صارت أقصر')}});
  if(!f.oldRoad)M.spots.push({k:'nq',opt:1,x:2190,y:2060,r:140,label:'كلّم ناصر عن الطريق',fn:roadQuest});
  const sec2=meta.secrets2||{};for(const k of ['receipts','notebook'])if(sec2[k]&&save.flags['s2'+k]){rm(k)}
  for(const[a,x,y]of[['antenna',1050,880],['speaker',2380,880],['knob',3480,1780]])if(!f.wkGot[a])part(a,x,y);
@@ -638,9 +638,11 @@ async function intro(){S.mode='none';S.fade=1;inIntro=true;A.music('music_desert
 async function run(from){if(from===0)await intro();for(let i=from;i<CH.length;i++){save.ch=i;store.put();skipOK=(i===0||i===1||i===4)&&!TEST;$('#skip').hidden=true;await CH[i]();if(i===2&&save.ch===3){}save.ch=i+1;store.put()}}
 function secretCount(){return SECRETS.filter(s=>meta.secrets[s.id]).length}
 function panel(html){const p=$('#panel');p.firstElementChild.innerHTML=html+'<button class="btn ghost" id="pback" style="margin-top:.5em">رجوع</button>';p.hidden=false;$('#pback').onclick=()=>p.hidden=true}
+const ACHS=[[1,'ep1','اللي يدور يلقى',1],[1,'q1','سدّيت التسريب'],[1,'q2','أبو الكفرات'],[1,'nasser','فزعة'],[2,'ep2','الوصل الأخير',1],[2,'road','الطريق القديم'],[2,'drive','ولا برميل طاح']];
+function achRow(ep){return '<div style="display:flex;flex-wrap:wrap;gap:.4em;margin:-.2em 0 .7em">'+ACHS.filter(a=>a[0]===ep).map(a=>{const on=meta.ach[a[1]];return `<span style="display:inline-flex;align-items:center;gap:.3em;font-size:.72em;padding:.15em .55em .15em .3em;border-radius:.5em;border:1px solid ${on?(a[3]?'#5ff0e1':'#f2b84b'):'#ffffff22'};opacity:${on?1:.4}"><span style="width:1.6em;height:1.6em;display:inline-block">${a[3]?TGEM:TCUP}</span>${on?a[2]:'؟؟؟'}</span>`}).join('')+'</div>'}
 function panelEpisodes(){const n2=['receipts','notebook','tape'].filter(x=>meta.secrets2&&meta.secrets2[x]).length;panel(`<h2>الحلقات</h2>
- <div class="row"><div><b>الحلقة الأولى: بريال</b><small>الأسرار ${secretCount()}/${SECRETS.length}${meta.ach.ep1?' · الإنجاز محقق':''}</small></div><button class="btn" id="ep1">العب</button></div>
- <div class="row ${meta.ep1done?'':'off'}"><div><b>الحلقة الثانية: الزائر</b><small>${meta.ep1done?`الأسرار ${n2}/3${meta.ach.ep2?' · الإنجاز محقق':''}`:'تنفتح بعد الحلقة الأولى'}</small></div>${meta.ep1done?'<button class="btn" id="ep2">العب</button>':''}</div>
+ <div class="row"><div><b>الحلقة الأولى: بريال</b><small>الأسرار ${secretCount()}/${SECRETS.length}${meta.ach.ep1?' · الإنجاز محقق':''}</small></div><button class="btn" id="ep1">العب</button></div>${achRow(1)}
+ <div class="row ${meta.ep1done?'':'off'}"><div><b>الحلقة الثانية: الزائر</b><small>${meta.ep1done?`الأسرار ${n2}/3${meta.ach.ep2?' · الإنجاز محقق':''}`:'تنفتح بعد الحلقة الأولى'}</small></div>${meta.ep1done?'<button class="btn" id="ep2">العب</button>':''}</div>${meta.ep1done?achRow(2):''}
  <div class="row off"><div><b>الحلقة الثالثة</b><small>قريبًا</small></div></div>`);$('#ep1').onclick=()=>{$('#panel').hidden=true;askNew()};if(meta.ep1done)$('#ep2').onclick=()=>{const go=()=>{$('#panel').hidden=true;save={ch:7,flags:JSON.parse(JSON.stringify(meta.ep1flags||{}))};store.put();beginAt(7)};if(save.ch>0&&save.ch!==7){panel(`<h2>تبدأ الحلقة الثانية؟</h2><div class="note" style="opacity:1;font-size:1em">تقدمك الحالي بينمسح. الأسرار والإنجازات تبقى لك.</div><button class="btn" id="yes">إيه، ابدأ</button> `);$('#yes').onclick=go}else go()}}
 function applySide(){$('#act').classList.toggle('left',meta.actSide==='left')}
 function panelSettings(){panel(`<h2>الإعدادات</h2>
@@ -648,7 +650,7 @@ function panelSettings(){panel(`<h2>الإعدادات</h2>
  <div class="row"><b>المؤثرات الصوتية</b><input type="range" id="se" min="0" max="100" value="${meta.sfx}"></div>
  
  <div class="row"><b>زر التفاعل</b><div class="seg"><button id="sr" class="${meta.actSide==='right'?'on':''}">يمين</button><button id="sl" class="${meta.actSide==='left'?'on':''}">يسار</button></div></div>
- <div class="row"><b>الجودة</b><div class="seg"><button id="qh" class="${meta.quality==='high'?'on':''}">عالية</button><button id="ql" class="${meta.quality==='low'?'on':''}">موفرة</button></div></div>`);
+ <div class="row"><b>الجودة</b><div class="seg"><button id="qh" class="${meta.quality==='high'?'on':''}">عالية</button><button id="ql" class="${meta.quality==='low'?'on':''}">موفرة</button></div></div><div style="opacity:.45;font-size:.75em;margin-top:.6em">الإصدار 88</div>`);
  $('#sm').oninput=e=>{meta.music=+e.target.value;putMeta();A.vol()};$('#se').oninput=e=>{meta.sfx=+e.target.value;putMeta();A.vol()};
  const side=v=>{meta.actSide=v;putMeta();applySide();$('#sr').className=v==='right'?'on':'';$('#sl').className=v==='left'?'on':''};$('#sr').onclick=()=>side('right');$('#sl').onclick=()=>side('left');
  const q=v=>{meta.qset=1;setQuality(v);$('#qh').className=v==='high'?'on':'';$('#ql').className=v==='low'?'on':''};$('#qh').onclick=()=>q('high');$('#ql').onclick=()=>q('low')}
