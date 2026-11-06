@@ -1,0 +1,7 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:960,height:600}});const er=[];p.on('pageerror',e=>er.push(e.message));
+await p.addInitScript(()=>{localStorage.setItem('awwal-barmeel-ep1',JSON.stringify({ch:2,flags:{px:2190,py:2030,metMubarak:1,got_s1:1,got_s2:1,got_s3:1,got_s4:1,got_s5:1,got_s6:1}}))});
+await p.goto('http://127.0.0.1:8765/test.html');await p.waitForFunction('window.__ready',{timeout:30000});await p.mouse.click(480,300);await p.waitForTimeout(800);await p.click('#go2');await p.waitForTimeout(2000);
+const st=()=>p.evaluate(()=>({cho:!document.querySelector('#choices').hidden&&[...document.querySelectorAll('#choices button')].map(x=>x.textContent),dlg:!document.querySelector('#dlg').hidden&&document.querySelector('#dlg').textContent.slice(0,60)}));
+const log=[];const pickText=async t=>{for(let i=0;i<40;i++){const s=await st();if(s.cho){const bs=await p.$$('#choices button');for(const bb of bs){if((await bb.textContent()).includes(t)){await p.waitForTimeout(550);await bb.click();log.push('pick '+t);return}}}else if(s.dlg){log.push(s.dlg);await p.mouse.click(480,200)}await p.waitForTimeout(300)}log.push('NOTFOUND '+t)};
+await p.click('#act',{timeout:5000});await pickText('كفر');await pickText('جبت لك الخردة');await pickText('كفر');await pickText('برجع');await p.waitForTimeout(500);
+console.log(log.join('\n'));console.log(await p.evaluate(()=>({q2on:window.__g.save.flags.q2on,sold:window.__g.save.flags.sold})),await st(),er);await b.close()})()

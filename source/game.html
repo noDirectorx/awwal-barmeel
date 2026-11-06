@@ -340,24 +340,33 @@ function faceTalk(){if(S.mode!=='map'||!M.npc||!M.p)return null;let n=null,bd=26
 async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;const un=faceTalk();await fn();if(un)un();M.lock=!!M.leaving;renderTasks();store.put()}
 function pickOn(i){return M.spots||save.flags.metMubarak||i===TIRE}
 function takeItem(i){M.pick=M.pick.filter(x=>x!==i);save.flags['got_'+i.id]=1;A.play('fx_pickup',.9);toast('حصلت: '+i.name);renderTasks();store.put()}
-function talkHamdan(){talk(async()=>{const g=stage(),f=save.flags;
- if(!g.met)await say('hamdan','neutral','مبارك عند المضخة. هو أدرى منا كلنا فيها.');
- else if(f.sec_stone&&!f.askedRashid){await say('hero','worried','حمدان، مين راشد؟');await say('hamdan','worried','من وين لك هالصورة؟');await wait(700);await say('hamdan','sad','مو الحين يا ولدي. يوم يجي وقتها أقول لك.');f.askedRashid=1}
- else if(f.q1&&!f.said48){await say('hamdan','warm','تسريب الوصلة وقف، والضايع نزل للنص. مين علمك؟');f.said48=1}
- else if(!f.q1on){await say('hamdan','worried','الخزان فيه شرخ يبغى له فلوس. بس الوصلة اللي فوقه تسرّب، وهذي تقدر تصلحها بيدك.');f.q1on=1}
- else if(!f.said47){await say('hamdan','neutral','أبوك كان يقعد كل ليلة عند الحجر، وعينه على باب المكتب. ما قال لأحد ليش.');f.said47=1}
- else await say('hamdan','warm','وريهم إنك ولد سالم.')})}
+async function topics(who,title,list){for(;;){const L=list().filter(x=>x);const r=await choose(title,L.map(x=>({t:x.t,s:x.s})).concat([{t:'برجع لك بعدين'}]));if(r>=L.length)return;const end=await L[r].fn();renderTasks();store.put();if(end)return}}
+function secretHint(){const f=save.flags;if(!f.sec_stone)return 'أبوك كان يقعد كل ليلة عند الحجر اللي قدام المضخة، وعينه على باب المكتب. ما قال لأحد ليش.';if(!f.sec_pile)return 'وكان يطوّل عند كومة الخردة اللي جنب المظلة، أكثر مما تستاهل خردة.';if(!f.sec_cab)return 'ومكتبه ما أحد فتح أدراجه من يوم مات. يمكن تلقى فيه اللي ما قاله لنا.';return null}
+function allSecrets(){return SECRETS.every(x=>save.flags['sec_'+x.id])}
+function talkHamdan(){talk(async()=>{const f=save.flags;if(!f.metHamdan){f.metHamdan=1;await say('hamdan','warm','هلا يا ولدي.')}
+ await topics('hamdan','حمدان',()=>{const g=stage();return[
+  {t:'وش أسوي الحين؟',fn:async()=>{if(!g.met)await say('hamdan','neutral','مبارك عند المضخة. هو أدرى منا كلنا فيها.');else if(g.mp>=3&&g.sold)await say('hamdan','warm','القطع كلها معك. ارجع لمبارك وركّبوها.');else await say('hamdan','neutral','مبارك قال لك وش ناقص. لقّط القطع، وودّ الخردة لناصر.')}},
+  !f.q1?{t:'فيه شي ثاني يحتاج إصلاح؟',s:f.q1on?'وصلة الخزان':'',fn:async()=>{if(!f.q1on){await say('hamdan','worried','الخزان فيه شرخ يبغى له فلوس. بس الوصلة اللي فوقه تسرّب، وهذي تقدر تصلحها بيدك.');f.q1on=1;toast('مهمة جانبية: صلّح وصلة الخزان')}else await say('hamdan','neutral','الوصلة فوق الخزان اللي جنب المكتب. كل ما تأخرت ضاع نفط.')}}:null,
+  f.q1&&!f.said48?{t:'صلّحت الوصلة',fn:async()=>{await say('hamdan','warm','تسريب الوصلة وقف، والضايع نزل للنص. مين علمك؟');f.said48=1}}:null,
+  {t:'حدثني عن أبوي',fn:async()=>{const h=secretHint();if(h)await say('hamdan','neutral',h);else await say('hamdan','sad','الباقي ما عندي له جواب. للحين.')}},
+  allSecrets()&&!f.askedRashid?{t:'مين راشد؟',s:'الصورة اللي عند الحجر',fn:async()=>{await say('hero','worried','حمدان، مين راشد؟');await say('hamdan','worried','من وين لك هالصورة؟');await wait(700);await say('hamdan','sad','مو الحين يا ولدي. يوم يجي وقتها أقول لك.');f.askedRashid=1}}:null,
+  {t:'كيف كانت آخر أيام أبوي؟',fn:async()=>{await say('hamdan','sad','كان يطلع الصبح قبلنا، ويرجع آخر واحد. وكل جمعة يسأل: ما اتصل عبدالله؟');await say('hamdan','warm','وريهم إنك ولد سالم.')}}]})})}
 function missingParts(g){const f=save.flags,a=[];if(!f.got_head)a.push('الرأس عند المظلة');if(!f.got_rod)a.push('العمود ورا الخزان');if(!f.got_weight)a.push('الثقل عند الخردة');if(!g.sold)a.push('السير والصمام عند ناصر');return a.join('، ')}
-function talkMubarak(){talk(async()=>{const g=stage();
+function talkMubarak(){talk(async()=>{let g=stage();
  if(!g.met){await say('mubarak','neutral','حياك الله يا أبو سالم. تفرق بين المفتاح والعجرة؟');await say('hero','firm','علمني.');
   await say('mubarak','neutral','خربت، وفكيتها عشان أصلحها. وبعدها انقطعت الرواتب، ووقفت.');await say('mubarak','neutral','الرأس عند المظلة، والعمود ورا الخزان، والثقل عند الخردة. والسير والصمام تلفوا، وتلقى بدلها عند ناصر.');await say('mubarak','neutral','ما معنا فلوس، بس ناصر يشتري الخردة. لقّطها وودّها له.');await say('hero','neutral','يعني بتساعدني؟');await say('mubarak','neutral','لا. أبي أشوف وش عندك.');save.flags.metMubarak=1;return}
- if(g.mp>=3&&g.sold){await say('mubarak','happy','كل القطع معك؟ يلا. أبيك تركبها بيدك.');await say('mubarak','neutral','أبوك ركّب أول مضخة هنا بيده. وأنت بعد.');save.ch=3;store.put();M.leaving=true;M.leave&&M.leave();return}
- await say('mubarak','neutral','باقي عليك: '+missingParts(g)+'.')})}
-function talkNasser(){talk(async()=>{const g=stage(),f=save.flags;
+ await topics('mubarak','مبارك',()=>{g=stage();return[
+  g.mp>=3&&g.sold?{t:'جبت القطع كلها',fn:async()=>{await say('mubarak','happy','كل القطع معك؟ يلا. أبيك تركبها بيدك.');await say('mubarak','neutral','أبوك ركّب أول مضخة هنا بيده. وأنت بعد.');save.ch=3;store.put();M.leaving=true;M.leave&&M.leave();return true}}
+   :{t:'جيت عشان المضخة',fn:async()=>{await say('mubarak','neutral','باقي عليك: '+missingParts(g)+'.')}},
+  {t:'من متى وأنت هنا؟',fn:async()=>{await say('mubarak','neutral','من قبل ما تنولد. أبوك جابني من ورشة في الدمام، وقال: هنا تصير معلّم.');await say('mubarak','neutral','وصرت. بس المعلم بعد يبي راتب.')}}]})})}
+function talkNasser(){talk(async()=>{const f=save.flags;
  if(!f.metNasser){f.metNasser=1;await say('nasser','happy','ولد سالم! الله يرحم أبوك، كان يدفع متأخر بس يدفع.')}
- if(g.sold){await say('nasser','happy','وإذا شغلتها، حمولتك أنا اللي أوديها. أول مرة أخصم الديزل من الحساب، عشان أبوك. بعدها الكاش قبل الديزل!');return}
- if(g.sc<6){await say('nasser','neutral',`أبغى ست قطع خردة، وأعطيك سير وصمام. معك ${g.sc} للحين.`);if(!f.q2on){await say('nasser','happy','وكفر الشاحنة نايم، وعندي حمولة لازم تطلع اليوم. الاحتياطي ضايع في الموقع، والجك يبغى له واحد يعرف له. ساعدني وأعوضك.');f.q2on=1;if(!f.got_tire)M.pick.push(TIRE)}return}
- await say('nasser','happy','هذي خردة تسوى ذهب! خذ السير والصمام.');await say('nasser','happy','وإذا شغلتها، حمولتك أنا اللي أوديها. أول مرة أخصم الديزل من الحساب، عشان أبوك. بعدها الكاش قبل الديزل!');f.sold=1;A.play('fx_pickup',.9);toast('حصلت: السير والصمام');})}
+ await topics('nasser','ناصر',()=>{const g=stage();return[
+  g.sold?{t:'عن الحمولة',fn:async()=>{await say('nasser','happy','إذا شغلتها، حمولتك أنا اللي أوديها. أول مرة أخصم الديزل من الحساب، عشان أبوك. بعدها الكاش قبل الديزل!')}}
+   :g.sc>=6?{t:'جبت لك الخردة',fn:async()=>{await say('nasser','happy','هذي خردة تسوى ذهب! خذ السير والصمام.');await say('nasser','happy','وإذا شغلتها، حمولتك أنا اللي أوديها. أول مرة أخصم الديزل من الحساب، عشان أبوك. بعدها الكاش قبل الديزل!');f.sold=1;A.play('fx_pickup',.9);toast('حصلت: السير والصمام')}}
+   :{t:'أبي السير والصمام',fn:async()=>{await say('nasser','neutral',`أبغى ست قطع خردة، وأعطيك سير وصمام. معك ${g.sc} للحين.`)}},
+  !f.q2?{t:'وش فيه كفر الشاحنة؟',s:f.q2on?'الكفر الاحتياطي':'',fn:async()=>{if(!f.q2on){await say('nasser','happy','كفر الشاحنة نايم، وعندي حمولة لازم تطلع اليوم. الاحتياطي ضايع في الموقع، والجك يبغى له واحد يعرف له. ساعدني وأعوضك.');f.q2on=1;if(!f.got_tire)M.pick.push(TIRE);toast('مهمة جانبية: دوّر الكفر الاحتياطي')}else if(!f.got_tire)await say('nasser','neutral','الاحتياطي طاح من الشاحنة وأنا جاي. دوّره فوق المضخة، ناحية الشمال.');else await say('nasser','happy','لقيته؟ ركّبه عند الشاحنة، وأنا أمسك لك.')}}:null,
+  {t:'كيف الشغل معك؟',fn:async()=>{await say('nasser','neutral','الطريق طويل، والديزل غالي، والخواجة ما يحب التأخير. بس الحمد لله، الشاحنة للحين تمشي.')}}]})})}
 async function ch2(){S.mode='map';setView(true);startScene();A.music('music_desert',.3);A.ambience({amb_wind:.5,amb_site:.12});$('#skip').hidden=true;S.bars=0;M.leaving=false;buildMap();const p=M.p;M.cam.x=clamp(p.x-W/2,0,MW-W);M.cam.y=clamp(p.y-H/2,0,MH-H);M.lock=false;$('#hud').hidden=false;renderTasks();
  if(!save.flags.mapHint){save.flags.mapHint=1;toast(matchMedia('(pointer:coarse)').matches?'اسحب إصبعك في أي مكان عشان تمشي':'امش بالأسهم أو WASD، وتفاعل بـE')}
  await fadeTo(0,500);await new Promise(r=>M.leave=r);M.leave=null;A.walk(false);await fadeTo(1,500);$('#hud').hidden=true;$('#act').hidden=true;S.mode='none';setView(false)}
@@ -369,7 +378,7 @@ const SECRETS=[
 function note(lines,sign){return new Promise(res=>{const l=$('#letter'),d=l.firstElementChild;d.style.backgroundImage=`url(${ASSETS.s_letter})`;d.style.flexDirection='column';d.innerHTML='';d.style.fontSize='clamp(16px,3.5vmin,32px)';for(const t of lines.concat(sign?[sign]:[])){const p=document.createElement('div');p.style.cssText='position:static;width:auto;aspect-ratio:auto;padding:0;display:block';p.textContent=t;d.appendChild(p)}l.hidden=false;
  if(TEST||window.__fast)return setTimeout(()=>{l.hidden=true;res()},20);const f=()=>{l.removeEventListener('pointerup',f);l.hidden=true;res()};setTimeout(()=>l.addEventListener('pointerup',f),250)})}
 function trophy(t,s){const e=$('#trophy');e.innerHTML=`<b>${t}</b>${s}`;e.style.opacity=1;setTimeout(()=>e.style.opacity=0,3600)}
-function findSecret(id){const s=SECRETS.find(x=>x.id===id);talk(async()=>{A.play('fx_paper');await note(s.lines,s.sign);if(s.after)await say('hero','worried',s.after);save.flags['sec_'+id]=1;meta.secrets[id]=1;putMeta();toast(`سر ${SECRETS.filter(x=>save.flags['sec_'+x.id]).length}/${SECRETS.length}: ${s.title}`);
+function findSecret(id){const s=SECRETS.find(x=>x.id===id);talk(async()=>{A.play('fx_paper');await note(s.lines,s.sign);if(s.after)await say('hero','worried',s.after);save.flags['sec_'+id]=1;meta.secrets[id]=1;putMeta();toast(`سر ${SECRETS.filter(x=>save.flags['sec_'+x.id]).length}/${SECRETS.length}: ${s.title}`);if(allSecrets()&&!save.flags.askedRashid)setTimeout(()=>toast('اسأل حمدان عن الصورة'),2600);
  if(secretCount()===SECRETS.length&&!meta.ach.ep1){meta.ach.ep1=1;putMeta();A.play('fx_trophy');trophy('إنجاز: اللي يدور يلقى','لقيت كل أسرار الحلقة الأولى');await wait(1200);await say('hero','worried','يبه… وش كنت مخبي عن الكل؟')}})}
 /* ---------- office you can walk in ---------- */
 const ROOM={spots:[{x:230,y:745,label:'فتّش الأدراج',fn(){if(!save.flags.sec_cab)findSecret('cab');else talk(()=>say('hero','neutral','الباقي فواتير قديمة.'))}},
