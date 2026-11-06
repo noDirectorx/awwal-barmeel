@@ -337,7 +337,7 @@ function renderTasks(){if(M.customTask){M.customTask();return}const g=stage(),T=
  let h='<b>شغّل المضخة</b>';if(!g.met)h+=line('كلّم مبارك عند المضخة');else{h+=line(`لقّط القطع من الموقع ${g.mp}/3`,g.mp>=3);h+=line(`اجمع الخردة ${g.sc}/6`,g.sc>=6);h+=line('بدّل الخردة عند ناصر',g.sold);if(g.mp>=3&&g.sold)h+=line('ارجع لمبارك وركّب')}
  const f=save.flags;if(f.q1on||f.q2on){h+='<b>جانبية</b>';if(f.q1on)h+=line('صلّح وصلة الخزان',f.q1);if(f.q2on)h+=line(f.got_tire?'ركّب الكفر لناصر':'دوّر الكفر الاحتياطي لناصر',f.q2)}h+=`<div style="opacity:.8">أسرار ${SECRETS.filter(s=>f['sec_'+s.id]).length}/${SECRETS.length}</div>`;T.innerHTML=h;
  $('#stat').textContent='باقي على العقد: 6 أشهر'}
-function faceTalk(){if(S.mode!=='map'||!M.npc||!M.p)return null;let n=null,bd=260;for(const q of Object.values(M.npc)){const d=Math.hypot(q.x-M.p.x,q.y-M.p.y);if(d<bd){bd=d;n=q}}if(!n)return null;const old=n.dir;M.p.moving=false;M.p.dir=n.x>=M.p.x?'r':'l';n.dir=n.x>=M.p.x?'l':'r';return()=>{n.dir=old}}
+function faceTalk(){if(S.mode!=='map'||!M.npc||!M.p)return null;let n=null,bd=260;for(const q of Object.values(M.npc)){const d=Math.hypot(q.x-M.p.x,q.y-M.p.y);if(d<bd){bd=d;n=q}}if(!n)return null;const old=n.dir;M.p.moving=false;const dx=n.x-M.p.x,dy=n.y-M.p.y;if(Math.abs(dy)>Math.abs(dx)){M.p.dir=dy<0?'b':'f';n.dir=dy<0?'f':'b'}else{M.p.dir=dx>=0?'r':'l';n.dir=dx>=0?'l':'r'}return()=>{n.dir=old}}
 async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;const un=faceTalk();await fn();if(un)un();M.lock=!!M.leaving;renderTasks();store.put()}
 function pickOn(i){return M.spots||save.flags.metMubarak||i===TIRE}
 function takeItem(i){M.pick=M.pick.filter(x=>x!==i);save.flags['got_'+i.id]=1;A.play('fx_pickup',.9);toast('حصلت: '+i.name);renderTasks();store.put()}
