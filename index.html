@@ -392,7 +392,7 @@ function awardRare(t,sub){A.play('fx_trophy');trophy(t,sub,'rare')}
 function award(id,t,sub,ms=0){if(meta.ach[id])return;meta.ach[id]=1;putMeta();setTimeout(()=>{A.play('fx_gem',.95);trophy(t,sub)},ms)}
 function trophy(t,s,tier){const e=$('#trophy'),rare=tier==='rare';e.classList.remove('pop','rare');void e.offsetWidth;e.classList.add('pop');if(rare)e.classList.add('rare');e.innerHTML=(rare?TGEM:TCUP)+`<div class="tt">${rare?'<span class="tier">إنجاز نادر</span>':''}<b>${t}</b>${s}</div>`+(rare?'<div class="shine"></div>':'');if(rare)for(let i=0;i<14;i++){const p=document.createElement('i');p.className='spk';const a=Math.random()*6.28,d=40+Math.random()*70;p.style.cssText=`right:2.2em;top:50%;--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px;animation-delay:${.15+Math.random()*.5}s`;e.appendChild(p)}e.style.opacity=1;clearTimeout(trophy.t);trophy.t=setTimeout(()=>e.style.opacity=0,rare?5200:3600)}
 function findSecret(id){const s=SECRETS.find(x=>x.id===id);talk(async()=>{A.play('fx_paper');await note(s.lines,s.sign);if(s.after)await say('hero','worried',s.after);save.flags['sec_'+id]=1;meta.secrets[id]=1;putMeta();toast(`سر ${SECRETS.filter(x=>save.flags['sec_'+x.id]).length}/${SECRETS.length}: ${s.title}`);if(allSecrets()&&!save.flags.askedRashid)setTimeout(()=>toast('اسأل حمدان عن الصورة'),2600);
- if(secretCount()===SECRETS.length){await wait(600);await say('hero','worried','يبه… وش كنت مخبي عن الكل؟')}})}
+ if(allSecrets()){await wait(600);await say('hero','worried','يبه… وش كنت مخبي عن الكل؟')}})}
 /* ---------- office you can walk in ---------- */
 const ROOM={spots:[{x:230,y:745,label:'فتّش الأدراج',fn(){if(!save.flags.sec_cab&&save.flags.h_cab)findSecret('cab');else talk(()=>say('hero','neutral','الباقي فواتير قديمة.'))}},
  {x:790,y:745,label:'اقرأ الدفتر',fn(){talk(()=>say('hero','worried','البرميل يكلفنا الحين ريال ونص، ونبيعه بريال. من متى وأبوي يغطي الفرق؟'))}},
@@ -650,7 +650,7 @@ function panelSettings(){panel(`<h2>الإعدادات</h2>
  <div class="row"><b>المؤثرات الصوتية</b><input type="range" id="se" min="0" max="100" value="${meta.sfx}"></div>
  
  <div class="row"><b>زر التفاعل</b><div class="seg"><button id="sr" class="${meta.actSide==='right'?'on':''}">يمين</button><button id="sl" class="${meta.actSide==='left'?'on':''}">يسار</button></div></div>
- <div class="row"><b>الجودة</b><div class="seg"><button id="qh" class="${meta.quality==='high'?'on':''}">عالية</button><button id="ql" class="${meta.quality==='low'?'on':''}">موفرة</button></div></div><div style="opacity:.45;font-size:.75em;margin-top:.6em">الإصدار 88</div>`);
+ <div class="row"><b>الجودة</b><div class="seg"><button id="qh" class="${meta.quality==='high'?'on':''}">عالية</button><button id="ql" class="${meta.quality==='low'?'on':''}">موفرة</button></div></div><div style="opacity:.45;font-size:.75em;margin-top:.6em">الإصدار 89</div>`);
  $('#sm').oninput=e=>{meta.music=+e.target.value;putMeta();A.vol()};$('#se').oninput=e=>{meta.sfx=+e.target.value;putMeta();A.vol()};
  const side=v=>{meta.actSide=v;putMeta();applySide();$('#sr').className=v==='right'?'on':'';$('#sl').className=v==='left'?'on':''};$('#sr').onclick=()=>side('right');$('#sl').onclick=()=>side('left');
  const q=v=>{meta.qset=1;setQuality(v);$('#qh').className=v==='high'?'on':'';$('#ql').className=v==='low'?'on':''};$('#qh').onclick=()=>q('high');$('#ql').onclick=()=>q('low')}
