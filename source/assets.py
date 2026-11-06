@@ -216,6 +216,7 @@ def hdobj(name,i):
     w=L(i);m2,lab2=key(w,4000);w=despill(w,m2);bx=bboxes(m2,lab2);x0=min(b[0] for b in bx);y0=min(b[1] for b in bx);x1=max(b[2] for b in bx);y1=max(b[3] for b in bx)
     im=crop(w,m2,(x0,y0,x1,y1));tw=round(OW[name]*OSC[name]*2.2);im=im.resize((tw,round(im.height*tw/im.width)),Image.LANCZOS);save('o_'+name,im,q=92)
 for _n,_i in dict(barrel='d7f63844',barrels='3c4cde3e',crate='cd7ce873',fence='8a3847bd',marker='31247836').items():hdobj(_n,_i)
+for _n,_i in dict(gate='b9e14b9e',pebble='46339d88',office='ecdbd928',pump='80b2f7da',pipes='432aa1ff',scrappile='983e6c71',rock='9a1b293a').items():hdobj(_n,_i)
 json.dump(meta,open('meta.json','w'))
 print(len(meta),sum(os.path.getsize(OUT+f) for f in os.listdir(OUT))//1024,'KB')
 # review sheets
