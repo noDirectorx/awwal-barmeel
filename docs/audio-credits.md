@@ -14,6 +14,7 @@
 | drv_engine | freesound_community-engine-6000.mp3 |
 | drv_rattle | freesound_community-metal-moving-81780.mp3 |
 | fx_assemble | freesound_community-mechanical1-107614.mp3 |
+| fx_gem | benkirb-shine-1-268902.mp3 (Pixabay) |
 | fx_cut | freesound_community-bench-grinder-start-and-stop-01-69589.mp3 |
 | fx_paper | lenspulse-foley-paper-handling-amp-page-turning-sfx-584919.mp3 |
 | fx_phone | freesound_community-022059_old-rotary-phone-ringing-68614.mp3 |
