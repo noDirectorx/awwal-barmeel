@@ -22,6 +22,7 @@ canvas{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);display:bl
 .mi:hover,.mi:active{color:var(--gold)}
 .mi.first{color:var(--gold);font-weight:800;font-size:clamp(25px,5.4vmin,44px)}
 .mi.first:before{content:"";position:absolute;right:.05em;top:50%;transform:translateY(-50%);border-style:solid;border-width:.26em .36em .26em 0;border-color:transparent var(--gold) transparent transparent}
+#tapgo{position:absolute!important;bottom:max(9vh,env(safe-area-inset-bottom));left:0;right:0;font:800 clamp(18px,4.2vmin,32px) Almarai,sans-serif;color:#fff4d8;animation:tapg 1.6s ease-in-out infinite}@keyframes tapg{50%{opacity:.35}}
 #panel{position:absolute;inset:0;background:rgba(14,6,2,.86);display:flex;align-items:center;justify-content:center;padding:1em;overflow:auto;touch-action:auto}
 #panel>div{width:min(36em,96%);max-height:96%;overflow:auto;touch-action:pan-y}
 #panel h2{font:400 1.9em Lalezar,serif;color:var(--gold);margin:0 0 .4em}
@@ -513,6 +514,7 @@ function startNew(){save={ch:0,flags:{}};store.clear();beginAt(0)}
 function beginAt(n){const c=$('#title');c.style.opacity=0;A.ambience({});let f=0;const id=setInterval(()=>{f=Math.min(1,f+.07);S.fade=f;if(f>=1)clearInterval(id)},40);setTimeout(()=>{clearInterval(id);S.fade=1;S.mode='none';window.__cover=false;setView(false);c.hidden=true;c.style.opacity=1;run(n)},TEST?10:720)}
 function titleScreen(){applySide();if(meta.quality==='low'){RS=.68;applyRes()}A.music('music_menu',.8);const c=$('#title');const has=save.ch>0;S.mode='menu';S.fade=0;window.__cover=true;Menu.start();setView(false);
  c.innerHTML=`<h1>أول برميل</h1><nav class="menu">${has?'<button class="mi first" id="go2">استمرار</button>':''}<button class="mi ${has?'':'first'}" id="go">${has?'لعبة جديدة':'ابدأ'}</button><button class="mi" id="eps">الحلقات</button><button class="mi" id="set">الإعدادات</button><button class="mi" id="con">تواصل معنا</button></nav>`;c.hidden=false;
+ const nav=c.querySelector('.menu');nav.hidden=true;const tp=document.createElement('p');tp.id='tapgo';tp.textContent='المس الشاشة للبدء';c.appendChild(tp);const open=()=>{removeEventListener('pointerup',open,true);removeEventListener('keydown',open,true);tp.remove();nav.hidden=false;nav.style.pointerEvents='none';nav.style.opacity=0;nav.style.transition='opacity .45s';requestAnimationFrame(()=>nav.style.opacity=1);setTimeout(()=>nav.style.pointerEvents='',400)};addEventListener('pointerup',open,true);addEventListener('keydown',open,true);
  $('#go').onclick=askNew;if(has)$('#go2').onclick=()=>beginAt(save.ch);$('#eps').onclick=panelEpisodes;$('#set').onclick=panelSettings;$('#con').onclick=panelContact}
 const motes=Array.from({length:34},()=>({x:Math.random()*1672,y:Math.random()*941,s:2+Math.random()*3|0,v:6+Math.random()*16,p:Math.random()*6}));
 function grade(){if(meta.quality==='low'||S.mode==='none')return;const m=S.mode,h=H;let sun,warm='255,150,70',wa=.16,vig=.42,motesOn=true;
