@@ -98,7 +98,7 @@ const store={load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&type
 const META_KEY='awwal-barmeel-meta';let meta={secrets:{},ach:{},music:70,sfx:80,quality:'high',actSide:'right'};
 try{meta=Object.assign(meta,JSON.parse(localStorage.getItem(META_KEY))||{})}catch(e){}
 const putMeta=()=>{try{localStorage.setItem(META_KEY,JSON.stringify(meta))}catch(e){}};
-const DEV_EMAIL='csscre4m@gmail.com';
+const DEV_EMAIL='awwalbarmeel@gmail.com';
 const TEST=/[?&]test/.test(location.search);
 const ease=t=>t*t*(3-2*t);
 let time=0,skipping=false,skipOK=false;
