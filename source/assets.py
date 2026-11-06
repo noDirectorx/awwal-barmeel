@@ -217,6 +217,15 @@ def hdobj(name,i):
     im=crop(w,m2,(x0,y0,x1,y1));tw=round(OW[name]*OSC[name]*2.2);im=im.resize((tw,round(im.height*tw/im.width)),Image.LANCZOS);save('o_'+name,im,q=92)
 for _n,_i in dict(barrel='d7f63844',barrels='3c4cde3e',crate='cd7ce873',fence='8a3847bd',marker='31247836').items():hdobj(_n,_i)
 for _n,_i in dict(gate='b9e14b9e',pebble='46339d88',office='ecdbd928',pump='80b2f7da',pipes='432aa1ff',scrappile='983e6c71',rock='9a1b293a').items():hdobj(_n,_i)
+# توحيد ألوان أشياء الخريطة: حدود بنية بدل الأسود، تشبع أقل، ميل لألوان الرمل
+def tone_obj(n,sat=.78,mix=.10,sand=(226,178,118),edge=(70,38,22)):
+    im=Image.open(OUT+n+'.webp').convert('RGBA');a=np.array(im).astype(float);rgb=a[...,:3]
+    g=rgb.mean(2,keepdims=True);rgb=g+(rgb-g)*sat;rgb=rgb*(1-mix)+np.array(sand)*mix
+    lum=a[...,:3].max(2);d=lum<70;t=np.clip((70-lum)/70,0,1)[...,None]*.85
+    rgb=np.where(d[...,None],rgb*(1-t)+np.array(edge)*t,rgb)
+    a[...,:3]=np.clip(rgb,0,255);save(n,Image.fromarray(a.astype('uint8'),'RGBA'),q=92)
+for _f in sorted(os.listdir(OUT)):
+    if _f.startswith('o_') and _f.endswith('.webp'):tone_obj(_f[:-5])
 json.dump(meta,open('meta.json','w'))
 print(len(meta),sum(os.path.getsize(OUT+f) for f in os.listdir(OUT))//1024,'KB')
 # review sheets
