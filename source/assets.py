@@ -149,6 +149,20 @@ for _n,_b in zip(['p1','p2','p3'],[(190,632,525,748),(605,634,1065,750),(1142,63
     save('tp_'+_n,Image.fromarray(np.dstack([_c.astype('uint8'),(_big*255).astype('uint8')]),'RGBA'),q=92);meta['tp_'+_n+'_at']=(_b[0],_b[1])
 # real wheel art
 _w=L('b31563f7');print('wheel alpha0',int((_w[...,3]<10).mean()*100));_mw=_w[...,3]>120;_ys,_xs=np.where(_mw);_wi=crop(_w,_mw,(int(_xs.min()),int(_ys.min()),int(_xs.max())+1,int(_ys.max())+1));_wn=np.array(_wi.resize((128,128),Image.LANCZOS));_yy,_xx=np.mgrid[:128,:128];_wn[...,3]=np.where((_xx-63.5)**2+(_yy-63.5)**2<64**2,_wn[...,3],0);save('s_tire',Image.fromarray(_wn,'RGBA'),q=92)
+# night map (Episode 2)
+_n=L('4cfe3d3e');_nrgb=_n[...,:3].astype('uint8')
+for _k,_x in zip(['sand','stones','dirt','road','curve','tee'],[32,322,613,903,1193,1483]):
+    _raw=_nrgb[34:288,_x+2:_x+256]
+    if _k=='sand':_ti=Image.fromarray(seamless(_raw))
+    elif _k=='stones':
+        _yy,_xx=np.mgrid[:254,:254];_ed=np.minimum.reduce([_yy,_xx,253-_yy,253-_xx]);_ti=Image.fromarray(np.dstack([_raw,(np.clip(_ed/26,0,1)*255).astype('uint8')]),'RGBA')
+    else:_ti=Image.fromarray(_raw)
+    save('n_t_'+_k,_ti,q=86)
+_bw=np.clip(1-np.abs(np.linspace(-1,1,254))/0.62,0,1)*5;_bw=np.clip(_bw,0,1)
+save('n_t_band',Image.fromarray(np.dstack([_nrgb[34:288,905:1159],(np.tile(_bw,(254,1))*255).astype('uint8')]),'RGBA'),q=86)
+_nm,_nl=key(_n,300);_n=despill(_n,_nm);_nb=[b for b in bboxes(_nm,_nl) if b[1]>300]
+for _k,_b in O.items():
+    _cx,_cy=(_b[0]+_b[2])/2,(_b[1]+_b[3])/2;_q=min(_nb,key=lambda t:((t[0]+t[2])/2-_cx)**2+((t[1]+t[3])/2-_cy)**2);print('night',_k,_b,_q);save('n_o_'+_k,crop(_n,_nm,_q),q=90)
 # parts
 a=L('03945519');m,lab=key(a,300);a=despill(a,m)
 for n,b in dict(head=(135,311,348,653),rod=(481,327,552,628),weight=(684,311,930,653),belt=(1013,421,1283,546),valve=(1362,380,1540,587)).items():save('q_'+n,crop(a,m,b),q=92)

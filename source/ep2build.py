@@ -25,9 +25,9 @@ R("if(S.mode==='pipes')tapPipes(e);","if(S.onTap)S.onTap(e);else if(S.mode==='pa
 R("function cover(c,im){c.drawImage(im,0,0,W,H)}","function cover(c,im){if(Math.abs(im.width-im.height)<4){c.fillStyle='#120803';c.fillRect(0,0,W,H);c.drawImage(im,(W-H)/2,0,H,H)}else c.drawImage(im,0,0,W,H)}")
 R(" drawDust();\n if(S.tint){"," if(S.over)S.over();\n drawDust();\n if(S.tint){")
 R(" const t=nextPoint();if(t)edgeArrow"," if(M.night){X.fillStyle='rgba(12,18,60,.62)';X.fillRect(0,0,W,H)}\n const t=nextPoint();if(t)edgeArrow") if False else None
-R("const fl=save.flags;if(fl.q1on&&!fl.q1)marker","if(M.night){X.fillStyle='rgba(12,18,60,.62)';X.fillRect(0,0,W,H)}const fl=save.flags;if(fl.q1on&&!fl.q1)marker")
+R("const fl=save.flags;if(fl.q1on&&!fl.q1)marker","const fl=save.flags;if(fl.q1on&&!fl.q1)marker")
 R("const t=nextPoint();if(t)edgeArrow(t.x-cx,t.y-cy);","const t=nextPoint();if(t)edgeArrow(t.x-cx,t.y-cy);if(t&&M.spots)marker(t.x-cx,t.y-cy-95);/* on-screen objective */")
-R(" if(S.tint&&S.bg!==img.bg_office_night){sun.a*=.15;"," if(S.bg===img.bg_barrel1||S.bg===img.bg_barrel3){sun={x:390,y:150,r:620,a:.2,c:'255,180,90'};wa=.02;vig=.25;motesOn=false}/* night grade */\n if(S.tint&&S.bg!==img.bg_office_night){sun.a*=.15;")
+R(" if(S.tint&&S.bg!==img.bg_office_night){sun.a*=.15;"," if(m==='map'&&M.night){sun={x:W*.16,y:-40,r:W*.9,a:.16,c:'150,180,255'};warm='70,90,170';wa=.05;vig=.42}\n if(S.bg===img.bg_barrel1||S.bg===img.bg_barrel3){sun={x:390,y:150,r:620,a:.2,c:'255,180,90'};wa=.02;vig=.25;motesOn=false}/* night grade */\n if(S.tint&&S.bg!==img.bg_office_night){sun.a*=.15;")
 s=s.replace('/*ASSETS*/null',json.dumps(d)).replace('/*META*/null',json.dumps(m))
 open('www/ep2t.html','w',encoding='utf8').write(s.replace('/*TESTHOOK*/','window.__g={M,S,PT,tapPatch,get save(){return save}};'))
 open('ep2.html','w',encoding='utf8').write(s.replace('/*TESTHOOK*/\n',''));print(len(s)//1024)
