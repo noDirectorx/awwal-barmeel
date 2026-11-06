@@ -127,11 +127,14 @@ function tween(ms,fn){return new Promise(res=>{if(skipping||ms<=0){fn(1);res();r
 const wait=ms=>tween(TEST?Math.min(ms,30):ms,()=>{});
 /* ---------- stage ---------- */
 const S={mode:'none',bg:null,bg2:null,bg2a:0,fade:1,bars:0,shake:0,tint:null,actors:[],parts:[],overlay:null,lamp:0,drops:0,oilT:0,dust:[]};
+const silC={};function sil(k){if(silC[k])return silC[k];const im=img[k],c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#2a1206';x.fillRect(0,0,c.width,c.height);return silC[k]=c}
 function actor(name,x,y,h=255,dir='s'){const a={name,x,y,h,dir,f:1,step:0,on:true,bob:0};S.actors.push(a);return a}
 function drawWalker(c,a,ox=0,oy=0){const im=img['w_'+a.name],[cw,ch]=META['w_'+a.name+'_cell'];if(!im)return;
  const row={f:0,b:3,r:6,l:6}[a.dir]??0;const s=a.h/ch,dw=cw*s,dh=ch*s,x=a.x-ox,y=a.y-oy+(a.bob||0);
- c.fillStyle='rgba(40,14,0,.28)';c.beginPath();c.ellipse(x,a.y-oy,dw*.27,dh*.05,0,0,7);c.fill();
  const k=row+[0,1,2,1][a.step%4]*(a.moving?1:0)+(a.moving?0:1);
+ const lit=S.mode==='map'?{sk:.5,sh:.2,al:.3}:S.mode==='room'||S.bg===img.bg_office?{sk:-.75,sh:.14,al:.28}:{sk:1.05,sh:.16,al:.34};
+ if(meta.quality!=='low'){c.save();c.globalAlpha=lit.al;c.translate(x,a.y-oy);c.transform(1,0,-lit.sk,-lit.sh,0,0);if(a.dir==='l')c.scale(-1,1);c.drawImage(sil('w_'+a.name),k*cw,0,cw,ch,-dw/2,-dh,dw,dh);c.restore()}
+ c.fillStyle='rgba(40,14,0,.32)';c.beginPath();c.ellipse(x,a.y-oy,dw*.24,dh*.04,0,0,7);c.fill();
  c.save();c.translate(x,y);if(a.dir==='l')c.scale(-1,1);c.drawImage(im,k*cw,0,cw,ch,-dw/2,-dh,dw,dh);c.restore()}
 function walk(a,x,y,speed=230){return new Promise(res=>{if(skipping){a.x=x;a.y=y;a.moving=false;a.dir='f';res();return}
  const dx=x-a.x,dy=y-a.y,d=Math.hypot(dx,dy);if(d<1){res();return}a.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'r':'l'):(dy>0?'f':'b');a.moving=true;let go=0;const sp=TEST?speed*12:speed;
@@ -148,7 +151,7 @@ function drawCine(){X.save();
  if(S.tint){X.fillStyle=S.tint;X.fillRect(0,0,W,H)}
  if(S.lamp>0){const g=X.createRadialGradient(1010,450,10,1010,450,430);g.addColorStop(0,`rgba(255,190,90,${.42*S.lamp})`);g.addColorStop(1,'rgba(255,190,90,0)');X.fillStyle=g;X.fillRect(0,0,W,H)}
  X.restore();
- if(S.bars>0){X.fillStyle='#000';const b=62*S.bars;X.fillRect(0,0,W,b);X.fillRect(0,H-b,W,b)}}
+}
 const oil=[];
 function drawDrops(front){for(const d of oil){if((d.z>0)!==front)continue;X.fillStyle=d.c;X.fillRect(d.x|0,d.y|0,d.s,d.s*1.5)}}
 function updDrops(dt){if(S.drops>0){for(let n=0;n<S.drops*dt*(meta.quality==='low'?.45:1);n++){oil.push({x:Math.random()*W,y:-20,v:360+Math.random()*420,s:3+Math.random()*7|0,z:Math.random()-.4,c:Math.random()<.2?'#6d3a14':'#1d0d05'})}}
@@ -263,7 +266,7 @@ function buildMap(){M.objs=[];M.pick=[];M.npc={};
   c.drawImage(img.t_sand,px,py,TS+1,TS+1);const q=rnd();if(y!==8&&x!==10&&q<.1)c.drawImage(img.t_stones,px,py,TS+1,TS+1);
   }
  for(const [x,y,rot] of rows.sort((a,b)=>a[2]-b[2])){c.save();c.translate(x*TS+TS/2,y*TS+TS/2);c.rotate(rot*Math.PI/180);c.drawImage(img.t_band,-TS/2,-TS/2,TS+1,TS+1);c.restore()}
- M.tiles=t;
+ M.tiles=t;M.truck={x:2430,y:2190};
  const fw=img.o_fence.width*OBJ_SCALE.fence-4;
  for(let x=150;x<MW-100;x+=fw)place('fence',x,300);
  for(let x=150;x<MW-100;x+=fw){if(Math.abs(x-(10*TS+96))<fw*.9)continue;place('fence',x,MH-140)}
@@ -271,11 +274,15 @@ function buildMap(){M.objs=[];M.pick=[];M.npc={};
  place('office',2900,1500);place('tanks',3380,1050);place('pump',1940,1250);place('shed',760,1420);place('scrappile',470,1450);place('scrappile',900,620);place('marker',1830,1370);
  for(const [n,x,y] of [['barrels',1130,1400],['barrel',1240,1455],['crate',2590,1560],['pipes',3050,860],['crate',3250,1620],['rock',340,800],['rock',3560,2050],['pebble',1500,750],['pebble',2500,2050],['shrub',620,2020],['shrub',1450,2060],['shrub',3100,2120],['shrub',2450,620],['rock',1250,2000],['barrel',3560,1370]])place(n,x,y);
  place('rock',170,1300);
+ c.save();for(let i=0;i<26;i++){const px=rnd()*MW,py=rnd()*MH,r=220+rnd()*520,tone=rnd()<.5?'120,60,20':'255,225,160',gr=c.createRadialGradient(px,py,0,px,py,r);gr.addColorStop(0,`rgba(${tone},.09)`);gr.addColorStop(1,`rgba(${tone},0)`);c.fillStyle=gr;c.fillRect(px-r,py-r,r*2,r*2)}c.restore();
+ for(const o of M.objs){c.save();c.globalAlpha=.3;c.translate(o.x,o.y);c.transform(1,0,-.55,-.24,0,0);c.drawImage(sil('o_'+o.n),-o.w/2,-o.h,o.w,o.h);c.restore();c.save();c.globalAlpha=.22;c.fillStyle='#2a1206';c.beginPath();c.ellipse(o.x,o.y-3,o.w*.52,Math.max(8,o.h*.05),0,0,7);c.fill();c.restore()}
+ {const tr=img.truck_side,tw=tr.width*1.2,th=tr.height*1.2;c.save();c.globalAlpha=.3;c.translate(M.truck?M.truck.x:2430,2214);c.transform(1,0,-.55,-.24,0,0);c.drawImage(sil('truck_side'),-tw/2,-th,tw,th);c.restore()}
  const items=[{id:'head',k:'q_head',x:760,y:1370,s:.33,name:'رأس المضخة'},{id:'rod',k:'q_rod',x:3180,y:900,s:.35,name:'عمود التوصيل'},{id:'weight',k:'q_weight',x:760,y:720,s:.3,name:'الثقل'},
  {id:'s1',k:'s_s1',x:1050,y:880,s:.3,name:'خردة'},{id:'s2',k:'s_s2',x:1580,y:1720,s:.3,name:'خردة'},{id:'s3',k:'s_s3',x:2380,y:880,s:.3,name:'خردة'},{id:'s4',k:'s_s4',x:2750,y:1950,s:.3,name:'خردة'},{id:'s5',k:'s_s5',x:3480,y:1780,s:.3,name:'خردة'},{id:'s6',k:'s_s6',x:480,y:1800,s:.3,name:'خردة'}];
  for(const i of items)if(!save.flags['got_'+i.id])M.pick.push(i);
  if(save.flags.q2on&&!save.flags.got_tire)M.pick.push(TIRE);
  M.p={name:'hero',x:save.flags.px||2700,y:save.flags.py||1720,h:112,dir:'b',step:0,moving:false,dist:0};
+ M.truck={x:2430,y:2190};
  M.npc.hamdan={name:'hamdan',x:2660,y:1620,h:108,dir:'f',step:0};
  M.npc.mubarak={name:'mubarak',x:1560,y:1290,h:110,dir:'r',step:0};
  M.npc.nasser={name:'nasser',x:2190,y:2120,h:106,dir:'l',step:0};
@@ -504,9 +511,26 @@ function beginAt(n){const c=$('#title');c.style.opacity=0;document.body.style.ba
 function titleScreen(){applySide();A.music('music_menu',.8);S.mode='none';S.fade=1;const c=$('#title');const has=save.ch>0;c.style.backgroundImage=`url(${ASSETS.bg_desert})`;document.body.style.background=`#000 url(${ASSETS.bg_desert}) center 70%/cover no-repeat`;
  c.innerHTML=`<h1>أول برميل</h1><nav class="menu">${has?'<button class="mi first" id="go2">استمرار</button>':''}<button class="mi ${has?'':'first'}" id="go">${has?'لعبة جديدة':'ابدأ'}</button><button class="mi" id="eps">الحلقات</button><button class="mi" id="set">الإعدادات</button><button class="mi" id="con">تواصل معنا</button></nav>`;c.hidden=false;
  $('#go').onclick=askNew;if(has)$('#go2').onclick=()=>beginAt(save.ch);$('#eps').onclick=panelEpisodes;$('#set').onclick=panelSettings;$('#con').onclick=panelContact}
+const motes=Array.from({length:34},()=>({x:Math.random()*1672,y:Math.random()*941,s:2+Math.random()*3|0,v:6+Math.random()*16,p:Math.random()*6}));
+function grade(){if(meta.quality==='low'||S.mode==='none')return;const m=S.mode,h=H;let sun,warm='255,150,70',wa=.16,vig=.42,motesOn=true;
+ if(m==='map'){sun={x:W*.08,y:-120,r:W*1.05,a:.24,c:'255,214,140'};wa=.1;vig=.26;motesOn=false}
+ else if(m==='board'){sun={x:255,y:405,r:760,a:.36,c:'255,190,100'}}
+ else if(m==='room'||S.bg===img.bg_office){sun={x:1570,y:300,r:980,a:.34,c:'255,190,110'};wa=.14}
+ else if(m==='pipes'||m==='jack'){sun={x:445,y:360,r:800,a:.2,c:'255,190,100'}}
+ else{sun={x:445,y:360,r:900,a:.4,c:'255,190,100'}}
+ if(S.tint){sun.a*=.15;wa=.03;vig=.55;warm='70,90,170'}
+ if(S.bg===img.bg_gusher){sun.a*=.55;vig=.52}
+ const flick=1+Math.sin(time*.9)*.05;X.save();
+ X.globalCompositeOperation='soft-light';const top=X.createLinearGradient(0,0,0,h);top.addColorStop(0,`rgba(${warm},${wa*1.5})`);top.addColorStop(.6,`rgba(${warm},${wa*.6})`);top.addColorStop(1,'rgba(60,20,70,'+wa*.9+')');X.fillStyle=top;X.fillRect(0,0,W,h);
+ X.globalCompositeOperation='screen';const g=X.createRadialGradient(sun.x,sun.y,0,sun.x,sun.y,sun.r);g.addColorStop(0,`rgba(${sun.c},${sun.a*flick})`);g.addColorStop(.45,`rgba(${sun.c},${sun.a*.28})`);g.addColorStop(1,`rgba(${sun.c},0)`);X.fillStyle=g;X.fillRect(0,0,W,h);
+ if(motesOn){for(const p of motes){p.y-=p.v*.016;p.x+=Math.sin(time+p.p)*.25;if(p.y<0){p.y=h;p.x=Math.random()*W}const d=Math.hypot(p.x-sun.x,p.y-sun.y)/sun.r;const al=clamp((1-d)*.55,0,.55);if(al>.03){X.fillStyle=`rgba(255,226,170,${al})`;X.fillRect(p.x|0,p.y|0,p.s,p.s)}}}
+ X.globalCompositeOperation='multiply';const v=X.createRadialGradient(W/2,h*.48,h*.36,W/2,h*.5,W*.68);v.addColorStop(0,'rgba(255,255,255,1)');v.addColorStop(1,`rgba(${60},${30},${45},1)`);X.globalAlpha=vig;X.fillStyle=v;X.fillRect(0,0,W,h);
+ X.restore()}
 /* ---------- loop ---------- */
 let last=0;function frame(ts){const dt=Math.min(.05,(ts-last)/1000||0);last=ts;time+=dt;jobs=jobs.filter(j=>!j.u(dt));updDrops(dt);updDust(dt);
  if(S.mode==='map'){updMap(dt);drawMap()}else if(S.mode==='room'){updRoom(dt);drawRoom()}else if(S.mode==='pipes'){if(S.shake)S.shake=0;drawPipes()}else if(S.mode==='jack'){updJack(dt);S.shake=Math.max(0,S.shake-dt*30);drawJack()}else if(S.mode==='board'){updBoard(dt);drawBoard()}else if(S.mode==='cine')drawCine();else{X.fillStyle='#000';X.fillRect(0,0,W,H)}
+ grade();
+ if(S.bars>0&&S.mode==='cine'){X.fillStyle='#000';const b=62*S.bars;X.fillRect(0,0,W,b);X.fillRect(0,H-b,W,b)}
  if(S.fade>0){X.fillStyle=`rgba(0,0,0,${S.fade})`;X.fillRect(0,0,W,H)}
  requestAnimationFrame(frame)}
 /*TESTHOOK*/
