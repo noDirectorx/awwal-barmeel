@@ -25,7 +25,7 @@ async function eHide(){if(!save.flags.hid)return;S.mode='map';setView(true);star
  task();toast('دحرج البرميل بعد ما تجمع الغطاء والحبل');
  M.tick=(dt)=>{if(hold>0){hold-=dt;K.moving=false;return}const tx=2900,ty=1620,dx=tx-K.x,dy=ty-K.y,d=Math.hypot(dx,dy);if(d<20){if(res)res();return}K.moving=true;const sp=46;K.x+=dx/d*sp*dt;K.y+=dy/d*sp*dt;K.dist+=sp*dt;K.step=Math.floor(K.dist/30);K.dir=Math.abs(dx)>Math.abs(dy)?(dx>0?'r':'l'):(dy>0?'f':'b')};
  await fadeTo(0,500);await new Promise(r=>res=r);M.tick=null;M.spots=null;M.slow=false;M.barrel=null;delete M.npc.old;A.walk(false);f.caught=done?0:1;store.put();await fadeTo(1,500);$('#hud').hidden=true;$('#act').hidden=true;S.mode='none';setView(false)}
-async function eVisit(){const f=save.flags;S.mode='cine';startScene();setBg('office');S.bars=1;S.fade=1;A.music('music_tension',.6);A.ambience({amb_room:.5});
+async function eVisit(){const f=save.flags;S.mode='cine';startScene();setBg(f.hid?'office_empty':'office');S.bars=1;S.fade=1;A.music('music_tension',.6);A.ambience({amb_room:.5});
  const o=actor('old',420,840,330),e=actor('hero',1240,860,340);o.dir='r';e.dir='l';await fadeTo(0,700);
  if(!f.hid){await say('old','cunning','ملحوم. حتى أنت ما تدري وش فيه؟');
   const r=await timedChoice('وش ترد؟',['قديم، وما يهمني','وأنت ليش يهمك؟'],6000);f.answer=r;
@@ -33,8 +33,8 @@ async function eVisit(){const f=save.flags;S.mode='cine';startScene();setBg('off
   await say('old','neutral','خمسين ألف مقابل البرميل وحده. تغطي رواتب كم شهر.');
   await say('hero','firm','وأبوي رفض ثلاثة ريالات عشانه. قبل أبيع، أبي أعرف ليش.');f.khawajaSuspect=r===1?1:0}
  else if(f.caught){await say('old','cunning','قالوا لي إن البرميل ما له حركة.');await say('old','neutral','خمسين ألف مقابله. تغطي رواتب كم شهر.');await say('hero','firm','وأبوي رفض ثلاثة ريالات عشانه. قبل أبيع، أبي أعرف ليش.');f.khawajaSuspect=1}
- else{await say('old','surprised','ما شاء الله. لقيتوا له مكان أحسن؟');await say('old','neutral','خمسين ألف مقابله، وين ما كان. تغطي رواتب كم شهر.');await say('hero','firm','وأبوي رفض ثلاثة ريالات عشانه. قبل أبيع، أبي أعرف ليش.');await say('old','cunning','احتفظ بخوذتي. يوم ترجع البرميل مكانه، رجّعها لي.');f.khawajaSuspect=1;f.helmetLeft=1}
- store.put();await walk(o,-120,840,200);await fadeTo(1,700)}
+ else{await say('old','surprised','ما شاء الله. لقيتوا له مكان أحسن؟');await say('old','neutral','خمسين ألف مقابله، وين ما كان. تغطي رواتب كم شهر.');await say('hero','firm','وأبوي رفض ثلاثة ريالات عشانه. قبل أبيع، أبي أعرف ليش.');o.name='oldnh';S.prop={k:'i_helmet',x:META.office_stand[0],y:META.office_stand[1],w:105};A.play('fx_assemble',.5);await say('old','cunning','احتفظ بخوذتي. يوم ترجع البرميل مكانه، رجّعها لي.');f.khawajaSuspect=1;f.helmetLeft=1}
+ store.put();await walk(o,-120,840,200);await fadeTo(1,700);S.prop=null}
 function timedChoice(title,opts,ms){return new Promise(res=>{const c=$('#choices');c.innerHTML=`<h3>${title}</h3>`;let done=false;const go=i=>{if(done)return;done=true;clearTimeout(tm);c.hidden=true;res(i)};opts.forEach((t,i)=>{const b=document.createElement('button');b.className='btn';b.textContent=t;b.onclick=()=>go(i);c.appendChild(b)});const s=document.createElement('button');s.className='btn ghost';s.textContent='تسكت';s.onclick=()=>go(2);c.appendChild(s);c.hidden=false;const tm=setTimeout(()=>go(2),ms)})}
 async function eMunira(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;A.music('music_desert',.5);A.ambience({amb_wind:.4,amb_site:.2});
  const h=actor('hero',760,780,290),m=actor('hamdan',1020,780,270),n=actor('munira',1660,800,285);h.dir='r';m.dir='l';await fadeTo(0,700);await walk(n,1240,800,200);n.dir='l';

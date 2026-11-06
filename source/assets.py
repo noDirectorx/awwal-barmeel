@@ -127,8 +127,24 @@ _a=L('0051108d');_m,_l=key(_a,3000);_a=despill(_a,_m);_bb=bboxes(_m,_l)
 _low=sorted([b for b in _bb if b[1]>600],key=lambda b:b[0]);_top=sorted([b for b in _bb if b[1]<600],key=lambda b:b[0])
 for _b,_n in zip(_low,['neutral','firm','annoyed','worried','smile']):
     _i=crop(_a,_m,_b);_s=PH/_i.height;save(f'p_munira_{_n}',_i.resize((round(_i.width*_s),PH),Image.BOX),q=88)
-_f,_bk,_sd=crop(_a,_m,_top[1]),crop(_a,_m,_top[3]),crop(_a,_m,_top[2])
-strip('munira',[_f,_f,_f,_bk,_bk,_bk,_sd,_sd,_sd])
+def walk4(i):
+    w=L(i);m2,lab2=key(w,1500);w=despill(w,m2);bx=bboxes(m2,lab2);assert len(bx)==16,len(bx)
+    G2={}
+    for b_ in bx:G2[(int(((b_[1]+b_[3])/2)//(w.shape[0]/4)),int(((b_[0]+b_[2])/2)//(w.shape[1]/4)))]=b_
+    return [crop(w,m2,G2[(0,c)]) for c in range(3)]+[crop(w,m2,G2[(1,c)]) for c in range(3)]+[crop(w,m2,G2[(2,c)]).transpose(Image.FLIP_LEFT_RIGHT) for c in range(3)]
+strip('munira',walk4('9248cde5'));strip('oldnh',walk4('fb5accaa'))
+# Episode 2 art
+for _n,_i in dict(market='eb99eb29',workshop='a0b66145').items():save('bg_'+_n,Image.fromarray(L(_i)[...,:3].astype('uint8')),q=86)
+_bz=L('e5b52726')[...,:3].astype('uint8');save('bg_barrel1',Image.fromarray(_bz[10:877,10:877]),q=86);save('bg_barrel2',Image.fromarray(_bz[10:877,897:1764]),q=86)
+_t=L('f9ffa46d');_mt,_=key(_t,1500);_t=despill(_t,_mt);save('q_truck',crop(_t,_mt,(74,223,1323,668)),q=92);save('q_barrel',crop(_t,_mt,(1523,485,1699,700)),q=92)
+_it=L('c8093133');_mi,_=key(_it,800);_it=despill(_it,_mi)
+for _n,_b in dict(tarp=(20,84,350,333),rope=(391,78,694,342),radio=(755,50,1081,341),antenna=(1173,39,1391,342),speaker=(50,410,337,701),knob=(436,438,641,639),receipts=(745,392,1011,694),notebook=(1104,399,1411,694),stone=(1120,732,1407,1051),tape=(20,777,333,1023),box=(375,760,694,1032),helmet=(728,765,1086,1025)).items():save('i_'+_n,crop(_it,_mi,_b),q=90)
+# office without the barrel (Episode 2, hidden path)
+_o=L('6df3d61d')[...,:3].astype('uint8').copy();_h,_w=_o.shape[:2];_x0,_x1,_y0,_y1=int(.772*_w),int(.872*_w),int(.27*_h),int(.665*_h);_top=np.tile(_o[_y0-6:_y0-2,_x0:_x1].mean((0,1)),(_x1-_x0,1))
+for _y in range(_y0,_y1):
+    for _x in range(_x0,_x1):
+        _o[_y,_x]=_top[_x-_x0]
+_oi=Image.fromarray(_o);_bl=_oi.filter(__import__('PIL.ImageFilter',fromlist=['x']).GaussianBlur(7));_mk=Image.new('L',_oi.size,0);__import__('PIL.ImageDraw',fromlist=['x']).Draw(_mk).rectangle((_x0-10,_y0-8,_x1+10,_y1-30),fill=255);_oi=Image.composite(_bl,_oi,_mk);save('bg_office_empty',_oi,q=86);meta['office_stand']=(int((_x0+_x1)/2),_y1)
 # real wheel art
 _w=L('b31563f7');print('wheel alpha0',int((_w[...,3]<10).mean()*100));_mw=_w[...,3]>120;_ys,_xs=np.where(_mw);_wi=crop(_w,_mw,(int(_xs.min()),int(_ys.min()),int(_xs.max())+1,int(_ys.max())+1));_wn=np.array(_wi.resize((128,128),Image.LANCZOS));_yy,_xx=np.mgrid[:128,:128];_wn[...,3]=np.where((_xx-63.5)**2+(_yy-63.5)**2<64**2,_wn[...,3],0);save('s_tire',Image.fromarray(_wn,'RGBA'),q=92)
 # parts

@@ -19,6 +19,7 @@ R("const v=inputVec(),SP=450,","if(M.tick)M.tick(dt);const v=inputVec(),SP=M.slo
 R(" list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});"," if(M.barrel){M.barrel.r+=M.vx*.002;const b=img.o_barrel,w=b.width*.8,h=b.height*.8,px=M.p.x+(M.p.dir==='l'?-58:58),py=M.p.y+10;list.push({y:py,d(){X.save();X.translate(px-cx,py-h/2-cy);X.rotate(M.barrel.r);X.drawImage(b,-w/2,-h/2,w,h);X.restore()}})}\n list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});")
 R("function nextPoint(){","function nextPoint(){if(M.spots){const q=M.spots.find(s=>!['pump','nas','ham'].includes(s.k)&&(!s.cond||s.cond()));return q||null}")
 R("function nextTarget(){","function nextTarget(){if(M.spots)return null;")
+R(" if(S.drops>0)drawDrops(false);"," if(S.prop){const q=img[S.prop.k],h=q.height*S.prop.w/q.width;X.drawImage(q,S.prop.x-S.prop.w/2,S.prop.y-h,S.prop.w,h)}\n if(S.drops>0)drawDrops(false);")
 s=s.replace('/*ASSETS*/null',json.dumps(d)).replace('/*META*/null',json.dumps(m))
 open('www/ep2t.html','w',encoding='utf8').write(s.replace('/*TESTHOOK*/','window.__g={M,S,get save(){return save}};'))
 open('ep2.html','w',encoding='utf8').write(s.replace('/*TESTHOOK*/\n',''));print(len(s)//1024)

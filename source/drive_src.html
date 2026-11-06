@@ -26,7 +26,7 @@ const BUMPS=[];{let x=1400;let s=9;while(x<LEN-700){s=(s*16807)%2147483647;const
 const slope=x=>Math.atan2(ground(x+24)-ground(x-24),48);
 const T={x:220,y:0,vx:0,vy:0,a:0,va:0,g:false,spin:0,lastImp:0},WB=136,RIDE=36;
 let barrels=[],debris=[],lost=0,camX=0,camY=0,dust=[],sand=[];
-function reset(){Object.assign(T,{x:220,vx:0,vy:0,a:slope(220),va:0,g:true,spin:0});T.y=(ground(T.x-WB)+ground(T.x+WB))/2-RIDE;barrels=[0,1,2,3,4,5].map(i=>({u:-176+i*40,h:0,vh:0,vu:0,on:true,i}));debris=[];lost=0;t=0;camX=T.x-500;camY=0;dust=[];state='ready';sand=Array.from({length:90},()=>({x:Math.random()*W,y:Math.random()*H,v:700+Math.random()*700,l:40+Math.random()*90}))}
+function reset(){Object.assign(T,{x:220,vx:0,vy:0,a:slope(220),va:0,g:true,spin:0});T.y=(ground(T.x-WB)+ground(T.x+WB))/2-RIDE;barrels=[0,1,2,3,4,5].map(i=>({u:-190+i*33,h:0,vh:0,vu:0,on:true,i}));debris=[];lost=0;t=0;camX=T.x-500;camY=0;dust=[];state='ready';sand=Array.from({length:90},()=>({x:Math.random()*W,y:Math.random()*H,v:700+Math.random()*700,l:40+Math.random()*90}))}
 const inp={gas:false,brk:false};function bind(id,k){const e=$(id),on=v=>{inp[k]=v;e.classList.toggle('on',v)};e.addEventListener('pointerdown',x=>{x.preventDefault();e.setPointerCapture&&e.setPointerCapture(x.pointerId);on(true)});for(const n of['pointerup','pointercancel','lostpointercapture'])e.addEventListener(n,()=>on(false))}bind('#gas','gas');bind('#brk','brk');
 addEventListener('keydown',e=>{if(e.code==='ArrowRight'||e.code==='KeyD')inp.gas=true;if(e.code==='ArrowLeft'||e.code==='KeyA')inp.brk=true});addEventListener('keyup',e=>{if(e.code==='ArrowRight'||e.code==='KeyD')inp.gas=false;if(e.code==='ArrowLeft'||e.code==='KeyA')inp.brk=false});
 function say(s){const e=$('#say');e.textContent=s;e.style.opacity=1;clearTimeout(say.t);say.t=setTimeout(()=>e.style.opacity=0,2000)}
@@ -43,12 +43,12 @@ function step(dt){if(state!=='run')return;t+=dt;const prev=T.vx;const sl=slope(T
  const shake=imp>0?imp:0;
  for(const b of barrels){if(!b.on)continue;const gravT=Math.sin(T.a)*1250;b.vu+=(-ax*.32+gravT)*dt;const fric=b.h<=0?4.2:.5;b.vu*=Math.exp(-dt*fric);
   if(shake>150&&b.h<=0)b.vh=(shake-95)*(.62+Math.random()*.36)+T.vx*.1;b.vh-=1500*dt;b.h+=b.vh*dt;if(b.h<=0){b.h=0;if(b.vh<-120)b.vh=-b.vh*.22;else b.vh=0}
-  b.u+=b.vu*dt;const lo=-190,hi=34,rail=38;if(b.u<lo){if(b.h<rail){b.u=lo;b.vu=Math.abs(b.vu)*.3}else fall(b,-1)}else if(b.u>hi){b.u=hi;b.vu=-Math.abs(b.vu)*.3}if(b.on&&b.h>108){fall(b,-1)}
-  for(const o of barrels){if(o!==b&&o.on&&Math.abs(o.u-b.u)<36&&b.h<26&&o.h<26){const d=(36-Math.abs(o.u-b.u))*Math.sign(b.u-o.u||1)*.5;b.u+=d;o.u-=d;const m=(b.vu+o.vu)/2;b.vu=o.vu=m}}}
+  b.u+=b.vu*dt;const lo=-205,hi=-8,rail=38;if(b.u<lo){if(b.h<rail){b.u=lo;b.vu=Math.abs(b.vu)*.3}else fall(b,-1)}else if(b.u>hi){b.u=hi;b.vu=-Math.abs(b.vu)*.3}if(b.on&&b.h>108){fall(b,-1)}
+  for(const o of barrels){if(o!==b&&o.on&&Math.abs(o.u-b.u)<32&&b.h<26&&o.h<26){const d=(32-Math.abs(o.u-b.u))*Math.sign(b.u-o.u||1)*.5;b.u+=d;o.u-=d;const m=(b.vu+o.vu)/2;b.vu=o.vu=m}}}
  for(const d of debris){d.vy+=1500*dt;d.x+=d.vx*dt;d.y+=d.vy*dt;d.r+=d.vr*dt;const g=ground(d.x)-22;if(d.y>g){d.y=g;d.vy*=-.3;d.vx*=.55;d.vr*=.5}}
  for(const p of dust){p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt}dust=dust.filter(p=>p.t<p.l);
  if(T.x>=LEN)finish();}
-function wp(u,h){const c=Math.cos(T.a),s=Math.sin(T.a);const lx=u,ly=-92-h;return{x:T.x+lx*c-ly*s,y:T.y+lx*s+ly*c}}
+function wp(u,h){const c=Math.cos(T.a),s=Math.sin(T.a);const lx=u,ly=-110-h;return{x:T.x+lx*c-ly*s,y:T.y+lx*s+ly*c}}
 function fall(b,dir){b.on=false;const p=wp(b.u,b.h);debris.push({x:p.x,y:p.y,vx:T.vx*.7+dir*170,vy:-180,r:0,vr:dir*5});say(LINES[lost]||LINES[0]);lost++;if(lost>=6)finish()}
 function finish(){if(state!=='run')return;state='end';const kept=6-lost,m=Math.floor(t/60),s=String(Math.floor(t%60)).padStart(2,'0');const e=$('#end');e.innerHTML=`<h2>${kept===6?'ما طاح شي!':kept===0?'رجعتوا فاضيين':'وصلت الحمولة'}</h2><p>البراميل: ${kept} من 6 · الوقت: ${m}:${s}</p><p>${kept===6?'ناصر: والله تصلح سواق. أبوك ما كان يصلح.':kept>=3?'ناصر: ما هي بطالة، بس الناقص من حسابك.':'ناصر: المرة الجاية أنا أسوق.'}</p><button id="again">جرّب مرة ثانية</button>`;e.hidden=false;$('#again').onclick=()=>{e.hidden=true;reset();state='run'};window.__res={kept,t}}
 function draw(){const k=clamp(T.x/LEN,0,1),st=k>STORM[0]&&k<STORM[1]?Math.min(1,Math.min(k-STORM[0],STORM[1]-k)/.03):0;
@@ -58,12 +58,12 @@ function draw(){const k=clamp(T.x/LEN,0,1),st=k>STORM[0]&&k<STORM[1]?Math.min(1,
  X.save();X.clip();const g=X.createLinearGradient(0,380,0,H);if(lowFx){g.addColorStop(0,'rgba(255,214,140,.25)');g.addColorStop(1,'rgba(120,52,12,.4)')}else{g.addColorStop(0,'rgba(255,214,140,.5)');g.addColorStop(1,'rgba(120,52,12,.55)')}X.fillStyle=g;X.fillRect(0,0,W,H);X.fillStyle='rgba(120,60,15,.22)';for(let i=0;i<70;i++){const sx=((i*173.3-cx*1)%(W+80)+W+80)%(W+80)-40,gy=ground(cx+sx)-cy;X.fillRect(sx|0,gy+18+(i*37)%240,20+(i%4)*14,4)}X.restore();
  X.strokeStyle='#7a3b12';X.lineWidth=5;X.beginPath();for(let sx=-10;sx<=W+step;sx+=step){const y=ground(cx+sx)-cy;sx===-10?X.moveTo(sx,y):X.lineTo(sx,y)}X.stroke();
  if(k>.97||T.x>LEN-1300){const fxx=LEN-cx,fy=ground(LEN)-cy;X.fillStyle='#3b1c08';X.fillRect(fxx,fy-210,10,210);X.fillStyle='#c8401f';X.fillRect(fxx+10,fy-210,110,60);X.fillStyle='#fff4d8';X.font='400 34px Lalezar,serif';X.textAlign='center';X.fillText('الميناء',fxx+65,fy-168)}
- const tr=img.truck_side,S=1.36,tw=tr.width*S,th=tr.height*S;
+ const tr=img.q_truck,Q=.363,tw=tr.width*Q;
  X.save();X.fillStyle='rgba(40,14,0,.3)';X.beginPath();X.ellipse(T.x-cx,ground(T.x)-cy+6,tw*.45,12,0,0,7);X.fill();X.restore();
- for(const d of debris){X.save();X.translate(d.x-cx,d.y-cy);X.rotate(d.r);const b=img.o_barrel,w=b.width*.6,h=b.height*.6;X.drawImage(b,-w/2,-h/2,w,h);X.restore()}
+ for(const d of debris){X.save();X.translate(d.x-cx,d.y-cy);X.rotate(d.r);const b=img.q_barrel,w=b.width*.2,h=b.height*.2;X.drawImage(b,-w/2,-h/2,w,h);X.restore()}
  X.save();X.translate(T.x-cx,T.y-cy);X.rotate(T.a);
- for(const b of barrels){if(!b.on)continue;const im=img.o_barrel,w=im.width*.47,h=im.height*.47;X.save();X.translate(b.u,-92-b.h);X.rotate(clamp(b.vu*.0006,-.25,.25));X.drawImage(im,-w/2,-h/2,w,h);X.restore()}
- X.drawImage(tr,-tw/2,-th+38,tw,th);const ti=img.s_tire,tl=31*S*2;for(const wx of[-tw/2+71*S,-tw/2+280*S]){X.save();X.translate(wx,-th+38+101*S);X.rotate(T.spin);X.drawImage(ti,-tl/2,-tl/2,tl,tl);X.restore()}X.restore();
+ for(const b of barrels){if(!b.on)continue;const im=img.q_barrel,w=im.width*.185,h=im.height*.185;X.save();X.translate(b.u,-110-b.h);X.rotate(clamp(b.vu*.0006,-.25,.25));X.drawImage(im,-w/2,-h/2,w,h);X.restore()}
+ X.drawImage(tr,-591*Q,-417*Q,tr.width*Q,tr.height*Q);const ti=img.s_tire,tl=72;for(const wx of[-136,136]){X.save();X.translate(wx,0);X.rotate(T.spin);X.drawImage(ti,-tl/2,-tl/2,tl,tl);X.restore()}X.restore();
  for(const p of dust){X.globalAlpha=clamp(1-p.t/p.l,0,.8);X.fillStyle='#e8c490';X.fillRect(p.x-cx|0,p.y-cy|0,p.s,p.s)}X.globalAlpha=1;
  if(st>0){X.fillStyle=`rgba(214,150,84,${st*.64})`;X.fillRect(0,0,W,H);X.fillStyle=`rgba(255,226,170,${st*.45})`;for(const s of sand){s.x-=s.v/60;if(s.x<-100){s.x=W+50;s.y=Math.random()*H}X.fillRect(s.x|0,s.y|0,s.l,2)}}
  if(!lowFx){X.save();X.globalCompositeOperation='multiply';const v=X.createRadialGradient(W/2,H*.48,H*.38,W/2,H*.5,W*.7);v.addColorStop(0,'#fff');v.addColorStop(1,'#a07a7a');X.fillStyle=v;X.fillRect(0,0,W,H);X.restore()}
