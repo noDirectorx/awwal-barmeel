@@ -317,7 +317,7 @@ function updMap(dt){if(M.lock){M.vx=M.vy=0;M.p.moving=false}else{if(M.tick)M.tic
  look(2900,1530,120,enterOffice,'ادخل المكتب');
  if(!save.flags.sec_stone&&save.flags.h_stone)look(1830,1400,105,()=>findSecret('stone'),'فتّش عند الحجر');if(!save.flags.sec_pile&&save.flags.h_pile)look(470,1490,125,()=>findSecret('pile'),'فتّش الخردة');
  if(save.flags.q1on&&!save.flags.q1)look(3380,1100,170,()=>openJob('pipes'),'صلّح الوصلة');if(save.flags.q2on&&save.flags.got_tire&&!save.flags.q2)look(M.truck.x-60,M.truck.y+40,230,()=>openJob('jack'),'ركّب الكفر');
- look(M.npc.hamdan.x,M.npc.hamdan.y,135,talkHamdan,'كلّم حمدان');look(M.npc.mubarak.x,M.npc.mubarak.y,135,talkMubarak,'كلّم مبارك');if(!save.flags.nasDone)look(M.npc.nasser.x,M.npc.nasser.y,145,talkNasser,'كلّم ناصر')}
+ look(M.npc.hamdan.x,M.npc.hamdan.y,135,talkHamdan,'كلّم حمدان');look(M.npc.mubarak.x,M.npc.mubarak.y,135,talkMubarak,'كلّم مبارك');if(!(save.flags.q2&&save.flags.sold))look(M.npc.nasser.x,M.npc.nasser.y,145,talkNasser,'كلّم ناصر')}
  if(p.moving&&Math.hypot(p.x-2660,p.y-1620)<1e-9){}
  M.act=M.lock?null:best;const b=$('#act');if(M.act){if(b.textContent!==M.act.label)b.textContent=M.act.label;b.hidden=false}else b.hidden=true;
  if(window.__autosave===undefined||time-window.__autosave>4){window.__autosave=time;save.flags.px=p.x|0;save.flags.py=p.y|0;store.put()}}
