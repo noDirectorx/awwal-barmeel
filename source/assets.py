@@ -72,15 +72,15 @@ for nm,y0,y1 in(('nasser',400,700),('mubarak',1200,1536)):
     for b,n in zip(r,['neutral','happy','angry']):
         im=crop(a,m,b);s=PH/im.height;save(f'p_{nm}_{n}',im.resize((round(im.width*s),PH),Image.BOX),q=88)
 # walk strips: 9 frames [front a,s,b, back a,s,b, side(right) a,s,b]; feet at cell bottom, head centred
-def strip(name,frames,hero=False):
+def strip(name,frames,hero=False,pre='w_'):
     H=max(f.height for f in frames);W=max(f.width for f in frames)+24
-    S=Image.new('RGBA',(W*9,H),(0,0,0,0))
+    S=Image.new('RGBA',(W*len(frames),H),(0,0,0,0))
     for k,f in enumerate(frames):
         arr=np.array(f)[...,3]>0;top=arr[:f.height//4];hx=np.where(top)[1].mean()
         x=round(W/2-hx);x=max(0,min(W-f.width,x));S.paste(f,(k*W+x,H-f.height),f)
     if hero:S=charcoal(S)
     k=1
-    save('w_'+name,S,q=90);meta['w_'+name+'_cell']=(W*k,H*k)
+    save(pre+name,S,q=90);meta[pre+name+'_cell']=(W*k,H*k)
 a=L('781de63d');m,lab=key(a,1500);a=despill(a,m);bb=bboxes(m,lab);assert len(bb)==16
 G={}
 for b in bb:G[(int(((b[1]+b[3])/2)//(a.shape[0]/4)),int(((b[0]+b[2])/2)//(a.shape[1]/4)))]=b
@@ -200,10 +200,12 @@ def sprite(n,mask):
     o=np.dstack([a[y0:y1,x0:x1],(mask[y0:y1,x0:x1]*255).astype('uint8')]);save(n,Image.fromarray(o,'RGBA'),q=92);meta[n+'_at']=(int(x0),int(y0))
 sprite('pump_beam',bmask);sprite('pump_saddle',saddle&(ni.binary_dilation(pm)|True));sprite('pump_prod',prodk)
 # redrawn walk sheets (one row of 9)
-def row9(name,i,hero=False):
-    w=L(i);m2,lab2=key(w,1500);w=despill(w,m2);bx=sorted(bboxes(m2,lab2),key=lambda b:b[0]);assert len(bx)==9,len(bx)
-    strip(name,[crop(w,m2,b) for b in bx],hero)
+def row9(name,i,hero=False,n=9,pre='w_'):
+    w=L(i);m2,lab2=key(w,1500);w=despill(w,m2);bx=sorted(bboxes(m2,lab2),key=lambda b:b[0]);assert len(bx)==n,len(bx)
+    strip(name,[crop(w,m2,b) for b in bx],hero,pre)
 row9('nasser','89ae01d4')
+row9('hero','03051b8c',True)
+row9('hero','39142331',True,6,'wd_')  # diagonals: down-right x3, up-right x3
 json.dump(meta,open('meta.json','w'))
 print(len(meta),sum(os.path.getsize(OUT+f) for f in os.listdir(OUT))//1024,'KB')
 # review sheets
