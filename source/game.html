@@ -135,7 +135,7 @@ const S={mode:'none',bg:null,bg2:null,bg2a:0,fade:1,bars:0,shake:0,tint:null,act
 const silC={};function sil(k){if(silC[k])return silC[k];const im=img[k],c=document.createElement('canvas');c.width=im.width;c.height=im.height;const x=c.getContext('2d');x.drawImage(im,0,0);x.globalCompositeOperation='source-in';x.fillStyle='#2a1206';x.fillRect(0,0,c.width,c.height);return silC[k]=c}
 function actor(name,x,y,h=255,dir='s'){const a={name,x,y,h,dir,f:1,step:0,on:true,bob:0};S.actors.push(a);return a}
 function drawWalker(c,a,ox=0,oy=0){const dg=a.dir&&a.dir.length===2&&img['wd_'+a.name],key=(dg?'wd_':'w_')+a.name,im=img[key];if(!im)return;const [cw,ch]=META[key+'_cell'],fl=dg?a.dir[1]==='l':a.dir==='l';
- const row=dg?(a.dir[0]==='d'?0:3):({f:0,b:3,r:6,l:6}[a.dir]??0);const s=a.h/ch,dw=cw*s,dh=ch*s,x=a.x-ox,y=a.y-oy+(a.bob||0);
+ const row=dg?(a.dir[0]==='d'?0:3):({f:0,b:3,r:6,l:6}[a.dir]??0);const s=a.h/ch,dw=cw*s,dh=ch*s,x=Math.round((a.x-ox)*RS)/RS,y=Math.round((a.y-oy+(a.bob||0))*RS)/RS;
  const k=row+[0,1,2,1][a.step%4]*(a.moving?1:0)+(a.moving?0:1);
  const lit=S.mode==='map'?{sk:.5,sh:.2,al:.3}:S.bg===img.bg_office_night?{sk:.35,sh:.12,al:.22}:S.mode==='room'||S.bg===img.bg_office?{sk:-.75,sh:.14,al:.28}:{sk:1.05,sh:.16,al:.34};
  if(meta.quality!=='low'){c.save();c.globalAlpha=lit.al;c.translate(x,a.y-oy);c.transform(1,0,-lit.sk,-lit.sh,0,0);if(fl)c.scale(-1,1);c.drawImage(sil(key),k*cw,0,cw,ch,-dw/2,-dh,dw,dh);c.restore()}
@@ -306,7 +306,7 @@ function updMap(dt){if(M.lock){M.vx=M.vy=0;M.p.moving=false}else{const v=inputVe
  const nx=p.x+M.vx*dt,ny=p.y+M.vy*dt;let moved=0;if(!blocked(nx,p.y)){moved+=Math.abs(nx-p.x);p.x=nx}else M.vx=0;if(!blocked(p.x,ny)){moved+=Math.abs(ny-p.y);p.y=ny}else M.vy=0;
  const sp=Math.hypot(M.vx,M.vy);p.moving=sp>26;if(p.moving){p.dist+=sp*dt;p.step=Math.floor(p.dist/34);if(Math.abs(M.vx)>Math.abs(M.vy)*1.15)p.dir=M.vx>0?'r':'l';else if(Math.abs(M.vy)>Math.abs(M.vx)*1.15)p.dir=M.vy>0?'f':'b';else if(img['wd_'+p.name])p.dir=(M.vy>0?'d':'u')+(M.vx>0?'r':'l')}}
  A.walk(M.p.moving&&!M.lock,.14);
- const p=M.p,tx=clamp(p.x-W/2,0,MW-W),ty=clamp(p.y-H/2-20,0,MH-H),k=1-Math.exp(-dt*7);M.cam.x+=(tx-M.cam.x)*k;M.cam.y+=(ty-M.cam.y)*k;
+ const p=M.p,tx=clamp(p.x-W/2,0,MW-W),ty=clamp(p.y-H/2-20,0,MH-H),k=1-Math.exp(-dt*12);M.cam.x+=(tx-M.cam.x)*k;M.cam.y+=(ty-M.cam.y)*k;if(Math.abs(tx-M.cam.x)<.6)M.cam.x=tx;if(Math.abs(ty-M.cam.y)<.6)M.cam.y=ty;
  let best=null,bd=1e9;const look=(x,y,r,fn,label)=>{const d=Math.hypot(p.x-x,p.y-y);if(d<r&&d<bd){bd=d;best={fn,label}}};
  for(const i of M.pick)if(pickOn(i))look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);
  const g=stage();
@@ -320,7 +320,7 @@ function updMap(dt){if(M.lock){M.vx=M.vy=0;M.p.moving=false}else{const v=inputVe
 function doAct(){if(M.act){const f=M.act.fn;M.act=null;f()}}
 $('#act').addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();A.init&&A.init();doAct()});
 function stage(){const f=save.flags,sc=[1,2,3,4,5,6].filter(i=>f['got_s'+i]).length,mp=['head','rod','weight'].filter(i=>f['got_'+i]).length;return{sc,mp,sold:f.sold,met:f.metMubarak}}
-function drawMap(){const c=M.cam,cx=c.x|0,cy=c.y|0;X.fillStyle='#e8b673';X.fillRect(0,0,W,H);X.drawImage(M.tiles,0,0,MW/2,MH/2,-cx,-cy,MW,MH);
+function drawMap(){const c=M.cam,cx=Math.round(c.x*RS)/RS,cy=Math.round(c.y*RS)/RS;X.fillStyle='#e8b673';X.fillRect(0,0,W,H);X.drawImage(M.tiles,0,0,MW/2,MH/2,-cx,-cy,MW,MH);
  const list=[];for(const o of M.objs)list.push({y:o.y,d(){X.drawImage(o.im,o.x-o.w/2-cx,o.y-o.h-cy,o.w,o.h)}});
  for(const i of M.pick){if(!pickOn(i))continue;const im=img[i.k];list.push({y:i.y,d(){const b=Math.sin(time*3.2+i.x)*5,w=im.width*i.s,h=im.height*i.s;X.fillStyle='rgba(40,14,0,.25)';X.beginPath();X.ellipse(i.x-cx,i.y-cy,w*.4,8,0,0,7);X.fill();X.drawImage(im,i.x-w/2-cx,i.y-h-10+b-cy,w,h);const g=.45+.35*Math.sin(time*4+i.y);X.fillStyle=`rgba(255,240,180,${g})`;X.fillRect(i.x-cx+w*.2,i.y-h-12+b-cy,5,5)}})}
  for(const n of Object.values(M.npc))list.push({y:n.y,d(){drawWalker(X,n,cx,cy);if(n===nextTarget())marker(n.x-cx,n.y-n.h-26-cy)}});
