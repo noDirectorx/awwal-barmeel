@@ -1,0 +1,4 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const er=[];
+const go=async(ch,name,wait,fn)=>{const p=await b.newPage({viewport:{width:1180,height:664}});p.on('pageerror',e=>er.push(e.message));await p.addInitScript(c=>{try{localStorage.setItem('awwal-barmeel-ep1',JSON.stringify({ch:c,flags:{metMubarak:1}}))}catch(e){}},ch);await p.goto('http://127.0.0.1:8765/test.html');await p.waitForFunction('window.__ready');await p.click('#go2');await p.waitForTimeout(wait);if(fn)await fn(p);await p.screenshot({path:`lk_${name}.png`});await p.close()};
+await go(2,'map',1600,async p=>{await p.evaluate(()=>{__g.M.p.x=2100;__g.M.p.y=1420});await p.waitForTimeout(900)});
+await go(1,'site',5200);await go(3,'board',1500);await go(5,'night',5500);await b.close();console.log(er)})()

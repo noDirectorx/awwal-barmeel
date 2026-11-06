@@ -1,7 +1,7 @@
 import numpy as np,cv2,json,base64,io,os
 from PIL import Image
 from scipy import ndimage as ni
-A='/mnt/user-data/attachments/a43984e7-b446-5fa2-9fd4-fd5dfc8a4638/'
+A='art_raw/'
 OUT='a/';os.makedirs(OUT,exist_ok=True)
 def L(i): return np.array(Image.open(A+i+'-image.png').convert('RGBA')).astype(int)
 def key(a,minb=300,fr=False):

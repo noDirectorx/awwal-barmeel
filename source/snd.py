@@ -1,5 +1,5 @@
 import subprocess,numpy as np,os
-S='snd/';O='site_snd/';os.makedirs(O,exist_ok=True)
+S='snd_raw/';O='../snd/';os.makedirs(O,exist_ok=True)
 def ff(*a):subprocess.run(['ffmpeg','-y','-v','error',*a],check=True)
 def env(f,win):
     r=subprocess.run(['ffmpeg','-v','error','-i',f,'-ac','1','-ar','8000','-f','f32le','-'],capture_output=True).stdout

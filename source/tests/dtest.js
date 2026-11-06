@@ -1,0 +1,4 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1180,height:664}});const er=[];p.on('pageerror',e=>er.push(e.message));await p.goto('file://'+process.cwd()+'/drive.html'+(process.argv[3]||''));await p.waitForFunction('window.__ready');await p.click('#go');const pol=process.argv[2];let n=0;const t0=Date.now();
+await p.evaluate(pol=>{window.__t=setInterval(()=>{const{T,next,setB}=__d;if(pol==='none'||!next)return setB(false);const d=next.x-(T.x+101),lim=pol==='late'?170:430;setB(d<lim&&T.v>(pol==='late'?360:270))},16)},pol);
+while(Date.now()-t0<120000){if(await p.evaluate(()=>__d.state)==='end')break;n++;if(n===90)await p.screenshot({path:`d_${pol}.png`});await p.waitForTimeout(100)}
+console.log(pol,await p.evaluate(()=>window.__res),er);await b.close()})()
