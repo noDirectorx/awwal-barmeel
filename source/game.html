@@ -152,7 +152,7 @@ function drawCine(){X.save();
  if(S.drops>0)drawDrops(false);
  for(const a of [...S.actors].filter(a=>a.on).sort((p,q)=>p.y-q.y))drawWalker(X,a);
  if(S.drops>0)drawDrops(true);
- if(S.truck){const im=img.truck_side,k=2.1;puff(S.truck.x-140,842,1,'rgba(235,190,120,.5)',30);X.drawImage(im,S.truck.x,860-im.height*k,im.width*k,im.height*k)}
+ if(S.truck){const im=img.truck_side,k=2.1;puff(S.truck.x-140,842,1,'rgba(235,190,120,.5)',30);const x0=S.truck.x,y0=860-im.height*k;X.drawImage(im,x0,y0,im.width*k,im.height*k);for(const [wx,wy] of [[73,104],[276,104]]){const r=24;X.save();X.beginPath();X.arc(x0+wx*k,y0+wy*k,r*k,0,7);X.clip();X.translate(x0+wx*k,y0+wy*k);X.rotate(S.truck.x/(r*k));X.drawImage(im,wx-r,wy-r,2*r,2*r,-r*k,-r*k,2*r*k,2*r*k);X.restore()}}
  drawDust();
  if(S.tint){X.fillStyle=S.tint;X.fillRect(0,0,W,H)}
  if(S.lamp>0){const g=X.createRadialGradient(1010,450,10,1010,450,430);g.addColorStop(0,`rgba(255,190,90,${.42*S.lamp})`);g.addColorStop(1,'rgba(255,190,90,0)');X.fillStyle=g;X.fillRect(0,0,W,H)}
