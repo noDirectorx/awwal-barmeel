@@ -134,7 +134,7 @@ function actor(name,x,y,h=255,dir='s'){const a={name,x,y,h,dir,f:1,step:0,on:tru
 function drawWalker(c,a,ox=0,oy=0){const im=img['w_'+a.name],[cw,ch]=META['w_'+a.name+'_cell'];if(!im)return;
  const row={f:0,b:3,r:6,l:6}[a.dir]??0;const s=a.h/ch,dw=cw*s,dh=ch*s,x=a.x-ox,y=a.y-oy+(a.bob||0);
  const k=row+[0,1,2,1][a.step%4]*(a.moving?1:0)+(a.moving?0:1);
- const lit=S.mode==='map'?{sk:.5,sh:.2,al:.3}:S.mode==='room'||S.bg===img.bg_office?{sk:-.75,sh:.14,al:.28}:{sk:1.05,sh:.16,al:.34};
+ const lit=S.mode==='map'?{sk:.5,sh:.2,al:.3}:S.bg===img.bg_office_night?{sk:.35,sh:.12,al:.22}:S.mode==='room'||S.bg===img.bg_office?{sk:-.75,sh:.14,al:.28}:{sk:1.05,sh:.16,al:.34};
  if(meta.quality!=='low'){c.save();c.globalAlpha=lit.al;c.translate(x,a.y-oy);c.transform(1,0,-lit.sk,-lit.sh,0,0);if(a.dir==='l')c.scale(-1,1);c.drawImage(sil('w_'+a.name),k*cw,0,cw,ch,-dw/2,-dh,dw,dh);c.restore()}
  c.fillStyle='rgba(40,14,0,.32)';c.beginPath();c.ellipse(x,a.y-oy,dw*.24,dh*.04,0,0,7);c.fill();
  c.save();c.translate(x,y);if(a.dir==='l')c.scale(-1,1);c.drawImage(im,k*cw,0,cw,ch,-dw/2,-dh,dw,dh);c.restore()}
@@ -464,7 +464,7 @@ async function ch4(){S.mode='cine';startScene();setBg('site');S.bars=1;S.fade=1;
  else if(f.q2){f.mubarakAdvance=1;await say('hero','firm','مبارك، باقي معي ألفين. هذي دفعة من راتبك، والباقي بعد التسليم الجاي، وعد.');await say('mubarak','neutral','ألفين… طيب. أصبر للتسليم الجاي بس. وهالمرة عشانك، مو عشان أبوك.');await card('الخزان تصلّح، ومبارك عطاك فرصة أخيرة<small>بس الشباب شافوا إنه الوحيد اللي قبض</small>',2800)}
  else{f.mubarakLeft=1;A.music('music_sad',.55);await say('mubarak','angry','الحديد عندك أغلى منا؟ طيب.');await walk(b,1800,860,230);b.on=false;await say('hamdan','sad','مبارك كبير الشباب. يوم يطلع ما يرجع، والباقين بيعيدون حساباتهم.');await card('الخزان تصلّح<small>بس راح أكثر واحد يعرف للمضخة</small>',2600)}
  store.put();await fadeTo(1,800)}
-async function ch5(){S.mode='cine';startScene();setBg('office');S.bars=1;S.fade=1;S.tint='rgba(15,20,60,.62)';S.lamp=1;A.music('music_sad',.5);A.ambience({amb_room:.55});await card('الليلة نفسها',1000);
+async function ch5(){S.mode='cine';startScene();setBg('office_night');S.bars=1;S.fade=1;S.tint='rgba(15,20,60,.2)';A.music('music_sad',.5);A.ambience({amb_room:.55});await card('الليلة نفسها',1000);
  const f=save.flags,h=actor('hero',520,860,340);h.dir='r';await fadeTo(0,900);await wait(500);
  await say('hero','neutral','ريحة مكتبك مثل ما هي، يبه.');
  await walk(h,1195,810,150);h.dir='r';await wait(600);
@@ -518,10 +518,11 @@ function grade(){if(meta.quality==='low'||S.mode==='none')return;const m=S.mode,
  if(m==='menu'){sun=Menu.pump?{x:255,y:405,r:760,a:.36,c:'255,190,100'}:{x:445,y:360,r:900,a:.42,c:'255,190,100'};vig=.34}
  else if(m==='map'){sun={x:W*.08,y:-120,r:W*1.05,a:.24,c:'255,214,140'};wa=.1;vig=.26;motesOn=false}
  else if(m==='board'){sun={x:255,y:405,r:760,a:.36,c:'255,190,100'}}
+ else if(S.bg===img.bg_office_night){sun={x:1000,y:410,r:560,a:.24,c:'255,180,90'};wa=.02;vig=.3;motesOn=false}
  else if(m==='room'||S.bg===img.bg_office){sun={x:1570,y:300,r:980,a:.34,c:'255,190,110'};wa=.14}
  else if(m==='pipes'||m==='jack'){sun={x:445,y:360,r:800,a:.2,c:'255,190,100'}}
  else{sun={x:445,y:360,r:900,a:.4,c:'255,190,100'}}
- if(S.tint){sun.a*=.15;wa=.03;vig=.55;warm='70,90,170'}
+ if(S.tint&&S.bg!==img.bg_office_night){sun.a*=.15;wa=.03;vig=.55;warm='70,90,170'}
  if(S.bg===img.bg_gusher){sun.a*=.55;vig=.52}
  const flick=1+Math.sin(time*.9)*.05;X.save();
  X.globalCompositeOperation='soft-light';const top=X.createLinearGradient(0,0,0,h);top.addColorStop(0,`rgba(${warm},${wa*1.5})`);top.addColorStop(.6,`rgba(${warm},${wa*.6})`);top.addColorStop(1,'rgba(60,20,70,'+wa*.9+')');X.fillStyle=top;X.fillRect(0,0,W,h);
