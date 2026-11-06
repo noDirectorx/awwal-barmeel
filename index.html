@@ -350,7 +350,7 @@ function talkHamdan(){talk(async()=>{const g=stage(),f=save.flags;
  else await say('hamdan','warm','وريهم إنك ولد سالم.')})}
 function missingParts(g){const f=save.flags,a=[];if(!f.got_head)a.push('الرأس عند المظلة');if(!f.got_rod)a.push('العمود ورا الخزان');if(!f.got_weight)a.push('الثقل عند الخردة');if(!g.sold)a.push('السير والصمام عند ناصر');return a.join('، ')}
 function talkMubarak(){talk(async()=>{const g=stage();
- if(!g.met){await say('mubarak','neutral','الولد رجع. تعرف تفرق بين مفتاح وملعقة؟');await say('hero','firm','علمني.');
+ if(!g.met){await say('mubarak','neutral','حياك الله يا أبو سالم. بس يدك ذي مسكت حديد قبل؟');await say('hero','firm','علمني.');
   await say('mubarak','neutral','خربت، وفكيتها عشان أصلحها. وبعدها انقطعت الرواتب، ووقفت.');await say('mubarak','neutral','الرأس عند المظلة، والعمود ورا الخزان، والثقل عند الخردة. والسير والصمام تلفوا، وتلقى بدلها عند ناصر.');await say('mubarak','neutral','ما معنا فلوس، بس ناصر يشتري الخردة. لقّطها وودّها له.');await say('hero','neutral','يعني بتساعدني؟');await say('mubarak','neutral','لا. أبي أشوف وش عندك.');save.flags.metMubarak=1;return}
  if(g.mp>=3&&g.sold){await say('mubarak','happy','كل القطع معك؟ يلا. أبيك تركبها بيدك.');await say('mubarak','neutral','أبوك ركّب أول مضخة هنا بيده. وأنت بعد.');save.ch=3;store.put();M.leaving=true;M.leave&&M.leave();return}
  await say('mubarak','neutral','باقي عليك: '+missingParts(g)+'.')})}
