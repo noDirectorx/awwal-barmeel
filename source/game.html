@@ -283,7 +283,7 @@ function buildMap(){M.objs=[];M.pick=[];M.npc={};
  const items=[{id:'head',k:'q_head',x:760,y:1370,s:.33,name:'رأس المضخة'},{id:'rod',k:'q_rod',x:3180,y:900,s:.35,name:'عمود التوصيل'},{id:'weight',k:'q_weight',x:760,y:720,s:.3,name:'الثقل'},
  {id:'s1',k:'s_s1',x:1050,y:880,s:.3,name:'خردة'},{id:'s2',k:'s_s2',x:1580,y:1720,s:.3,name:'خردة'},{id:'s3',k:'s_s3',x:2380,y:880,s:.3,name:'خردة'},{id:'s4',k:'s_s4',x:2750,y:1950,s:.3,name:'خردة'},{id:'s5',k:'s_s5',x:3480,y:1780,s:.3,name:'خردة'},{id:'s6',k:'s_s6',x:480,y:1800,s:.3,name:'خردة'}];
  for(const i of items)if(!save.flags['got_'+i.id])M.pick.push(i);
- if(save.flags.q2on&&!save.flags.got_tire)M.pick.push(TIRE);
+ if(!save.flags.got_tire&&!save.flags.q2)M.pick.push(TIRE);
  M.p={name:'hero',x:save.flags.px||2700,y:save.flags.py||1720,h:110,dir:'b',step:0,moving:false,dist:0};
  M.truck={x:2430,y:2190};
  M.npc.hamdan={name:'hamdan',x:2660,y:1620,h:110,dir:'f',step:0};
@@ -312,7 +312,7 @@ function updMap(dt){if(M.lock){M.vx=M.vy=0;M.p.moving=false}else{const v=inputVe
  for(const i of M.pick)if(pickOn(i))look(i.x,i.y,120,()=>takeItem(i),'التقط: '+i.name);
  const g=stage();
  look(2900,1530,120,enterOffice,'ادخل المكتب');
- if(!save.flags.sec_stone)look(1830,1400,105,()=>findSecret('stone'),'فتّش عند الحجر');if(!save.flags.sec_pile)look(470,1490,125,()=>findSecret('pile'),'فتّش الخردة');
+ if(!save.flags.sec_stone&&save.flags.h_stone)look(1830,1400,105,()=>findSecret('stone'),'فتّش عند الحجر');if(!save.flags.sec_pile&&save.flags.h_pile)look(470,1490,125,()=>findSecret('pile'),'فتّش الخردة');
  if(save.flags.q1on&&!save.flags.q1)look(3380,1100,170,()=>openJob('pipes'),'صلّح الوصلة');if(save.flags.q2on&&save.flags.got_tire&&!save.flags.q2)look(M.truck.x-60,M.truck.y+40,230,()=>openJob('jack'),'ركّب الكفر');
  look(M.npc.hamdan.x,M.npc.hamdan.y,135,talkHamdan,'كلّم حمدان');look(M.npc.mubarak.x,M.npc.mubarak.y,135,talkMubarak,'كلّم مبارك');look(M.npc.nasser.x,M.npc.nasser.y,145,talkNasser,'كلّم ناصر');
  if(p.moving&&Math.hypot(p.x-2660,p.y-1620)<1e-9){}
@@ -323,7 +323,7 @@ $('#act').addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefaul
 function stage(){const f=save.flags,sc=[1,2,3,4,5,6].filter(i=>f['got_s'+i]).length,mp=['head','rod','weight'].filter(i=>f['got_'+i]).length;return{sc,mp,sold:f.sold,met:f.metMubarak}}
 function drawMap(){const c=M.cam,cx=Math.round(c.x*RS)/RS,cy=Math.round(c.y*RS)/RS;X.fillStyle='#e8b673';X.fillRect(0,0,W,H);{const sx=Math.max(0,Math.floor(cx/2)),sy=Math.max(0,Math.floor(cy/2)),sw=Math.min(MW/2-sx,Math.ceil(W/2)+2),sh=Math.min(MH/2-sy,Math.ceil(H/2)+2);X.drawImage(M.tiles,sx,sy,sw,sh,sx*2-cx,sy*2-cy,sw*2,sh*2)}
  const list=[];for(const o of M.objs)list.push({y:o.y,d(){X.drawImage(o.im,Math.round((o.x-o.w/2-cx)*RS)/RS,Math.round((o.y-o.h-cy)*RS)/RS,o.w,o.h)}});
- for(const i of M.pick){if(!pickOn(i))continue;const im=img[i.k];list.push({y:i.y,d(){const b=Math.sin(time*3.2+i.x)*5,w=im.width*i.s,h=im.height*i.s;X.fillStyle='rgba(40,14,0,.25)';X.beginPath();X.ellipse(i.x-cx,i.y-cy,w*.4,8,0,0,7);X.fill();X.drawImage(im,i.x-w/2-cx,i.y-h-10+b-cy,w,h);const g=.45+.35*Math.sin(time*4+i.y);X.fillStyle=`rgba(255,240,180,${g})`;X.fillRect(i.x-cx+w*.2,i.y-h-12+b-cy,5,5)}})}
+ for(const i of M.pick){const im=img[i.k],on=pickOn(i);list.push({y:i.y,d(){const w=im.width*i.s*.72,h=im.height*i.s*.72,x0=Math.round((i.x-w/2-cx)*RS)/RS,y0=Math.round((i.y-h-cy)*RS)/RS;X.fillStyle='rgba(40,14,0,.22)';X.beginPath();X.ellipse(i.x-cx,i.y-cy,w*.4,5,0,0,7);X.fill();X.drawImage(im,x0,y0,w,h);if(on){const per=3+((i.x*7+i.y)%20)/10,t=(time+i.y*.013)%per;if(t<.5){const a=Math.sin(t/.5*Math.PI),r=7+a*11;X.save();X.globalAlpha=a;X.fillStyle='#fff4c2';X.translate(x0+w*.7,y0+h*.25);X.beginPath();X.moveTo(0,-r);X.lineTo(r*.2,-r*.2);X.lineTo(r,0);X.lineTo(r*.2,r*.2);X.lineTo(0,r);X.lineTo(-r*.2,r*.2);X.lineTo(-r,0);X.lineTo(-r*.2,-r*.2);X.closePath();X.fill();X.restore()}}}})}
  for(const n of Object.values(M.npc))list.push({y:n.y,d(){drawWalker(X,n,cx,cy);if(n===nextTarget())marker(n.x-cx,n.y-n.h-26-cy)}});
  list.push({y:M.truck.y,d(){const im=img.truck_side,w=im.width*1.2,h=im.height*1.2;X.drawImage(im,M.truck.x-w/2-cx,M.truck.y-h+24-cy,w,h)}});
  list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});
@@ -332,26 +332,27 @@ function drawMap(){const c=M.cam,cx=Math.round(c.x*RS)/RS,cy=Math.round(c.y*RS)/
 function marker(x,y){const b=Math.sin(time*5)*5;X.fillStyle='#f2b84b';X.strokeStyle='#4b1f07';X.lineWidth=3;X.beginPath();X.moveTo(x-13,y-15+b);X.lineTo(x+13,y-15+b);X.lineTo(x,y+3+b);X.closePath();X.fill();X.stroke()}
 function edgeArrow(x,y){if(x>40&&x<W-40&&y>40&&y<H-40)return;const a=Math.atan2(y-H/2,x-W/2),r=Math.min((W/2-70)/Math.abs(Math.cos(a)||1e-3),(H/2-70)/Math.abs(Math.sin(a)||1e-3)),ax=W/2+Math.cos(a)*r,ay=H/2+Math.sin(a)*r;X.save();X.translate(ax,ay);X.rotate(a);X.fillStyle='#c8401f';X.strokeStyle='#fff4d8';X.lineWidth=4;X.beginPath();X.moveTo(26,0);X.lineTo(-16,-20);X.lineTo(-7,0);X.lineTo(-16,20);X.closePath();X.fill();X.stroke();X.restore()}
 function nextTarget(){const g=stage();if(!g.met)return M.npc.mubarak;if(g.sc>=6&&!g.sold)return M.npc.nasser;if(g.sold&&g.mp>=3)return M.npc.mubarak;return null}
-function nextPoint(){const n=nextTarget();if(n)return n;let best=null,bd=1e9;for(const i of M.pick){const d=Math.hypot(i.x-M.p.x,i.y-M.p.y);if(d<bd){bd=d;best=i}}return best}
+function nextPoint(){return nextTarget()||null}
 function renderTasks(){const g=stage(),T=$('#tasks');const line=(t,d)=>`<div class="${d?'done':''}">${t}</div>`;
  let h='<b>شغّل المضخة</b>';if(!g.met)h+=line('كلّم مبارك عند المضخة');else{h+=line(`لقّط القطع من الموقع ${g.mp}/3`,g.mp>=3);h+=line(`اجمع الخردة ${g.sc}/6`,g.sc>=6);h+=line('بدّل الخردة عند ناصر',g.sold);if(g.mp>=3&&g.sold)h+=line('ارجع لمبارك وركّب')}
  const f=save.flags;if(f.q1on||f.q2on){h+='<b>جانبية</b>';if(f.q1on)h+=line('صلّح وصلة الخزان',f.q1);if(f.q2on)h+=line(f.got_tire?'ركّب الكفر لناصر':'دوّر الكفر الاحتياطي لناصر',f.q2)}h+=`<div style="opacity:.8">أسرار ${SECRETS.filter(s=>f['sec_'+s.id]).length}/${SECRETS.length}</div>`;T.innerHTML=h;
  $('#stat').textContent='باقي على العقد: 6 أشهر'}
 function faceTalk(){if(S.mode!=='map'||!M.npc||!M.p)return null;let n=null,bd=260;for(const q of Object.values(M.npc)){const d=Math.hypot(q.x-M.p.x,q.y-M.p.y);if(d<bd){bd=d;n=q}}if(!n)return null;const old=n.dir;M.p.moving=false;const dx=n.x-M.p.x,dy=n.y-M.p.y;if(Math.abs(dy)>Math.abs(dx)){M.p.dir=dy<0?'b':'f';n.dir=dy<0?'f':'b'}else{M.p.dir=dx>=0?'r':'l';n.dir=dx>=0?'l':'r'}return()=>{n.dir=old}}
 async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;const un=faceTalk();await fn();if(un)un();M.lock=!!M.leaving;renderTasks();store.put()}
-function pickOn(i){return M.spots||save.flags.metMubarak||i===TIRE}
+function pickOn(i){return M.spots||(i===TIRE?save.flags.q2on:save.flags.metMubarak)}
 function takeItem(i){M.pick=M.pick.filter(x=>x!==i);save.flags['got_'+i.id]=1;A.play('fx_pickup',.9);toast('حصلت: '+i.name);renderTasks();store.put()}
 async function topics(who,title,list){for(;;){const L=list().filter(x=>x);const r=await choose(title,L.map(x=>({t:x.t,s:x.s})).concat([{t:'برجع لك بعدين'}]));if(r>=L.length)return;const end=await L[r].fn();renderTasks();store.put();if(end)return}}
-function secretHint(){const f=save.flags;if(!f.sec_stone)return 'أبوك كان يقعد كل ليلة عند الحجر اللي قدام المضخة، وعينه على باب المكتب. ما قال لأحد ليش.';if(!f.sec_pile)return 'وكان يطوّل عند كومة الخردة اللي جنب المظلة، أكثر مما تستاهل خردة.';if(!f.sec_cab)return 'ومكتبه ما أحد فتح أدراجه من يوم مات. يمكن تلقى فيه اللي ما قاله لنا.';return null}
+const HINTS=[['pile','كان يهوجس دايم عند الخردة.'],['stone','ذيك الصخرة اللي عند المضخة، منعنا نكسرها ونشيلها. مدري وش يبي فيها.'],['cab','كان يقعد في المكتب حتى بعد ما يخلص الدوام. وفي أيام تلقاه راقد فيه لليوم الثاني.']];
+function secretHint(){const f=save.flags,left=HINTS.filter(h=>!f['sec_'+h[0]]);if(!left.length)return null;const n=left.find(h=>!f['h_'+h[0]])||left[0];f['h_'+n[0]]=1;return n[1]}
 function allSecrets(){return SECRETS.every(x=>save.flags['sec_'+x.id])}
 function talkHamdan(){talk(async()=>{const f=save.flags;if(!f.metHamdan){f.metHamdan=1;await say('hamdan','warm','هلا يا ولدي.')}
  await topics('hamdan','حمدان',()=>{const g=stage();return[
   {t:'وش أسوي الحين؟',fn:async()=>{if(!g.met)await say('hamdan','neutral','مبارك عند المضخة. هو أدرى منا كلنا فيها.');else if(g.mp>=3&&g.sold)await say('hamdan','warm','القطع كلها معك. ارجع لمبارك وركّبوها.');else await say('hamdan','neutral','مبارك قال لك وش ناقص. لقّط القطع، وودّ الخردة لناصر.')}},
   !f.q1?{t:'فيه شي ثاني يحتاج إصلاح؟',s:f.q1on?'وصلة الخزان':'',fn:async()=>{if(!f.q1on){await say('hamdan','worried','الخزان فيه شرخ يبغى له فلوس. بس الوصلة اللي فوقه تسرّب، وهذي تقدر تصلحها بيدك.');f.q1on=1;toast('مهمة جانبية: صلّح وصلة الخزان')}else await say('hamdan','neutral','الوصلة فوق الخزان اللي جنب المكتب. كل ما تأخرت ضاع نفط.')}}:null,
   f.q1&&!f.said48?{t:'صلّحت الوصلة',fn:async()=>{await say('hamdan','warm','تسريب الوصلة وقف، والضايع نزل للنص. مين علمك؟');f.said48=1}}:null,
-  {t:'حدثني عن أبوي',fn:async()=>{const h=secretHint();if(h)await say('hamdan','neutral',h);else await say('hamdan','sad','الباقي ما عندي له جواب. للحين.')}},
+  {t:'كلمني عن أبوي',fn:async()=>{const h=secretHint();if(h)await say('hamdan','neutral',h);else await say('hamdan','sad','الباقي ما عندي له جواب. للحين.')}},
   allSecrets()&&!f.askedRashid?{t:'مين راشد؟',s:'الصورة اللي عند الحجر',fn:async()=>{await say('hero','worried','حمدان، مين راشد؟');await say('hamdan','worried','من وين لك هالصورة؟');await wait(700);await say('hamdan','sad','مو الحين يا ولدي. يوم يجي وقتها أقول لك.');f.askedRashid=1}}:null,
-  {t:'كيف كانت آخر أيام أبوي؟',fn:async()=>{await say('hamdan','sad','كان يطلع الصبح قبلنا، ويرجع آخر واحد. وكل جمعة يسأل: ما اتصل عبدالله؟');await say('hamdan','warm','وريهم إنك ولد سالم.')}}]})})}
+  {t:'كيف كانت آخر أيام أبوي؟',fn:async()=>{await say('hamdan','sad','كان أول واحد يجي الموقع، وآخر واحد يطلع منه. وكل جمعة يسأل: ما اتصل عبدالله؟');await say('hamdan','warm','وريهم إنك ولد سالم.')}}]})})}
 function missingParts(g){const f=save.flags,a=[];if(!f.got_head)a.push('الرأس عند المظلة');if(!f.got_rod)a.push('العمود ورا الخزان');if(!f.got_weight)a.push('الثقل عند الخردة');if(!g.sold)a.push('السير والصمام عند ناصر');return a.join('، ')}
 function talkMubarak(){talk(async()=>{let g=stage();
  if(!g.met){await say('mubarak','neutral','حياك الله يا أبو سالم. تفرق بين المفتاح والعجرة؟');await say('hero','firm','علمني.');
@@ -359,14 +360,14 @@ function talkMubarak(){talk(async()=>{let g=stage();
  await topics('mubarak','مبارك',()=>{g=stage();return[
   g.mp>=3&&g.sold?{t:'جبت القطع كلها',fn:async()=>{await say('mubarak','happy','كل القطع معك؟ يلا. أبيك تركبها بيدك.');await say('mubarak','neutral','أبوك ركّب أول مضخة هنا بيده. وأنت بعد.');save.ch=3;store.put();M.leaving=true;M.leave&&M.leave();return true}}
    :{t:'جيت عشان المضخة',fn:async()=>{await say('mubarak','neutral','باقي عليك: '+missingParts(g)+'.')}},
-  {t:'من متى وأنت هنا؟',fn:async()=>{await say('mubarak','neutral','من قبل ما تنولد. أبوك جابني من ورشة في الدمام، وقال: هنا تصير معلّم.');await say('mubarak','neutral','وصرت. بس المعلم بعد يبي راتب.')}}]})})}
+  (save.flags.mbAsk||0)<2?{t:'من متى وأنت هنا؟',fn:async()=>{const f=save.flags;if(!f.mbAsk){await say('mubarak','neutral','من قبل ما تنولد. أبوك جابني من ورشة في الدمام، وقال: هنا تصير معلّم. وصرت.');await say('mubarak','angry','بس المعلم بعد يبي راتب!');f.mbAsk=1}else{await say('mubarak','neutral','ركّب المضخة.');f.mbAsk=2}}}:null]})})}
 function talkNasser(){talk(async()=>{const f=save.flags;
  if(!f.metNasser){f.metNasser=1;await say('nasser','happy','ولد سالم! الله يرحم أبوك، كان يدفع متأخر بس يدفع.')}
  await topics('nasser','ناصر',()=>{const g=stage();return[
   g.sold?{t:'عن الحمولة',fn:async()=>{await say('nasser','happy','إذا شغلتها، حمولتك أنا اللي أوديها. أول مرة أخصم الديزل من الحساب، عشان أبوك. بعدها الكاش قبل الديزل!')}}
    :g.sc>=6?{t:'جبت لك الخردة',fn:async()=>{await say('nasser','happy','هذي خردة تسوى ذهب! خذ السير والصمام.');await say('nasser','happy','وإذا شغلتها، حمولتك أنا اللي أوديها. أول مرة أخصم الديزل من الحساب، عشان أبوك. بعدها الكاش قبل الديزل!');f.sold=1;A.play('fx_pickup',.9);toast('حصلت: السير والصمام')}}
    :{t:'أبي السير والصمام',fn:async()=>{await say('nasser','neutral',`أبغى ست قطع خردة، وأعطيك سير وصمام. معك ${g.sc} للحين.`)}},
-  !f.q2?{t:'وش فيه كفر الشاحنة؟',s:f.q2on?'الكفر الاحتياطي':'',fn:async()=>{if(!f.q2on){await say('nasser','happy','كفر الشاحنة نايم، وعندي حمولة لازم تطلع اليوم. الاحتياطي ضايع في الموقع، والجك يبغى له واحد يعرف له. ساعدني وأعوضك.');f.q2on=1;if(!f.got_tire)M.pick.push(TIRE);toast('مهمة جانبية: دوّر الكفر الاحتياطي')}else if(!f.got_tire)await say('nasser','neutral','الاحتياطي طاح من الشاحنة وأنا جاي. دوّره فوق المضخة، ناحية الشمال.');else await say('nasser','happy','لقيته؟ ركّبه عند الشاحنة، وأنا أمسك لك.')}}:null,
+  !f.q2?{t:'وش فيه كفر الشاحنة؟',s:f.q2on?'الكفر الاحتياطي':'',fn:async()=>{if(!f.q2on){await say('nasser','happy','كفر الشاحنة نايم، وعندي حمولة لازم تطلع اليوم. الاحتياطي ضايع في الموقع، والجك يبغى له واحد يعرف له. ساعدني وأعوضك.');f.q2on=1;toast('مهمة جانبية: دوّر الكفر الاحتياطي')}else if(!f.got_tire)await say('nasser','neutral','ها، لقيت الكفر؟ يا خي، تحصله حول المضخة!');else await say('nasser','happy','لقيته؟ ركّبه عند الشاحنة، وأنا أمسك لك.')}}:null,
   {t:'كيف الشغل معك؟',fn:async()=>{await say('nasser','neutral','الطريق طويل، والديزل غالي، والخواجة ما يحب التأخير. بس الحمد لله، الشاحنة للحين تمشي.')}}]})})}
 async function ch2(){S.mode='map';setView(true);startScene();A.music('music_desert',.3);A.ambience({amb_wind:.5,amb_site:.12});$('#skip').hidden=true;S.bars=0;M.leaving=false;buildMap();const p=M.p;M.cam.x=clamp(p.x-W/2,0,MW-W);M.cam.y=clamp(p.y-H/2,0,MH-H);M.lock=false;$('#hud').hidden=false;renderTasks();
  if(!save.flags.mapHint){save.flags.mapHint=1;toast(matchMedia('(pointer:coarse)').matches?'اسحب إصبعك في أي مكان عشان تمشي':'امش بالأسهم أو WASD، وتفاعل بـE')}
@@ -382,7 +383,7 @@ function trophy(t,s){const e=$('#trophy');e.innerHTML=`<b>${t}</b>${s}`;e.style.
 function findSecret(id){const s=SECRETS.find(x=>x.id===id);talk(async()=>{A.play('fx_paper');await note(s.lines,s.sign);if(s.after)await say('hero','worried',s.after);save.flags['sec_'+id]=1;meta.secrets[id]=1;putMeta();toast(`سر ${SECRETS.filter(x=>save.flags['sec_'+x.id]).length}/${SECRETS.length}: ${s.title}`);if(allSecrets()&&!save.flags.askedRashid)setTimeout(()=>toast('اسأل حمدان عن الصورة'),2600);
  if(secretCount()===SECRETS.length&&!meta.ach.ep1){meta.ach.ep1=1;putMeta();A.play('fx_trophy');trophy('إنجاز: اللي يدور يلقى','لقيت كل أسرار الحلقة الأولى');await wait(1200);await say('hero','worried','يبه… وش كنت مخبي عن الكل؟')}})}
 /* ---------- office you can walk in ---------- */
-const ROOM={spots:[{x:230,y:745,label:'فتّش الأدراج',fn(){if(!save.flags.sec_cab)findSecret('cab');else talk(()=>say('hero','neutral','الباقي فواتير قديمة.'))}},
+const ROOM={spots:[{x:230,y:745,label:'فتّش الأدراج',fn(){if(!save.flags.sec_cab&&save.flags.h_cab)findSecret('cab');else talk(()=>say('hero','neutral','الباقي فواتير قديمة.'))}},
  {x:790,y:745,label:'اقرأ الدفتر',fn(){talk(()=>say('hero','worried','البرميل يكلفنا الحين ريال ونص، ونبيعه بريال. من متى وأبوي يغطي الفرق؟'))}},
  {x:1090,y:745,label:'شوف الخريطة',fn(){talk(()=>say('hero','neutral','خريطة الحقل… وفيه دايرة بالقلم عند البير الأول، وكلمة مشطوبة: «راشد».'))}},
  {x:1370,y:760,label:'أول برميل',fn(){talk(()=>say('hero','neutral','هذا أول برميل. ثقيل، ومختوم، وما له حركة.'))}}]};
