@@ -40,6 +40,16 @@ def bboxes(m,lab):
 # backgrounds
 for n,i in dict(desert='0c23956f',gusher='0261b8ea',site='5ce9f162',office='6df3d61d').items():
     save('bg_'+n,Image.fromarray(L(i)[...,:3].astype('uint8')),q=86)
+# menu: rope split from the desert scene
+_d=L('0c23956f')[...,:3].astype('uint8');_c=_d.copy();_x0,_x1,_y0,_y1=812,850,508,772
+for _y in range(_y0,_y1):
+    _l=_d[_y,_x0-6:_x0].mean(0);_r=_d[_y,_x1:_x1+6].mean(0)
+    for _x in range(_x0,_x1):
+        _t=(_x-_x0)/(_x1-_x0);_c[_y,_x]=_l*(1-_t)+_r*_t
+_al=(np.abs(_d[_y0:_y1,_x0:_x1].astype(int)-_c[_y0:_y1,_x0:_x1].astype(int)).sum(2)>38)
+_al=ni.binary_closing(ni.binary_opening(_al,iterations=1),iterations=2)
+save('menu_bg',Image.fromarray(_c),q=86)
+save('menu_rope',Image.fromarray(np.dstack([_d[_y0:_y1,_x0:_x1],(_al*255).astype('uint8')]),'RGBA'),q=92);meta['menu_rope_at']=(_x0,_y0)
 # portraits
 PH=300
 def portraits(name,i,names,rows=None,hero=False):
