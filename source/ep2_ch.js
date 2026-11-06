@@ -20,7 +20,7 @@ async function eHide(){if(!save.flags.hid)return;S.mode='map';setView(true);star
  {k:'barrel',x:3020,y:1610,r:125,label:'دحرج البرميل',cond:()=>got.tarp&&got.rope,fn(){got.carry=1;M.slow=true;M.barrel={r:0};M.pick=M.pick.filter(p=>p.id!=='barrel');A.play('fx_assemble',.7);M.spots=M.spots.filter(s=>s.k!=='barrel');task()}},
  {k:'shed',x:760,y:1500,r:180,label:'نزّله في المظلة',cond:()=>got.carry,fn(){done=true;A.play('fx_assemble');res&&res()}},
  {k:'pump',x:1560,y:1290,r:150,label:'طفّ المضخة',fn(){useDelay('pump','الخواجة وقف يسأل وش صار')}},
- {k:'nas',x:2190,y:2120,r:150,label:'خل ناصر يقطع الطريق',fn(){useDelay('nas','ناصر: يا مرحبا مستر! الشاحنة تعطلت. ثواني بس!')}},
+ {k:'nas',x:2190,y:2060,r:150,label:'خل ناصر يقطع الطريق',fn(){useDelay('nas','ناصر: يا مرحبا مستر! الشاحنة تعطلت. ثواني بس!')}},
  {k:'ham',x:2660,y:1620,r:140,label:f.mubarakLeft?'خل حمدان يسأله':'خل مبارك يسأله',fn(){useDelay('ham','سؤال عن العقد عطّله شوي')}}];
  M.pick.push({id:'tarp',k:'i_tarp',x:3280,y:1300,s:.24,name:''},{id:'rope',k:'i_rope',x:1240,y:1560,s:.24,name:''},{id:'barrel',k:'q_barrel',x:3020,y:1610,s:.42,name:''});
  M.customTask=task;task();toast('اتبع العلامة الصفراء');
@@ -78,7 +78,7 @@ async function eWeeks(){const f=save.flags;S.mode='none';S.fade=1;A.music('music
   f.nq++;A.play('fx_paper',.5);store.put();task();
   if(f.nq===1)await say('nasser','happy','هذي علامة أبوي! فيه سهم ثاني محفور عليها، يودي أبعد.');
   else{await say('nasser','happy','شف! الميناء من ورا الكثبان. كذا نختصر ثلث الطريق.');f.oldRoad=1;rm('nq');store.put();task();A.play('fx_trophy');trophy('إنجاز: الطريق القديم','آخر حمولة صارت أقصر')}});
- if(!f.oldRoad)M.spots.push({k:'nq',opt:1,x:2190,y:2120,r:140,label:'كلّم ناصر عن الطريق',fn:roadQuest});
+ if(!f.oldRoad)M.spots.push({k:'nq',opt:1,x:2190,y:2060,r:140,label:'كلّم ناصر عن الطريق',fn:roadQuest});
  const sec2=meta.secrets2||{};for(const k of ['receipts','notebook'])if(sec2[k]&&save.flags['s2'+k]){rm(k)}
  for(const[a,x,y]of[['antenna',1050,880],['speaker',2380,880],['knob',3480,1780]])if(!f.wkGot[a])part(a,x,y);
  if(f.wkMain){const mf=M.spots.find(s=>s.k==='mun');rm('mun');task();if(!f.muniraQ)M.spots.push({k:'mun2',opt:1,x:3260,y:1330,r:150,label:'منيرة تناديك',fn(){rm('mun2');startMunira()}});M.spots.push({k:'go',x:2300,y:2260,r:220,label:'ابدأ آخر حمولة',fn(){talk(async()=>{res()})}});toast('لما تجهز، روح لشاحنة ناصر')}else{task();toast('كلّم منيرة عند الخزان')}

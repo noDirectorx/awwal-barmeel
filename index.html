@@ -272,7 +272,7 @@ function buildMap(){M.objs=[];M.pick=[];M.npc={};
   c.drawImage(img.t_sand,px,py,TS+1,TS+1);const q=rnd();if(y!==8&&x!==10&&q<.1)c.drawImage(img.t_stones,px,py,TS+1,TS+1);
   }
  for(const [x,y,rot] of rows.sort((a,b)=>a[2]-b[2])){c.save();c.translate(x*TS+TS/2,y*TS+TS/2);c.rotate(rot*Math.PI/180);c.drawImage(img.t_band,-TS/2,-TS/2,TS+1,TS+1);c.restore()}
- M.tiles=t;M.truck={x:2430,y:2190};
+ M.tiles=t;M.truck={x:2430,y:2070};
  const fw=OW.fence*OBJ_SCALE.fence*.875;
  for(let x=150;x<MW-100;x+=fw)place('fence',x,300);
  {const gx=10*TS+96,gh=OW.gate*OBJ_SCALE.gate*.45+fw/2-1;for(let x=gx-gh;x>60;x-=fw)place('fence',x,MH-140);for(let x=gx+gh;x<MW-60;x+=fw)place('fence',x,MH-140)}
@@ -282,17 +282,17 @@ function buildMap(){M.objs=[];M.pick=[];M.npc={};
  place('rock',170,1300);
  c.save();for(let i=0;i<26;i++){const px=rnd()*MW,py=rnd()*MH,r=220+rnd()*520,tone=rnd()<.5?'120,60,20':'255,225,160',gr=c.createRadialGradient(px,py,0,px,py,r);gr.addColorStop(0,`rgba(${tone},.09)`);gr.addColorStop(1,`rgba(${tone},0)`);c.fillStyle=gr;c.fillRect(px-r,py-r,r*2,r*2)}c.restore();
  for(const o of M.objs){c.save();c.globalAlpha=.3;c.translate(o.x,o.y);c.transform(1,0,-.55,-.24,0,0);c.drawImage(sil('o_'+o.n),-o.w/2,-o.h,o.w,o.h);c.restore();c.save();c.globalAlpha=.22;c.fillStyle='#2a1206';c.beginPath();c.ellipse(o.x,o.y-3,o.w*.52,Math.max(8,o.h*.05),0,0,7);c.fill();c.restore()}
- {const tr=img.truck_side,tw=tr.width*1.2,th=tr.height*1.2;c.save();c.globalAlpha=.3;c.translate(M.truck?M.truck.x:2430,2214);c.transform(1,0,-.55,-.24,0,0);c.drawImage(sil('truck_side'),-tw/2,-th,tw,th);c.restore()}
+ {const tr=img.truck_side,tw=tr.width*1.2,th=tr.height*1.2;c.save();c.globalAlpha=.3;c.translate(M.truck?M.truck.x:2430,2094);c.transform(1,0,-.55,-.24,0,0);c.drawImage(sil('truck_side'),-tw/2,-th,tw,th);c.restore()}
  const items=[{id:'head',k:'q_head',x:760,y:1370,s:.33,name:'رأس المضخة'},{id:'rod',k:'q_rod',x:3180,y:900,s:.35,name:'عمود التوصيل'},{id:'weight',k:'q_weight',x:760,y:720,s:.3,name:'الثقل'},
  {id:'s1',k:'s_s1',x:1050,y:880,s:.3,name:'خردة'},{id:'s2',k:'s_s2',x:1580,y:1720,s:.3,name:'خردة'},{id:'s3',k:'s_s3',x:2380,y:880,s:.3,name:'خردة'},{id:'s4',k:'s_s4',x:2750,y:1950,s:.3,name:'خردة'},{id:'s5',k:'s_s5',x:3480,y:1780,s:.3,name:'خردة'},{id:'s6',k:'s_s6',x:480,y:1800,s:.3,name:'خردة'}];
  for(const i of items)if(!save.flags['got_'+i.id])M.pick.push(i);
  if(!save.flags.got_tire&&!save.flags.q2)M.pick.push(TIRE);
  M.p={name:'hero',x:save.flags.px||2700,y:save.flags.py||1720,h:110,dir:'b',step:0,moving:false,dist:0};
- M.truck={x:2430,y:2190};
+ M.truck={x:2430,y:2070};
  M.npc.hamdan={name:'hamdan',x:2660,y:1620,h:110,dir:'f',step:0};
  M.npc.mubarak={name:'mubarak',x:1560,y:1290,h:110,dir:'r',step:0};
- M.npc.nasser={name:'nasser',x:2190,y:2120,h:110,dir:'l',step:0};
- M.truck={x:2430,y:2190};
+ M.npc.nasser={name:'nasser',x:2190,y:2060,h:110,dir:'l',step:0};
+ M.truck={x:2430,y:2070};
  M.colNpc=()=>Object.values(M.npc);
 }
 function blocked(x,y){const r=26,hh=11;if(x<70||x>MW-70||y<340||y>MH-150)return true;
@@ -328,7 +328,7 @@ function drawMap(){const c=M.cam,cx=Math.round(c.x*RS)/RS,cy=Math.round(c.y*RS)/
  const list=[];for(const o of M.objs)list.push({y:o.y,d(){X.drawImage(o.im,Math.round((o.x-o.w/2-cx)*RS)/RS,Math.round((o.y-o.h-cy)*RS)/RS,o.w,o.h)}});
  for(const i of M.pick){const flat=!M.spots,im=flat?pickImg(i.k):img[i.k],on=pickOn(i);list.push({y:i.y-30,d(){const k=flat?(i===TIRE?.3:.5):.72,w=im.width*i.s*k,h=im.height*i.s*k,px=Math.round((i.x-cx)*RS)/RS,py=Math.round((i.y-cy)*RS)/RS,rot=((i.x*13+i.y*7)%100/100-.5)*1.4;X.save();X.translate(px,py);if(i===TIRE){const D=58,cut=.58;X.drawImage(im,0,0,im.width,im.height*cut,-D/2,-D*cut,D,D*cut);X.fillStyle='rgba(150,95,45,.35)';X.beginPath();X.ellipse(0,1,D*.56,5,0,0,7);X.fill();X.fillStyle='rgba(236,190,125,.9)';X.beginPath();X.ellipse(0,-1,D*.5,3,0,0,7);X.fill()}else if(flat){X.rotate(rot);X.scale(1,.42);X.fillStyle='rgba(40,14,0,.28)';X.beginPath();X.ellipse(2,h*.08,w*.5,h*.5,0,0,7);X.fill();X.drawImage(im,-w/2,-h/2,w,h)}else{X.fillStyle='rgba(40,14,0,.22)';X.beginPath();X.ellipse(0,0,w*.4,5,0,0,7);X.fill();X.drawImage(im,-w/2,-h,w,h)}X.restore();if(on){const per=3+((i.x*7+i.y)%20)/10,t=(time+i.y*.013)%per;if(t<.5){const a=Math.sin(t/.5*Math.PI),r=7+a*11;X.save();X.globalAlpha=a;X.fillStyle='#fff4c2';X.translate(px+w*.2,py-(flat?h*.15:h*.7));X.beginPath();X.moveTo(0,-r);X.lineTo(r*.2,-r*.2);X.lineTo(r,0);X.lineTo(r*.2,r*.2);X.lineTo(0,r);X.lineTo(-r*.2,r*.2);X.lineTo(-r,0);X.lineTo(-r*.2,-r*.2);X.closePath();X.fill();X.restore()}}}})}
  for(const n of Object.values(M.npc))list.push({y:n.y,d(){drawWalker(X,n,cx,cy);if(n===nextTarget())marker(n.x-cx,n.y-n.h-26-cy)}});
- list.push({y:M.truck.y,d(){const im=img.truck_side,w=im.width*1.2,h=im.height*1.2;X.drawImage(im,M.truck.x-w/2-cx,M.truck.y-h+24-cy,w,h)}});
+ list.push({y:M.truck.y,d(){const im=img.truck_side,w=im.width*1.2,h=im.height*1.2;const flat=!save.flags.q2&&!M.spots;if(flat){X.save();X.translate(M.truck.x-w*.3-cx,M.truck.y+24-cy);X.rotate(.07);X.drawImage(im,-w*.2,-h,w,h);X.fillStyle='#2b2420';X.beginPath();X.ellipse(w*.657,-4,w*.088,5,0,0,7);X.fill();X.restore()}else X.drawImage(im,M.truck.x-w/2-cx,M.truck.y-h+24-cy,w,h)}});
  if(M.barrel){M.barrel.r+=M.vx*.002;const b=img.o_barrel,w=OW.barrel*.8,h=w*b.height/b.width,px=M.p.x+(M.p.dir.slice(-1)==='l'?-58:58),py=M.p.y+10;list.push({y:py,d(){X.save();X.translate(px-cx,py-h/2-cy);X.rotate(M.barrel.r);X.drawImage(b,-w/2,-h/2,w,h);X.restore()}})}
  list.push({y:M.p.y,d(){drawWalker(X,M.p,cx,cy)}});
  list.sort((a,b)=>a.y-b.y);for(const l of list)l.d();
@@ -527,7 +527,7 @@ async function eHide(){if(!save.flags.hid)return;S.mode='map';setView(true);star
  {k:'barrel',x:3020,y:1610,r:125,label:'دحرج البرميل',cond:()=>got.tarp&&got.rope,fn(){got.carry=1;M.slow=true;M.barrel={r:0};M.pick=M.pick.filter(p=>p.id!=='barrel');A.play('fx_assemble',.7);M.spots=M.spots.filter(s=>s.k!=='barrel');task()}},
  {k:'shed',x:760,y:1500,r:180,label:'نزّله في المظلة',cond:()=>got.carry,fn(){done=true;A.play('fx_assemble');res&&res()}},
  {k:'pump',x:1560,y:1290,r:150,label:'طفّ المضخة',fn(){useDelay('pump','الخواجة وقف يسأل وش صار')}},
- {k:'nas',x:2190,y:2120,r:150,label:'خل ناصر يقطع الطريق',fn(){useDelay('nas','ناصر: يا مرحبا مستر! الشاحنة تعطلت. ثواني بس!')}},
+ {k:'nas',x:2190,y:2060,r:150,label:'خل ناصر يقطع الطريق',fn(){useDelay('nas','ناصر: يا مرحبا مستر! الشاحنة تعطلت. ثواني بس!')}},
  {k:'ham',x:2660,y:1620,r:140,label:f.mubarakLeft?'خل حمدان يسأله':'خل مبارك يسأله',fn(){useDelay('ham','سؤال عن العقد عطّله شوي')}}];
  M.pick.push({id:'tarp',k:'i_tarp',x:3280,y:1300,s:.24,name:''},{id:'rope',k:'i_rope',x:1240,y:1560,s:.24,name:''},{id:'barrel',k:'q_barrel',x:3020,y:1610,s:.42,name:''});
  M.customTask=task;task();toast('اتبع العلامة الصفراء');
@@ -585,7 +585,7 @@ async function eWeeks(){const f=save.flags;S.mode='none';S.fade=1;A.music('music
   f.nq++;A.play('fx_paper',.5);store.put();task();
   if(f.nq===1)await say('nasser','happy','هذي علامة أبوي! فيه سهم ثاني محفور عليها، يودي أبعد.');
   else{await say('nasser','happy','شف! الميناء من ورا الكثبان. كذا نختصر ثلث الطريق.');f.oldRoad=1;rm('nq');store.put();task();A.play('fx_trophy');trophy('إنجاز: الطريق القديم','آخر حمولة صارت أقصر')}});
- if(!f.oldRoad)M.spots.push({k:'nq',opt:1,x:2190,y:2120,r:140,label:'كلّم ناصر عن الطريق',fn:roadQuest});
+ if(!f.oldRoad)M.spots.push({k:'nq',opt:1,x:2190,y:2060,r:140,label:'كلّم ناصر عن الطريق',fn:roadQuest});
  const sec2=meta.secrets2||{};for(const k of ['receipts','notebook'])if(sec2[k]&&save.flags['s2'+k]){rm(k)}
  for(const[a,x,y]of[['antenna',1050,880],['speaker',2380,880],['knob',3480,1780]])if(!f.wkGot[a])part(a,x,y);
  if(f.wkMain){const mf=M.spots.find(s=>s.k==='mun');rm('mun');task();if(!f.muniraQ)M.spots.push({k:'mun2',opt:1,x:3260,y:1330,r:150,label:'منيرة تناديك',fn(){rm('mun2');startMunira()}});M.spots.push({k:'go',x:2300,y:2260,r:220,label:'ابدأ آخر حمولة',fn(){talk(async()=>{res()})}});toast('لما تجهز، روح لشاحنة ناصر')}else{task();toast('كلّم منيرة عند الخزان')}
