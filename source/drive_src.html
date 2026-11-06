@@ -31,7 +31,7 @@ const T={x:220,v:0,y:0,a:0,spin:0};let state='ready',t=0,barrels=[],debris=[],lo
 function place(){const yr=ground(T.x-WB),yf=ground(T.x+WB);T.y=(yr+yf)/2-R;T.a=Math.atan2(yf-yr,WB*2)}
 function reset(){$('#retry').hidden=true;$('#say').style.opacity=0;T.x=220;T.v=0;T.spin=0;place();barrels=[0,1,2,3,4,5].map(i=>({u:-141+i*24.5,h:0,vh:0,on:true}));debris=[];lost=0;streak=0;warn=0;clean=0;total=0;t=0;camX=T.x-W*.2;dust=[];for(const b of BUMPS)b.done=false;window.__half=window.__near=0;state='ready';sand=Array.from({length:70},()=>({x:Math.random()*W,y:Math.random()*H,v:700+Math.random()*700,l:40+Math.random()*90}))}
 const B=$('#brk'),setB=v=>{brake=v;B.classList.toggle('on',v)};
-addEventListener('pointerdown',e=>{if(state==='run'&&!e.target.closest('button'))setB(true)});addEventListener('pointerup',()=>setB(false));addEventListener('pointercancel',()=>setB(false));
+addEventListener('pointerdown',e=>{if(state==='run'&&!e.target.closest('#retry,#again,#go'))setB(true)});addEventListener('pointerup',()=>setB(false));addEventListener('pointercancel',()=>setB(false));
 addEventListener('keydown',e=>{if(['Space','ArrowLeft','KeyA'].includes(e.code))setB(true)});addEventListener('keyup',e=>{if(['Space','ArrowLeft','KeyA'].includes(e.code))setB(false)});
 function say(s,ms=1500){const e=$('#say');e.textContent=s;e.style.opacity=1;clearTimeout(say.t);say.t=setTimeout(()=>e.style.opacity=0,ms)}
 const FALL=['ناصر: هذا واحد طاح من حسابك.','ناصر: هدّي عند المطب!','ناصر: كذا بنوصل بشاحنة فاضية!','ناصر: يا ولد، الفرامل وين؟','ناصر: الله يعوضنا.','ناصر: رجعنا فاضيين.'];
