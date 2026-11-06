@@ -283,11 +283,11 @@ function buildMap(){M.objs=[];M.pick=[];M.npc={};
  {id:'s1',k:'s_s1',x:1050,y:880,s:.3,name:'خردة'},{id:'s2',k:'s_s2',x:1580,y:1720,s:.3,name:'خردة'},{id:'s3',k:'s_s3',x:2380,y:880,s:.3,name:'خردة'},{id:'s4',k:'s_s4',x:2750,y:1950,s:.3,name:'خردة'},{id:'s5',k:'s_s5',x:3480,y:1780,s:.3,name:'خردة'},{id:'s6',k:'s_s6',x:480,y:1800,s:.3,name:'خردة'}];
  for(const i of items)if(!save.flags['got_'+i.id])M.pick.push(i);
  if(save.flags.q2on&&!save.flags.got_tire)M.pick.push(TIRE);
- M.p={name:'hero',x:save.flags.px||2700,y:save.flags.py||1720,h:112,dir:'b',step:0,moving:false,dist:0};
+ M.p={name:'hero',x:save.flags.px||2700,y:save.flags.py||1720,h:110,dir:'b',step:0,moving:false,dist:0};
  M.truck={x:2430,y:2190};
- M.npc.hamdan={name:'hamdan',x:2660,y:1620,h:108,dir:'f',step:0};
+ M.npc.hamdan={name:'hamdan',x:2660,y:1620,h:110,dir:'f',step:0};
  M.npc.mubarak={name:'mubarak',x:1560,y:1290,h:110,dir:'r',step:0};
- M.npc.nasser={name:'nasser',x:2190,y:2120,h:106,dir:'l',step:0};
+ M.npc.nasser={name:'nasser',x:2190,y:2120,h:110,dir:'l',step:0};
  M.truck={x:2430,y:2190};
  M.colNpc=()=>Object.values(M.npc);
 }
@@ -337,7 +337,8 @@ function renderTasks(){if(M.customTask){M.customTask();return}const g=stage(),T=
  let h='<b>شغّل المضخة</b>';if(!g.met)h+=line('كلّم مبارك عند المضخة');else{h+=line(`لقّط القطع من الموقع ${g.mp}/3`,g.mp>=3);h+=line(`اجمع الخردة ${g.sc}/6`,g.sc>=6);h+=line('بدّل الخردة عند ناصر',g.sold);if(g.mp>=3&&g.sold)h+=line('ارجع لمبارك وركّب')}
  const f=save.flags;if(f.q1on||f.q2on){h+='<b>جانبية</b>';if(f.q1on)h+=line('صلّح وصلة الخزان',f.q1);if(f.q2on)h+=line(f.got_tire?'ركّب الكفر لناصر':'دوّر الكفر الاحتياطي لناصر',f.q2)}h+=`<div style="opacity:.8">أسرار ${SECRETS.filter(s=>f['sec_'+s.id]).length}/${SECRETS.length}</div>`;T.innerHTML=h;
  $('#stat').textContent='باقي على العقد: 6 أشهر'}
-async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;await fn();M.lock=!!M.leaving;renderTasks();store.put()}
+function faceTalk(){if(S.mode!=='map'||!M.npc||!M.p)return null;let n=null,bd=260;for(const q of Object.values(M.npc)){const d=Math.hypot(q.x-M.p.x,q.y-M.p.y);if(d<bd){bd=d;n=q}}if(!n)return null;const old=n.dir;M.p.moving=false;M.p.dir=n.x>=M.p.x?'r':'l';n.dir=n.x>=M.p.x?'l':'r';return()=>{n.dir=old}}
+async function talk(fn){M.lock=true;M.stick=null;$('#act').hidden=true;const un=faceTalk();await fn();if(un)un();M.lock=!!M.leaving;renderTasks();store.put()}
 function pickOn(i){return M.spots||save.flags.metMubarak||i===TIRE}
 function takeItem(i){M.pick=M.pick.filter(x=>x!==i);save.flags['got_'+i.id]=1;A.play('fx_pickup',.9);toast('حصلت: '+i.name);renderTasks();store.put()}
 function talkHamdan(){talk(async()=>{const g=stage(),f=save.flags;
