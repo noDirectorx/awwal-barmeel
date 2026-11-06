@@ -256,7 +256,8 @@ const TS=192,MW=20*TS,MH=13*TS;
 const M={objs:[],pick:[],npc:{},p:null,cam:{x:0,y:0},tiles:null,act:null,stick:null,vx:0,vy:0};
 const OBJ_SCALE={office:1.55,tanks:1.5,pump:1.75,shed:1.5,fence:1.42,gate:1.42,barrel:.8,barrels:.85,crate:.85,pipes:.9,marker:.85,rock:1.05,pebble:.9,shrub:.9,scrappile:1.05};
 const FOOT={office:[.92,.3],tanks:[.9,.22],pump:[.9,.25],shed:[.0,.0],fence:[1,.12],gate:[1,.12],barrel:[.8,.25],barrels:[.85,.25],crate:[.85,.3],pipes:[.85,.3],marker:[.8,.3],rock:[.85,.3],pebble:[0,0],shrub:[0,0],scrappile:[.8,.3]};
-function place(n,x,y){const im=img['o_'+n],s=OBJ_SCALE[n];const o={n,x,y,im,w:im.width*s,h:im.height*s};const [fw,fh]=FOOT[n];o.col=fw?{x:x-o.w*fw/2,y:y-o.h*fh,w:o.w*fw,h:o.h*fh}:null;M.objs.push(o);return o}
+const OW={"office":268,"tanks":210,"pump":327,"shed":287,"fence":218,"gate":235,"barrel":79,"barrels":146,"crate":126,"pipes":175,"marker":141,"rock":152,"pebble":77,"shrub":108,"scrappile":184};
+function place(n,x,y){const im=img['o_'+n],s=OBJ_SCALE[n],w=OW[n]*s;const o={n,x,y,im,w,h:w*im.height/im.width};const [fw,fh]=FOOT[n];o.col=fw?{x:x-o.w*fw/2,y:y-o.h*fh,w:o.w*fw,h:o.h*fh}:null;M.objs.push(o);return o}
 function buildMap(){M.objs=[];M.pick=[];M.npc={};
  const t=document.createElement('canvas');t.width=MW/2;t.height=MH/2;const c=t.getContext('2d');c.scale(.5,.5);
  const R={};

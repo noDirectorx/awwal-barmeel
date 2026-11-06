@@ -209,6 +209,13 @@ row9('hero','39142331',True,6,'wd_')  # diagonals: down-right x3, up-right x3
 for _n,_i in dict(hamdan='28b1ab26',mubarak='f53cb616',munira='c299997e',old='ea678c10',salem='48e387fa',young='2cbaf024',oldnh='f609b1b3').items():row9(_n,_i)
 # منيرة أقصر 5%: حشوة شفافة فوق
 _m=Image.open(OUT+'w_munira.webp');_c=meta['w_munira_cell'];_p=round(_c[1]*.053);_n=Image.new('RGBA',(_m.width,_m.height+_p),(0,0,0,0));_n.paste(_m,(0,_p));save('w_munira',_n,q=90);meta['w_munira_cell']=(_c[0],_c[1]+_p)
+
+# أشياء الخريطة بدقة عالية: تُصغّر لـ2.2 ضعف حجم عرضها
+OW={"office": 268, "tanks": 210, "pump": 327, "shed": 287, "fence": 218, "gate": 235, "barrel": 79, "barrels": 146, "crate": 126, "pipes": 175, "marker": 141, "rock": 152, "pebble": 77, "shrub": 108, "scrappile": 184};OSC={"office": 1.55, "tanks": 1.5, "pump": 1.75, "shed": 1.5, "fence": 1.42, "gate": 1.42, "barrel": 0.8, "barrels": 0.85, "crate": 0.85, "pipes": 0.9, "marker": 0.85, "rock": 1.05, "pebble": 0.9, "shrub": 0.9, "scrappile": 1.05}
+def hdobj(name,i):
+    w=L(i);m2,lab2=key(w,4000);w=despill(w,m2);bx=bboxes(m2,lab2);x0=min(b[0] for b in bx);y0=min(b[1] for b in bx);x1=max(b[2] for b in bx);y1=max(b[3] for b in bx)
+    im=crop(w,m2,(x0,y0,x1,y1));tw=round(OW[name]*OSC[name]*2.2);im=im.resize((tw,round(im.height*tw/im.width)),Image.LANCZOS);save('o_'+name,im,q=92)
+for _n,_i in dict(barrel='d7f63844',barrels='3c4cde3e',crate='cd7ce873',fence='8a3847bd',marker='31247836').items():hdobj(_n,_i)
 json.dump(meta,open('meta.json','w'))
 print(len(meta),sum(os.path.getsize(OUT+f) for f in os.listdir(OUT))//1024,'KB')
 # review sheets
